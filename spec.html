@@ -7627,7 +7627,7 @@
       <p>The abstract operation FunctionInitialize requires the arguments: a function object _F_, _kind_ which is one of (Normal, Method, Arrow), a parameter list Parse Node specified by _ParameterList_, a body Parse Node specified by _Body_, a Lexical Environment specified by _Scope_. FunctionInitialize performs the following steps:</p>
       <emu-alg>
         1. Assert: _F_ is an extensible object that does not have a `length` own property.
-        1. Let _len_ be the ExpectedArgumentCount of _ParameterList_.
+        1. Let _len_ be _ParameterList_.ExpectedArgumentCount().
         1. Perform ! DefinePropertyOrThrow(_F_, `"length"`, PropertyDescriptor{[[Value]]: _len_, [[Writable]]: *false*, [[Enumerable]]: *false*, [[Configurable]]: *true*}).
         1. Let _Strict_ be _F_.[[Strict]].
         1. Set _F_.[[Environment]] to _Scope_.
@@ -7779,11 +7779,11 @@
         1. Let _formals_ be _func_.[[FormalParameters]].
         1. Let _parameterNames_ be _formals_.BoundNames().
         1. If _parameterNames_ has any duplicate entries, let _hasDuplicates_ be *true*. Otherwise, let _hasDuplicates_ be *false*.
-        1. Let _simpleParameterList_ be IsSimpleParameterList of _formals_.
-        1. Let _hasParameterExpressions_ be ContainsExpression of _formals_.
-        1. Let _varNames_ be the VarDeclaredNames of _code_.
-        1. Let _varDeclarations_ be the VarScopedDeclarations of _code_.
-        1. Let _lexicalNames_ be the LexicallyDeclaredNames of _code_.
+        1. Let _simpleParameterList_ be _formals_.IsSimpleParameterList().
+        1. Let _hasParameterExpressions_ be _formals_.ContainsExpression().
+        1. Let _varNames_ be _code_.VarDeclaredNames().
+        1. Let _varDeclarations_ be _code_.VarScopedDeclarations().
+        1. Let _lexicalNames_ be _code_.LexicallyDeclaredNames().
         1. Let _functionNames_ be a new empty List.
         1. Let _functionsToInitialize_ be a new empty List.
         1. For each _d_ in _varDeclarations_, in reverse list order, do
@@ -7861,11 +7861,11 @@
         1. Else, let _lexEnv_ be _varEnv_.
         1. Let _lexEnvRec_ be _lexEnv_'s EnvironmentRecord.
         1. Set the LexicalEnvironment of _calleeContext_ to _lexEnv_.
-        1. Let _lexDeclarations_ be the LexicallyScopedDeclarations of _code_.
+        1. Let _lexDeclarations_ be _code_.LexicallyScopedDeclarations().
         1. For each element _d_ in _lexDeclarations_, do
           1. NOTE: A lexically declared name cannot be the same as a function/generator declaration, formal parameter, or a var name. Lexically declared names are only instantiated here but not initialized.
           1. For each element _dn_ of _d_.BoundNames(), do
-            1. If IsConstantDeclaration of _d_ is *true*, then
+            1. If _d_.IsConstantDeclaration() is *true*, then
               1. Perform ! _lexEnvRec_.CreateImmutableBinding(_dn_, *true*).
             1. Else,
               1. Perform ! _lexEnvRec_.CreateMutableBinding(_dn_, *false*).
@@ -11603,9 +11603,9 @@
         <emu-see-also-para op="HasName"></emu-see-also-para>
         <emu-grammar>PrimaryExpression : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
         <emu-alg>
-          1. Let _expr_ be CoveredParenthesizedExpression of |CoverParenthesizedExpressionAndArrowParameterList|.
-          1. If IsFunctionDefinition of _expr_ is *false*, return *false*.
-          1. Return HasName of _expr_.
+          1. Let _expr_ be |CoverParenthesizedExpressionAndArrowParameterList|.CoveredParenthesizedExpression().
+          1. If _expr_.IsFunctionDefinition() is *false*, return *false*.
+          1. Return _expr_.HasName().
         </emu-alg>
       </emu-clause>
 
@@ -11628,8 +11628,8 @@
         </emu-alg>
         <emu-grammar>PrimaryExpression : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
         <emu-alg>
-          1. Let _expr_ be CoveredParenthesizedExpression of |CoverParenthesizedExpressionAndArrowParameterList|.
-          1. Return IsFunctionDefinition of _expr_.
+          1. Let _expr_ be |CoverParenthesizedExpressionAndArrowParameterList|.CoveredParenthesizedExpression().
+          1. Return _expr_.IsFunctionDefinition().
         </emu-alg>
       </emu-clause>
 
@@ -11684,8 +11684,8 @@
         </emu-alg>
         <emu-grammar>PrimaryExpression : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
         <emu-alg>
-          1. Let _expr_ be CoveredParenthesizedExpression of |CoverParenthesizedExpressionAndArrowParameterList|.
-          1. Return IsValidSimpleAssignmentTarget of _expr_.
+          1. Let _expr_ be |CoverParenthesizedExpressionAndArrowParameterList|.CoveredParenthesizedExpression().
+          1. Return _expr_.IsValidSimpleAssignmentTarget().
         </emu-alg>
       </emu-clause>
     </emu-clause>
@@ -11782,7 +11782,7 @@
         </emu-alg>
         <emu-grammar>Elision : Elision `,`</emu-grammar>
         <emu-alg>
-          1. Let _preceding_ be the ElisionWidth of |Elision|.
+          1. Let _preceding_ be |Elision|.ElisionWidth().
           1. Return _preceding_+1.
         </emu-alg>
       </emu-clause>
@@ -11793,7 +11793,7 @@
         <p>With parameters _array_ and _nextIndex_.</p>
         <emu-grammar>ElementList : Elision? AssignmentExpression</emu-grammar>
         <emu-alg>
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
+          1. Let _padding_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
           1. Let _initResult_ be |AssignmentExpression|.Evaluate().
           1. Let _initValue_ be ? GetValue(_initResult_).
           1. Let _created_ be CreateDataProperty(_array_, ToString(ToUint32(_nextIndex_+_padding_)), _initValue_).
@@ -11802,14 +11802,14 @@
         </emu-alg>
         <emu-grammar>ElementList : Elision? SpreadElement</emu-grammar>
         <emu-alg>
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
+          1. Let _padding_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
           1. Return the result of performing ArrayAccumulation for |SpreadElement| with arguments _array_ and _nextIndex_+_padding_.
         </emu-alg>
         <emu-grammar>ElementList : ElementList `,` Elision? AssignmentExpression</emu-grammar>
         <emu-alg>
           1. Let _postIndex_ be the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and _nextIndex_.
           1. ReturnIfAbrupt(_postIndex_).
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
+          1. Let _padding_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
           1. Let _initResult_ be |AssignmentExpression|.Evaluate().
           1. Let _initValue_ be ? GetValue(_initResult_).
           1. Let _created_ be CreateDataProperty(_array_, ToString(ToUint32(_postIndex_+_padding_)), _initValue_).
@@ -11820,7 +11820,7 @@
         <emu-alg>
           1. Let _postIndex_ be the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and _nextIndex_.
           1. ReturnIfAbrupt(_postIndex_).
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
+          1. Let _padding_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
           1. Return the result of performing ArrayAccumulation for |SpreadElement| with arguments _array_ and _postIndex_+_padding_.
         </emu-alg>
         <emu-grammar>SpreadElement : `...` AssignmentExpression</emu-grammar>
@@ -11847,7 +11847,7 @@
         <emu-grammar>ArrayLiteral : `[` Elision? `]`</emu-grammar>
         <emu-alg>
           1. Let _array_ be ! ArrayCreate(0).
-          1. Let _pad_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
+          1. Let _pad_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
           1. Perform Set(_array_, `"length"`, ToUint32(_pad_), *false*).
           1. NOTE: The above Set cannot fail because of the nature of the object returned by ArrayCreate.
           1. Return _array_.
@@ -11866,7 +11866,7 @@
           1. Let _array_ be ! ArrayCreate(0).
           1. Let _len_ be the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and 0.
           1. ReturnIfAbrupt(_len_).
-          1. Let _padding_ be the ElisionWidth of |Elision|; if |Elision| is not present, use the numeric value zero.
+          1. Let _padding_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
           1. Perform Set(_array_, `"length"`, ToUint32(_padding_+_len_), *false*).
           1. NOTE: The above Set cannot fail because of the nature of the object returned by ArrayCreate.
           1. Return _array_.
@@ -12006,7 +12006,7 @@
         </emu-alg>
         <emu-grammar>PropertyDefinition : PropertyName `:` AssignmentExpression</emu-grammar>
         <emu-alg>
-          1. Return PropName of |PropertyName|.
+          1. Return |PropertyName|.PropName().
         </emu-alg>
         <emu-grammar>LiteralPropertyName : IdentifierName</emu-grammar>
         <emu-alg>
@@ -12032,14 +12032,14 @@
         <h1>Static Semantics: PropertyNameList</h1>
         <emu-grammar>PropertyDefinitionList : PropertyDefinition</emu-grammar>
         <emu-alg>
-          1. If PropName of |PropertyDefinition| is ~empty~, return a new empty List.
-          1. Return a new List containing PropName of |PropertyDefinition|.
+          1. If |PropertyDefinition|.PropName() is ~empty~, return a new empty List.
+          1. Return a new List containing |PropertyDefinition|.PropName().
         </emu-alg>
         <emu-grammar>PropertyDefinitionList : PropertyDefinitionList `,` PropertyDefinition</emu-grammar>
         <emu-alg>
-          1. Let _list_ be PropertyNameList of |PropertyDefinitionList|.
-          1. If PropName of |PropertyDefinition| is ~empty~, return _list_.
-          1. Append PropName of |PropertyDefinition| to the end of _list_.
+          1. Let _list_ be |PropertyDefinitionList|.PropertyNameList().
+          1. If |PropertyDefinition|.PropName() is ~empty~, return _list_.
+          1. Append |PropertyDefinition|.PropName() to the end of _list_.
           1. Return _list_.
         </emu-alg>
       </emu-clause>
@@ -12306,7 +12306,7 @@
           1. Let _siteObj_ be GetTemplateObject(_templateLiteral_).
           1. Let _firstSubRef_ be |Expression|.Evaluate().
           1. Let _firstSub_ be ? GetValue(_firstSubRef_).
-          1. Let _restSub_ be SubstitutionEvaluation of |TemplateSpans|.
+          1. Let _restSub_ be |TemplateSpans|.SubstitutionEvaluation().
           1. ReturnIfAbrupt(_restSub_).
           1. Assert: _restSub_ is a List.
           1. Return a List whose first element is _siteObj_, whose second elements is _firstSub_, and whose subsequent elements are the elements of _restSub_, in order. _restSub_ may contain no elements.
@@ -12363,7 +12363,7 @@
         </emu-alg>
         <emu-grammar>TemplateSpans : TemplateMiddleList TemplateTail</emu-grammar>
         <emu-alg>
-          1. Return the result of SubstitutionEvaluation of |TemplateMiddleList|.
+          1. Return the result of |TemplateMiddleList|.SubstitutionEvaluation().
         </emu-alg>
         <emu-grammar>TemplateMiddleList : TemplateMiddle Expression</emu-grammar>
         <emu-alg>
@@ -12373,7 +12373,7 @@
         </emu-alg>
         <emu-grammar>TemplateMiddleList : TemplateMiddleList TemplateMiddle Expression</emu-grammar>
         <emu-alg>
-          1. Let _preceding_ be the result of SubstitutionEvaluation of |TemplateMiddleList|.
+          1. Let _preceding_ be the result of |TemplateMiddleList|.SubstitutionEvaluation().
           1. ReturnIfAbrupt(_preceding_).
           1. Let _nextRef_ be |Expression|.Evaluate().
           1. Let _next_ be ? GetValue(_nextRef_).
@@ -12454,7 +12454,7 @@
             It is a Syntax Error if |CoverParenthesizedExpressionAndArrowParameterList| is not covering a |ParenthesizedExpression|.
           </li>
           <li>
-            All Early Error rules for |ParenthesizedExpression| and its derived productions also apply to CoveredParenthesizedExpression of |CoverParenthesizedExpressionAndArrowParameterList|.
+            All Early Error rules for |ParenthesizedExpression| and its derived productions also apply to |CoverParenthesizedExpressionAndArrowParameterList|.CoveredParenthesizedExpression().
           </li>
         </ul>
       </emu-clause>
@@ -12465,7 +12465,7 @@
         <emu-see-also-para op="IsFunctionDefinition"></emu-see-also-para>
         <emu-grammar>ParenthesizedExpression : `(` Expression `)`</emu-grammar>
         <emu-alg>
-          1. Return IsFunctionDefinition of |Expression|.
+          1. Return |Expression|.IsFunctionDefinition().
         </emu-alg>
       </emu-clause>
 
@@ -12475,7 +12475,7 @@
         <emu-see-also-para op="IsValidSimpleAssignmentTarget"></emu-see-also-para>
         <emu-grammar>ParenthesizedExpression : `(` Expression `)`</emu-grammar>
         <emu-alg>
-          1. Return IsValidSimpleAssignmentTarget of |Expression|.
+          1. Return |Expression|.IsValidSimpleAssignmentTarget().
         </emu-alg>
       </emu-clause>
 
@@ -12484,7 +12484,7 @@
         <h1>Runtime Semantics: Evaluate</h1>
         <emu-grammar>PrimaryExpression : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
         <emu-alg>
-          1. Let _expr_ be CoveredParenthesizedExpression of |CoverParenthesizedExpressionAndArrowParameterList|.
+          1. Let _expr_ be |CoverParenthesizedExpressionAndArrowParameterList|.CoveredParenthesizedExpression().
           1. Return _expr_.Evaluate().
         </emu-alg>
         <emu-grammar>ParenthesizedExpression : `(` Expression `)`</emu-grammar>
@@ -12809,7 +12809,7 @@
             1. Let _constructor_ be ? GetValue(_ref_).
             1. If _arguments_ is ~empty~, let _argList_ be a new empty List.
             1. Else,
-              1. Let _argList_ be ArgumentListEvaluation of _arguments_.
+              1. Let _argList_ be _arguments_.ArgumentListEvaluation().
               1. ReturnIfAbrupt(_argList_).
             1. If IsConstructor(_constructor_) is *false*, throw a *TypeError* exception.
             1. Return ? Construct(_constructor_, _argList_).
@@ -12827,14 +12827,14 @@
         <h1>Runtime Semantics: Evaluate</h1>
         <emu-grammar>CallExpression : CoverCallExpressionAndAsyncArrowHead</emu-grammar>
         <emu-alg>
-          1. Let _expr_ be CoveredCallExpression of |CoverCallExpressionAndAsyncArrowHead|.
+          1. Let _expr_ be |CoverCallExpressionAndAsyncArrowHead|.CoveredCallExpression().
           1. Let _memberExpr_ be the |MemberExpression| of _expr_.
           1. Let _arguments_ be the |Arguments| of _expr_.
           1. Let _ref_ be _memberExpr_.Evaluate().
           1. Let _func_ be ? GetValue(_ref_).
           1. If Type(_ref_) is Reference and IsPropertyReference(_ref_) is *false* and GetReferencedName(_ref_) is `"eval"`, then
             1. If SameValue(_func_, %eval%) is *true*, then
-              1. Let _argList_ be ? ArgumentListEvaluation of _arguments_.
+              1. Let _argList_ be ? _arguments_.ArgumentListEvaluation().
               1. If _argList_ has no elements, return *undefined*.
               1. Let _evalText_ be the first element of _argList_.
               1. If the source code matching this |CallExpression| is strict mode code, let _strictCaller_ be *true*. Otherwise let _strictCaller_ be *false*.
@@ -12869,7 +12869,7 @@
               1. Let _thisValue_ be _refEnv_.WithBaseObject().
           1. Else Type(_ref_) is not Reference,
             1. Let _thisValue_ be *undefined*.
-          1. Let _argList_ be ArgumentListEvaluation of _arguments_.
+          1. Let _argList_ be _arguments_.ArgumentListEvaluation().
           1. ReturnIfAbrupt(_argList_).
           1. If Type(_func_) is not Object, throw a *TypeError* exception.
           1. If IsCallable(_func_) is *false*, throw a *TypeError* exception.
@@ -12908,7 +12908,7 @@
           1. Let _newTarget_ be GetNewTarget().
           1. Assert: Type(_newTarget_) is Object.
           1. Let _func_ be ? GetSuperConstructor().
-          1. Let _argList_ be ArgumentListEvaluation of |Arguments|.
+          1. Let _argList_ be |Arguments|.ArgumentListEvaluation().
           1. ReturnIfAbrupt(_argList_).
           1. Let _result_ be ? Construct(_func_, _argList_, _newTarget_).
           1. Let _thisER_ be GetThisEnvironment( ).
@@ -12981,7 +12981,7 @@
         </emu-alg>
         <emu-grammar>ArgumentList : ArgumentList `,` AssignmentExpression</emu-grammar>
         <emu-alg>
-          1. Let _precedingArgs_ be ArgumentListEvaluation of |ArgumentList|.
+          1. Let _precedingArgs_ be |ArgumentList|.ArgumentListEvaluation().
           1. ReturnIfAbrupt(_precedingArgs_).
           1. Let _ref_ be |AssignmentExpression|.Evaluate().
           1. Let _arg_ be ? GetValue(_ref_).
@@ -12990,7 +12990,7 @@
         </emu-alg>
         <emu-grammar>ArgumentList : ArgumentList `,` `...` AssignmentExpression</emu-grammar>
         <emu-alg>
-          1. Let _precedingArgs_ be ArgumentListEvaluation of |ArgumentList|.
+          1. Let _precedingArgs_ be |ArgumentList|.ArgumentListEvaluation().
           1. ReturnIfAbrupt(_precedingArgs_).
           1. Let _spreadRef_ be |AssignmentExpression|.Evaluate().
           1. Let _iteratorRecord_ be ? GetIterator(? GetValue(_spreadRef_)).
@@ -14520,7 +14520,7 @@
           1. ReturnIfAbrupt(_lref_).
           1. Let _rref_ be |AssignmentExpression|.Evaluate().
           1. Let _rval_ be ? GetValue(_rref_).
-          1. If IsAnonymousFunctionDefinition(|AssignmentExpression|) and IsIdentifierRef of |LeftHandSideExpression| are both *true*, then
+          1. If IsAnonymousFunctionDefinition(|AssignmentExpression|) and |LeftHandSideExpression|.IsIdentifierRef() are both *true*, then
             1. Let _hasNameProperty_ be ? HasOwnProperty(_rval_, `"name"`).
             1. If _hasNameProperty_ is *false*, perform SetFunctionName(_rval_, GetReferencedName(_lref_)).
           1. Perform ? PutValue(_lref_, _rval_).
@@ -14818,7 +14818,7 @@
           1. If |DestructuringAssignmentTarget| is an |ObjectLiteral| or an |ArrayLiteral|, then
             1. Let _nestedAssignmentPattern_ be the |AssignmentPattern| that is covered by |DestructuringAssignmentTarget|.
             1. Return the result of performing DestructuringAssignmentEvaluation of _nestedAssignmentPattern_ with _v_ as the argument.
-          1. If |Initializer| is present and _value_ is *undefined* and IsAnonymousFunctionDefinition(|Initializer|) and IsIdentifierRef of |DestructuringAssignmentTarget| are both *true*, then
+          1. If |Initializer| is present and _value_ is *undefined* and IsAnonymousFunctionDefinition(|Initializer|) and |DestructuringAssignmentTarget|.IsIdentifierRef() are both *true*, then
             1. Let _hasNameProperty_ be ? HasOwnProperty(_v_, `"name"`).
             1. If _hasNameProperty_ is *false*, perform SetFunctionName(_v_, GetReferencedName(_lref_)).
           1. Return ? PutValue(_lref_, _v_).
@@ -14869,7 +14869,7 @@
           1. If |DestructuringAssignmentTarget| is an |ObjectLiteral| or an |ArrayLiteral|, then
             1. Let _assignmentPattern_ be the |AssignmentPattern| that is covered by |DestructuringAssignmentTarget|.
             1. Return the result of performing DestructuringAssignmentEvaluation of _assignmentPattern_ with _rhsValue_ as the argument.
-          1. If |Initializer| is present and _v_ is *undefined* and IsAnonymousFunctionDefinition(|Initializer|) and IsIdentifierRef of |DestructuringAssignmentTarget| are both *true*, then
+          1. If |Initializer| is present and _v_ is *undefined* and IsAnonymousFunctionDefinition(|Initializer|) and |DestructuringAssignmentTarget|.IsIdentifierRef() are both *true*, then
             1. Let _hasNameProperty_ be ? HasOwnProperty(_rhsValue_, `"name"`).
             1. If _hasNameProperty_ is *false*, perform SetFunctionName(_rhsValue_, GetReferencedName(_lref_)).
           1. Return ? PutValue(_lref_, _rhsValue_).
@@ -15187,7 +15187,7 @@
           It is a Syntax Error if the LexicallyDeclaredNames of |StatementList| contains any duplicate entries.
         </li>
         <li>
-          It is a Syntax Error if any element of the LexicallyDeclaredNames of |StatementList| also occurs in the VarDeclaredNames of |StatementList|.
+          It is a Syntax Error if any element of the LexicallyDeclaredNames of |StatementList| also occurs in |StatementList|.VarDeclaredNames().
         </li>
       </ul>
     </emu-clause>
@@ -15265,13 +15265,13 @@
       </emu-alg>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _names_ be LexicallyDeclaredNames of |StatementList|.
-        1. Append to _names_ the elements of the LexicallyDeclaredNames of |StatementListItem|.
+        1. Let _names_ be |StatementList|.LexicallyDeclaredNames().
+        1. Append to _names_ the elements of |StatementListItem|.LexicallyDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>StatementListItem : Statement</emu-grammar>
       <emu-alg>
-        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return LexicallyDeclaredNames of |LabelledStatement|.
+        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return |LabelledStatement|.LexicallyDeclaredNames().
         1. Return a new empty List.
       </emu-alg>
       <emu-grammar>StatementListItem : Declaration</emu-grammar>
@@ -15286,18 +15286,18 @@
       <emu-see-also-para op="LexicallyScopedDeclarations"></emu-see-also-para>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be LexicallyScopedDeclarations of |StatementList|.
-        1. Append to _declarations_ the elements of the LexicallyScopedDeclarations of |StatementListItem|.
+        1. Let _declarations_ be |StatementList|.LexicallyScopedDeclarations().
+        1. Append to _declarations_ the elements of |StatementListItem|.LexicallyScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>StatementListItem : Statement</emu-grammar>
       <emu-alg>
-        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return LexicallyScopedDeclarations of |LabelledStatement|.
+        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return |LabelledStatement|.LexicallyScopedDeclarations().
         1. Return a new empty List.
       </emu-alg>
       <emu-grammar>StatementListItem : Declaration</emu-grammar>
       <emu-alg>
-        1. Return a new List containing DeclarationPart of |Declaration|.
+        1. Return a new List containing |Declaration|.DeclarationPart().
       </emu-alg>
     </emu-clause>
 
@@ -15307,8 +15307,8 @@
       <emu-see-also-para op="TopLevelLexicallyDeclaredNames"></emu-see-also-para>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _names_ be TopLevelLexicallyDeclaredNames of |StatementList|.
-        1. Append to _names_ the elements of the TopLevelLexicallyDeclaredNames of |StatementListItem|.
+        1. Let _names_ be |StatementList|.TopLevelLexicallyDeclaredNames().
+        1. Append to _names_ the elements of |StatementListItem|.TopLevelLexicallyDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>StatementListItem : Statement</emu-grammar>
@@ -15336,8 +15336,8 @@
       </emu-alg>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be TopLevelLexicallyScopedDeclarations of |StatementList|.
-        1. Append to _declarations_ the elements of the TopLevelLexicallyScopedDeclarations of |StatementListItem|.
+        1. Let _declarations_ be |StatementList|.TopLevelLexicallyScopedDeclarations().
+        1. Append to _declarations_ the elements of |StatementListItem|.TopLevelLexicallyScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>StatementListItem : Statement</emu-grammar>
@@ -15362,8 +15362,8 @@
       </emu-alg>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _names_ be TopLevelVarDeclaredNames of |StatementList|.
-        1. Append to _names_ the elements of the TopLevelVarDeclaredNames of |StatementListItem|.
+        1. Let _names_ be |StatementList|.TopLevelVarDeclaredNames().
+        1. Append to _names_ the elements of |StatementListItem|.TopLevelVarDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>StatementListItem : Declaration</emu-grammar>
@@ -15374,8 +15374,8 @@
       </emu-alg>
       <emu-grammar>StatementListItem : Statement</emu-grammar>
       <emu-alg>
-        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return TopLevelVarDeclaredNames of |Statement|.
-        1. Return VarDeclaredNames of |Statement|.
+        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return |Statement|.TopLevelVarDeclaredNames().
+        1. Return |Statement|.VarDeclaredNames().
       </emu-alg>
       <emu-note>
         <p>At the top level of a function or script, inner function declarations are treated like var declarations.</p>
@@ -15392,19 +15392,19 @@
       </emu-alg>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be TopLevelVarScopedDeclarations of |StatementList|.
-        1. Append to _declarations_ the elements of the TopLevelVarScopedDeclarations of |StatementListItem|.
+        1. Let _declarations_ be |StatementList|.TopLevelVarScopedDeclarations().
+        1. Append to _declarations_ the elements of |StatementListItem|.TopLevelVarScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>StatementListItem : Statement</emu-grammar>
       <emu-alg>
-        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return TopLevelVarScopedDeclarations of |Statement|.
-        1. Return VarScopedDeclarations of |Statement|.
+        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return |Statement|.TopLevelVarScopedDeclarations().
+        1. Return |Statement|.VarScopedDeclarations().
       </emu-alg>
       <emu-grammar>StatementListItem : Declaration</emu-grammar>
       <emu-alg>
         1. If |Declaration| is <emu-grammar>Declaration : HoistableDeclaration</emu-grammar> , then
-          1. Let _declaration_ be DeclarationPart of |HoistableDeclaration|.
+          1. Let _declaration_ be |HoistableDeclaration|.DeclarationPart().
           1. Return &laquo; _declaration_ &raquo;.
         1. Return a new empty List.
       </emu-alg>
@@ -15420,8 +15420,8 @@
       </emu-alg>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _names_ be VarDeclaredNames of |StatementList|.
-        1. Append to _names_ the elements of the VarDeclaredNames of |StatementListItem|.
+        1. Let _names_ be |StatementList|.VarDeclaredNames().
+        1. Append to _names_ the elements of |StatementListItem|.VarDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>StatementListItem : Declaration</emu-grammar>
@@ -15440,8 +15440,8 @@
       </emu-alg>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be VarScopedDeclarations of |StatementList|.
-        1. Append to _declarations_ the elements of the VarScopedDeclarations of |StatementListItem|.
+        1. Let _declarations_ be |StatementList|.VarScopedDeclarations().
+        1. Append to _declarations_ the elements of |StatementListItem|.VarScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>StatementListItem : Declaration</emu-grammar>
@@ -15502,10 +15502,10 @@
       <emu-alg>
         1. Let _envRec_ be _env_'s EnvironmentRecord.
         1. Assert: _envRec_ is a declarative Environment Record.
-        1. Let _declarations_ be the LexicallyScopedDeclarations of _code_.
+        1. Let _declarations_ be _code_.LexicallyScopedDeclarations().
         1. For each element _d_ in _declarations_, do
           1. For each element _dn_ of _d_.BoundNames(), do
-            1. If IsConstantDeclaration of _d_ is *true*, then
+            1. If _d_.IsConstantDeclaration() is *true*, then
               1. Perform ! _envRec_.CreateImmutableBinding(_dn_, *true*).
             1. Else,
               1. Perform ! _envRec_.CreateMutableBinding(_dn_, *false*).
@@ -15594,7 +15594,7 @@
         <emu-see-also-para op="IsConstantDeclaration"></emu-see-also-para>
         <emu-grammar>LexicalDeclaration : LetOrConst BindingList `;`</emu-grammar>
         <emu-alg>
-          1. Return IsConstantDeclaration of |LetOrConst|.
+          1. Return |LetOrConst|.IsConstantDeclaration().
         </emu-alg>
         <emu-grammar>LetOrConst : `let`</emu-grammar>
         <emu-alg>
@@ -15709,7 +15709,7 @@
         </emu-alg>
         <emu-grammar>VariableDeclarationList : VariableDeclarationList `,` VariableDeclaration</emu-grammar>
         <emu-alg>
-          1. Let _declarations_ be VarScopedDeclarations of |VariableDeclarationList|.
+          1. Let _declarations_ be |VariableDeclarationList|.VarScopedDeclarations().
           1. Append |VariableDeclaration| to _declarations_.
           1. Return _declarations_.
         </emu-alg>
@@ -15876,39 +15876,39 @@
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` Elision? BindingRestElement `]`</emu-grammar>
         <emu-alg>
-          1. Return ContainsExpression of |BindingRestElement|.
+          1. Return |BindingRestElement|.ContainsExpression().
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` BindingElementList `,` Elision? `]`</emu-grammar>
         <emu-alg>
-          1. Return ContainsExpression of |BindingElementList|.
+          1. Return |BindingElementList|.ContainsExpression().
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` BindingElementList `,` Elision? BindingRestElement `]`</emu-grammar>
         <emu-alg>
-          1. Let _has_ be ContainsExpression of |BindingElementList|.
+          1. Let _has_ be |BindingElementList|.ContainsExpression().
           1. If _has_ is *true*, return *true*.
-          1. Return ContainsExpression of |BindingRestElement|.
+          1. Return |BindingRestElement|.ContainsExpression().
         </emu-alg>
         <emu-grammar>BindingPropertyList : BindingPropertyList `,` BindingProperty</emu-grammar>
         <emu-alg>
-          1. Let _has_ be ContainsExpression of |BindingPropertyList|.
+          1. Let _has_ be |BindingPropertyList|.ContainsExpression().
           1. If _has_ is *true*, return *true*.
-          1. Return ContainsExpression of |BindingProperty|.
+          1. Return |BindingProperty|.ContainsExpression().
         </emu-alg>
         <emu-grammar>BindingElementList : BindingElementList `,` BindingElisionElement</emu-grammar>
         <emu-alg>
-          1. Let _has_ be ContainsExpression of |BindingElementList|.
+          1. Let _has_ be |BindingElementList|.ContainsExpression().
           1. If _has_ is *true*, return *true*.
-          1. Return ContainsExpression of |BindingElisionElement|.
+          1. Return |BindingElisionElement|.ContainsExpression().
         </emu-alg>
         <emu-grammar>BindingElisionElement : Elision? BindingElement</emu-grammar>
         <emu-alg>
-          1. Return ContainsExpression of |BindingElement|.
+          1. Return |BindingElement|.ContainsExpression().
         </emu-alg>
         <emu-grammar>BindingProperty : PropertyName `:` BindingElement</emu-grammar>
         <emu-alg>
-          1. Let _has_ be IsComputedPropertyKey of |PropertyName|.
+          1. Let _has_ be |PropertyName|.IsComputedPropertyKey().
           1. If _has_ is *true*, return *true*.
-          1. Return ContainsExpression of |BindingElement|.
+          1. Return |BindingElement|.ContainsExpression().
         </emu-alg>
         <emu-grammar>BindingElement : BindingPattern Initializer</emu-grammar>
         <emu-alg>
@@ -15928,7 +15928,7 @@
         </emu-alg>
         <emu-grammar>BindingRestElement : `...` BindingPattern</emu-grammar>
         <emu-alg>
-          1. Return ContainsExpression of |BindingPattern|.
+          1. Return |BindingPattern|.ContainsExpression().
         </emu-alg>
       </emu-clause>
 
@@ -16059,7 +16059,7 @@
 
         <emu-grammar>BindingRestProperty : `...` BindingIdentifier</emu-grammar>
         <emu-alg>
-          1. Let _lhs_ be ? ResolveBinding(StringValue of |BindingIdentifier|, _environment_).
+          1. Let _lhs_ be ? ResolveBinding(|BindingIdentifier|.StringValue(), _environment_).
           1. Let _restObj_ be ObjectCreate(%ObjectPrototype%).
           1. Perform ? CopyDataProperties(_restObj_, _value_, _excludedNames_).
           1. If _environment_ is *undefined*, return PutValue(_lhs_, _restObj_).
@@ -16380,7 +16380,7 @@
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return the VarDeclaredNames of |Statement|.
+        1. Return |Statement|.VarDeclaredNames().
       </emu-alg>
     </emu-clause>
 
@@ -16396,7 +16396,7 @@
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return the VarScopedDeclarations of |Statement|.
+        1. Return |Statement|.VarScopedDeclarations().
       </emu-alg>
     </emu-clause>
 
@@ -16554,7 +16554,7 @@
         <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
         <emu-grammar>IterationStatement : `do` Statement `while` `(` Expression `)` `;`</emu-grammar>
         <emu-alg>
-          1. Return the VarDeclaredNames of |Statement|.
+          1. Return |Statement|.VarDeclaredNames().
         </emu-alg>
       </emu-clause>
 
@@ -16564,7 +16564,7 @@
         <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
         <emu-grammar>IterationStatement : `do` Statement `while` `(` Expression `)` `;`</emu-grammar>
         <emu-alg>
-          1. Return the VarScopedDeclarations of |Statement|.
+          1. Return |Statement|.VarScopedDeclarations().
         </emu-alg>
       </emu-clause>
 
@@ -16630,7 +16630,7 @@
         <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
         <emu-grammar>IterationStatement : `while` `(` Expression `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return the VarDeclaredNames of |Statement|.
+          1. Return |Statement|.VarDeclaredNames().
         </emu-alg>
       </emu-clause>
 
@@ -16640,7 +16640,7 @@
         <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
         <emu-grammar>IterationStatement : `while` `(` Expression `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return the VarScopedDeclarations of |Statement|.
+          1. Return |Statement|.VarScopedDeclarations().
         </emu-alg>
       </emu-clause>
 
@@ -16673,7 +16673,7 @@
         <emu-grammar>IterationStatement : `for` `(` LexicalDeclaration Expression? `;` Expression? `)` Statement</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if any element of |LexicalDeclaration|.BoundNames() also occurs in the VarDeclaredNames of |Statement|.
+            It is a Syntax Error if any element of |LexicalDeclaration|.BoundNames() also occurs in |Statement|.VarDeclaredNames().
           </li>
         </ul>
       </emu-clause>
@@ -16732,17 +16732,17 @@
         <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
         <emu-grammar>IterationStatement : `for` `(` Expression? `;` Expression? `;` Expression? `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return the VarDeclaredNames of |Statement|.
+          1. Return |Statement|.VarDeclaredNames().
         </emu-alg>
         <emu-grammar>IterationStatement : `for` `(` `var` VariableDeclarationList `;` Expression? `;` Expression? `)` Statement</emu-grammar>
         <emu-alg>
           1. Let _names_ be |VariableDeclarationList|.BoundNames().
-          1. Append to _names_ the elements of the VarDeclaredNames of |Statement|.
+          1. Append to _names_ the elements of |Statement|.VarDeclaredNames().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>IterationStatement : `for` `(` LexicalDeclaration Expression? `;` Expression? `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return the VarDeclaredNames of |Statement|.
+          1. Return |Statement|.VarDeclaredNames().
         </emu-alg>
       </emu-clause>
 
@@ -16752,17 +16752,17 @@
         <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
         <emu-grammar>IterationStatement : `for` `(` Expression? `;` Expression? `;` Expression? `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return the VarScopedDeclarations of |Statement|.
+          1. Return |Statement|.VarScopedDeclarations().
         </emu-alg>
         <emu-grammar>IterationStatement : `for` `(` `var` VariableDeclarationList `;` Expression? `;` Expression? `)` Statement</emu-grammar>
         <emu-alg>
-          1. Let _declarations_ be VarScopedDeclarations of |VariableDeclarationList|.
-          1. Append to _declarations_ the elements of the VarScopedDeclarations of |Statement|.
+          1. Let _declarations_ be |VariableDeclarationList|.VarScopedDeclarations().
+          1. Append to _declarations_ the elements of |Statement|.VarScopedDeclarations().
           1. Return _declarations_.
         </emu-alg>
         <emu-grammar>IterationStatement : `for` `(` LexicalDeclaration Expression? `;` Expression? `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return the VarScopedDeclarations of |Statement|.
+          1. Return |Statement|.VarScopedDeclarations().
         </emu-alg>
       </emu-clause>
 
@@ -16790,7 +16790,7 @@
           1. Let _oldEnv_ be the running execution context's LexicalEnvironment.
           1. Let _loopEnv_ be NewDeclarativeEnvironment(_oldEnv_).
           1. Let _loopEnvRec_ be _loopEnv_'s EnvironmentRecord.
-          1. Let _isConst_ be the result of performing IsConstantDeclaration of |LexicalDeclaration|.
+          1. Let _isConst_ be the result of performing |LexicalDeclaration|.IsConstantDeclaration().
           1. Let _boundNames_ be |LexicalDeclaration|.BoundNames().
           1. For each element _dn_ of _boundNames_, do
             1. If _isConst_ is *true*, then
@@ -16894,7 +16894,7 @@
             It is a Syntax Error if |ForDeclaration|.BoundNames() contains `"let"`.
           </li>
           <li>
-            It is a Syntax Error if any element of |ForDeclaration|.BoundNames() also occurs in the VarDeclaredNames of |Statement|.
+            It is a Syntax Error if any element of |ForDeclaration|.BoundNames() also occurs in |Statement|.VarDeclaredNames().
           </li>
           <li>
             It is a Syntax Error if |ForDeclaration|.BoundNames() contains any duplicate entries.
@@ -16993,7 +16993,7 @@
         <emu-see-also-para op="IsDestructuring"></emu-see-also-para>
         <emu-grammar>ForDeclaration : LetOrConst ForBinding</emu-grammar>
         <emu-alg>
-          1. Return IsDestructuring of |ForBinding|.
+          1. Return |ForBinding|.IsDestructuring().
         </emu-alg>
         <emu-grammar>ForBinding : BindingIdentifier</emu-grammar>
         <emu-alg>
@@ -17014,17 +17014,17 @@
         <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
         <emu-grammar>IterationStatement : `for` `(` LeftHandSideExpression `in` Expression `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return the VarDeclaredNames of |Statement|.
+          1. Return |Statement|.VarDeclaredNames().
         </emu-alg>
         <emu-grammar>IterationStatement : `for` `(` `var` ForBinding `in` Expression `)` Statement</emu-grammar>
         <emu-alg>
           1. Let _names_ be |ForBinding|.BoundNames().
-          1. Append to _names_ the elements of the VarDeclaredNames of |Statement|.
+          1. Append to _names_ the elements of |Statement|.VarDeclaredNames().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>IterationStatement : `for` `(` ForDeclaration `in` Expression `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return the VarDeclaredNames of |Statement|.
+          1. Return |Statement|.VarDeclaredNames().
         </emu-alg>
         <emu-grammar>
           IterationStatement :
@@ -17032,7 +17032,7 @@
             `for` `await` `(` LeftHandSideExpression `of` AssignmentExpression `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return the VarDeclaredNames of |Statement|.
+          1. Return |Statement|.VarDeclaredNames().
         </emu-alg>
         <emu-grammar>
           IterationStatement :
@@ -17041,7 +17041,7 @@
         </emu-grammar>
         <emu-alg>
           1. Let _names_ be |ForBinding|.BoundNames().
-          1. Append to _names_ the elements of the VarDeclaredNames of |Statement|.
+          1. Append to _names_ the elements of |Statement|.VarDeclaredNames().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>
@@ -17050,7 +17050,7 @@
             `for` `await` `(` ForDeclaration `of` AssignmentExpression `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return the VarDeclaredNames of |Statement|.
+          1. Return |Statement|.VarDeclaredNames().
         </emu-alg>
         <emu-note>
           <p>This section is extended by Annex <emu-xref href="#sec-initializers-in-forin-statement-heads"></emu-xref>.</p>
@@ -17063,12 +17063,12 @@
         <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
         <emu-grammar>IterationStatement : `for` `(` LeftHandSideExpression `in` Expression `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return the VarScopedDeclarations of |Statement|.
+          1. Return |Statement|.VarScopedDeclarations().
         </emu-alg>
         <emu-grammar>IterationStatement : `for` `(` `var` ForBinding `in` Expression `)` Statement</emu-grammar>
         <emu-alg>
           1. Let _declarations_ be a List containing |ForBinding|.
-          1. Append to _declarations_ the elements of the VarScopedDeclarations of |Statement|.
+          1. Append to _declarations_ the elements of |Statement|.VarScopedDeclarations().
           1. Return _declarations_.
         </emu-alg>
         <emu-grammar>
@@ -17077,7 +17077,7 @@
             `for` `await` `(` LeftHandSideExpression `of` AssignmentExpression `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return the VarScopedDeclarations of |Statement|.
+          1. Return |Statement|.VarScopedDeclarations().
         </emu-alg>
         <emu-grammar>
           IterationStatement :
@@ -17085,7 +17085,7 @@
             `for` `await` `(` `var` ForBinding `of` AssignmentExpression `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return the VarScopedDeclarations of |Statement|.
+          1. Return |Statement|.VarScopedDeclarations().
         </emu-alg>
         <emu-grammar>
           IterationStatement :
@@ -17094,7 +17094,7 @@
         </emu-grammar>
         <emu-alg>
           1. Let _declarations_ be a List containing |ForBinding|.
-          1. Append to _declarations_ the elements of the VarScopedDeclarations of |Statement|.
+          1. Append to _declarations_ the elements of |Statement|.VarScopedDeclarations().
           1. Return _declarations_.
         </emu-alg>
         <emu-grammar>
@@ -17103,7 +17103,7 @@
             `for` `await` `(` ForDeclaration `of` AssignmentExpression `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return the VarScopedDeclarations of |Statement|.
+          1. Return |Statement|.VarScopedDeclarations().
         </emu-alg>
         <emu-note>
           <p>This section is extended by Annex <emu-xref href="#sec-initializers-in-forin-statement-heads"></emu-xref>.</p>
@@ -17133,7 +17133,7 @@
           1. Let _envRec_ be _environment_'s EnvironmentRecord.
           1. Assert: _envRec_ is a declarative Environment Record.
           1. For each element _name_ of |ForBinding|.BoundNames(), do
-            1. If IsConstantDeclaration of |LetOrConst| is *true*, then
+            1. If |LetOrConst|.IsConstantDeclaration() is *true*, then
               1. Perform ! _envRec_.CreateImmutableBinding(_name_, *true*).
             1. Else,
               1. Perform ! _envRec_.CreateMutableBinding(_name_, *false*).
@@ -17238,7 +17238,7 @@
           1. If _iteratorKind_ is not present, set _iteratorKind_ to ~sync~.
           1. Let _oldEnv_ be the running execution context's LexicalEnvironment.
           1. Let _V_ be *undefined*.
-          1. Let _destructuring_ be IsDestructuring of _lhs_.
+          1. Let _destructuring_ be _lhs_.IsDestructuring().
           1. If _destructuring_ is *true* and if _lhsKind_ is ~assignment~, then
             1. Assert: _lhs_ is a |LeftHandSideExpression|.
             1. Let _assignmentPattern_ be the |AssignmentPattern| that is covered by _lhs_.
@@ -17550,7 +17550,7 @@
       <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
       <emu-grammar>WithStatement : `with` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return the VarDeclaredNames of |Statement|.
+        1. Return |Statement|.VarDeclaredNames().
       </emu-alg>
     </emu-clause>
 
@@ -17560,7 +17560,7 @@
       <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
       <emu-grammar>WithStatement : `with` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return the VarScopedDeclarations of |Statement|.
+        1. Return |Statement|.VarScopedDeclarations().
       </emu-alg>
     </emu-clause>
 
@@ -17617,7 +17617,7 @@
           It is a Syntax Error if the LexicallyDeclaredNames of |CaseBlock| contains any duplicate entries.
         </li>
         <li>
-          It is a Syntax Error if any element of the LexicallyDeclaredNames of |CaseBlock| also occurs in the VarDeclaredNames of |CaseBlock|.
+          It is a Syntax Error if any element of the LexicallyDeclaredNames of |CaseBlock| also occurs in |CaseBlock|.VarDeclaredNames().
         </li>
       </ul>
     </emu-clause>
@@ -17763,18 +17763,18 @@
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
-        1. Let _names_ be LexicallyDeclaredNames of |CaseClauses|.
-        1. Append to _names_ the elements of the LexicallyDeclaredNames of |CaseClause|.
+        1. Let _names_ be |CaseClauses|.LexicallyDeclaredNames().
+        1. Append to _names_ the elements of |CaseClause|.LexicallyDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>CaseClause : `case` Expression `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return the LexicallyDeclaredNames of |StatementList|.
+        1. If the |StatementList| is present, return |StatementList|.LexicallyDeclaredNames().
         1. Return a new empty List.
       </emu-alg>
       <emu-grammar>DefaultClause : `default` `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return the LexicallyDeclaredNames of |StatementList|.
+        1. If the |StatementList| is present, return |StatementList|.LexicallyDeclaredNames().
         1. Return a new empty List.
       </emu-alg>
     </emu-clause>
@@ -17797,18 +17797,18 @@
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be LexicallyScopedDeclarations of |CaseClauses|.
-        1. Append to _declarations_ the elements of the LexicallyScopedDeclarations of |CaseClause|.
+        1. Let _declarations_ be |CaseClauses|.LexicallyScopedDeclarations().
+        1. Append to _declarations_ the elements of |CaseClause|.LexicallyScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>CaseClause : `case` Expression `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return the LexicallyScopedDeclarations of |StatementList|.
+        1. If the |StatementList| is present, return |StatementList|.LexicallyScopedDeclarations().
         1. Return a new empty List.
       </emu-alg>
       <emu-grammar>DefaultClause : `default` `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return the LexicallyScopedDeclarations of |StatementList|.
+        1. If the |StatementList| is present, return |StatementList|.LexicallyScopedDeclarations().
         1. Return a new empty List.
       </emu-alg>
     </emu-clause>
@@ -17819,7 +17819,7 @@
       <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
       <emu-grammar>SwitchStatement : `switch` `(` Expression `)` CaseBlock</emu-grammar>
       <emu-alg>
-        1. Return the VarDeclaredNames of |CaseBlock|.
+        1. Return |CaseBlock|.VarDeclaredNames().
       </emu-alg>
       <emu-grammar>CaseBlock : `{` `}`</emu-grammar>
       <emu-alg>
@@ -17835,18 +17835,18 @@
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
-        1. Let _names_ be VarDeclaredNames of |CaseClauses|.
-        1. Append to _names_ the elements of the VarDeclaredNames of |CaseClause|.
+        1. Let _names_ be |CaseClauses|.VarDeclaredNames().
+        1. Append to _names_ the elements of |CaseClause|.VarDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>CaseClause : `case` Expression `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return the VarDeclaredNames of |StatementList|.
+        1. If the |StatementList| is present, return |StatementList|.VarDeclaredNames().
         1. Return a new empty List.
       </emu-alg>
       <emu-grammar>DefaultClause : `default` `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return the VarDeclaredNames of |StatementList|.
+        1. If the |StatementList| is present, return |StatementList|.VarDeclaredNames().
         1. Return a new empty List.
       </emu-alg>
     </emu-clause>
@@ -17857,7 +17857,7 @@
       <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
       <emu-grammar>SwitchStatement : `switch` `(` Expression `)` CaseBlock</emu-grammar>
       <emu-alg>
-        1. Return the VarScopedDeclarations of |CaseBlock|.
+        1. Return |CaseBlock|.VarScopedDeclarations().
       </emu-alg>
       <emu-grammar>CaseBlock : `{` `}`</emu-grammar>
       <emu-alg>
@@ -17873,18 +17873,18 @@
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be VarScopedDeclarations of |CaseClauses|.
-        1. Append to _declarations_ the elements of the VarScopedDeclarations of |CaseClause|.
+        1. Let _declarations_ be |CaseClauses|.VarScopedDeclarations().
+        1. Append to _declarations_ the elements of |CaseClause|.VarScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>CaseClause : `case` Expression `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return the VarScopedDeclarations of |StatementList|.
+        1. If the |StatementList| is present, return |StatementList|.VarScopedDeclarations().
         1. Return a new empty List.
       </emu-alg>
       <emu-grammar>DefaultClause : `default` `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return the VarScopedDeclarations of |StatementList|.
+        1. If the |StatementList| is present, return |StatementList|.VarScopedDeclarations().
         1. Return a new empty List.
       </emu-alg>
     </emu-clause>
@@ -18104,7 +18104,7 @@
       <emu-see-also-para op="LexicallyDeclaredNames"></emu-see-also-para>
       <emu-grammar>LabelledStatement : LabelIdentifier `:` LabelledItem</emu-grammar>
       <emu-alg>
-        1. Return the LexicallyDeclaredNames of |LabelledItem|.
+        1. Return |LabelledItem|.LexicallyDeclaredNames().
       </emu-alg>
       <emu-grammar>LabelledItem : Statement</emu-grammar>
       <emu-alg>
@@ -18122,7 +18122,7 @@
       <emu-see-also-para op="LexicallyScopedDeclarations"></emu-see-also-para>
       <emu-grammar>LabelledStatement : LabelIdentifier `:` LabelledItem</emu-grammar>
       <emu-alg>
-        1. Return the LexicallyScopedDeclarations of |LabelledItem|.
+        1. Return |LabelledItem|.LexicallyScopedDeclarations().
       </emu-alg>
       <emu-grammar>LabelledItem : Statement</emu-grammar>
       <emu-alg>
@@ -18160,12 +18160,12 @@
       <emu-see-also-para op="TopLevelVarDeclaredNames"></emu-see-also-para>
       <emu-grammar>LabelledStatement : LabelIdentifier `:` LabelledItem</emu-grammar>
       <emu-alg>
-        1. Return the TopLevelVarDeclaredNames of |LabelledItem|.
+        1. Return |LabelledItem|.TopLevelVarDeclaredNames().
       </emu-alg>
       <emu-grammar>LabelledItem : Statement</emu-grammar>
       <emu-alg>
-        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return TopLevelVarDeclaredNames of |Statement|.
-        1. Return VarDeclaredNames of |Statement|.
+        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return |Statement|.TopLevelVarDeclaredNames().
+        1. Return |Statement|.VarDeclaredNames().
       </emu-alg>
       <emu-grammar>LabelledItem : FunctionDeclaration</emu-grammar>
       <emu-alg>
@@ -18179,12 +18179,12 @@
       <emu-see-also-para op="TopLevelVarScopedDeclarations"></emu-see-also-para>
       <emu-grammar>LabelledStatement : LabelIdentifier `:` LabelledItem</emu-grammar>
       <emu-alg>
-        1. Return the TopLevelVarScopedDeclarations of |LabelledItem|.
+        1. Return |LabelledItem|.TopLevelVarScopedDeclarations().
       </emu-alg>
       <emu-grammar>LabelledItem : Statement</emu-grammar>
       <emu-alg>
-        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return TopLevelVarScopedDeclarations of |Statement|.
-        1. Return VarScopedDeclarations of |Statement|.
+        1. If |Statement| is <emu-grammar>Statement : LabelledStatement</emu-grammar> , return |Statement|.TopLevelVarScopedDeclarations().
+        1. Return |Statement|.VarScopedDeclarations().
       </emu-alg>
       <emu-grammar>LabelledItem : FunctionDeclaration</emu-grammar>
       <emu-alg>
@@ -18198,7 +18198,7 @@
       <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
       <emu-grammar>LabelledStatement : LabelIdentifier `:` LabelledItem</emu-grammar>
       <emu-alg>
-        1. Return the VarDeclaredNames of |LabelledItem|.
+        1. Return |LabelledItem|.VarDeclaredNames().
       </emu-alg>
       <emu-grammar>LabelledItem : FunctionDeclaration</emu-grammar>
       <emu-alg>
@@ -18212,7 +18212,7 @@
       <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
       <emu-grammar>LabelledStatement : LabelIdentifier `:` LabelledItem</emu-grammar>
       <emu-alg>
-        1. Return the VarScopedDeclarations of |LabelledItem|.
+        1. Return |LabelledItem|.VarScopedDeclarations().
       </emu-alg>
       <emu-grammar>LabelledItem : FunctionDeclaration</emu-grammar>
       <emu-alg>
@@ -18312,10 +18312,10 @@
           It is a Syntax Error if |CatchParameter|.BoundNames() contains any duplicate elements.
         </li>
         <li>
-          It is a Syntax Error if any element of |CatchParameter|.BoundNames() also occurs in the LexicallyDeclaredNames of |Block|.
+          It is a Syntax Error if any element of |CatchParameter|.BoundNames() also occurs in |Block|.LexicallyDeclaredNames().
         </li>
         <li>
-          It is a Syntax Error if any element of |CatchParameter|.BoundNames() also occurs in the VarDeclaredNames of |Block|.
+          It is a Syntax Error if any element of |CatchParameter|.BoundNames() also occurs in |Block|.VarDeclaredNames().
         </li>
       </ul>
       <emu-note>
@@ -18422,26 +18422,26 @@
       <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
       <emu-grammar>TryStatement : `try` Block Catch</emu-grammar>
       <emu-alg>
-        1. Let _names_ be VarDeclaredNames of |Block|.
-        1. Append to _names_ the elements of the VarDeclaredNames of |Catch|.
+        1. Let _names_ be |Block|.VarDeclaredNames().
+        1. Append to _names_ the elements of |Catch|.VarDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Finally</emu-grammar>
       <emu-alg>
-        1. Let _names_ be VarDeclaredNames of |Block|.
-        1. Append to _names_ the elements of the VarDeclaredNames of |Finally|.
+        1. Let _names_ be |Block|.VarDeclaredNames().
+        1. Append to _names_ the elements of |Finally|.VarDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Catch Finally</emu-grammar>
       <emu-alg>
-        1. Let _names_ be VarDeclaredNames of |Block|.
-        1. Append to _names_ the elements of the VarDeclaredNames of |Catch|.
-        1. Append to _names_ the elements of the VarDeclaredNames of |Finally|.
+        1. Let _names_ be |Block|.VarDeclaredNames().
+        1. Append to _names_ the elements of |Catch|.VarDeclaredNames().
+        1. Append to _names_ the elements of |Finally|.VarDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>Catch : `catch` `(` CatchParameter `)` Block</emu-grammar>
       <emu-alg>
-        1. Return the VarDeclaredNames of |Block|.
+        1. Return |Block|.VarDeclaredNames().
       </emu-alg>
     </emu-clause>
 
@@ -18451,26 +18451,26 @@
       <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
       <emu-grammar>TryStatement : `try` Block Catch</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be VarScopedDeclarations of |Block|.
-        1. Append to _declarations_ the elements of the VarScopedDeclarations of |Catch|.
+        1. Let _declarations_ be |Block|.VarScopedDeclarations().
+        1. Append to _declarations_ the elements of |Catch|.VarScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Finally</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be VarScopedDeclarations of |Block|.
-        1. Append to _declarations_ the elements of the VarScopedDeclarations of |Finally|.
+        1. Let _declarations_ be |Block|.VarScopedDeclarations().
+        1. Append to _declarations_ the elements of |Finally|.VarScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Catch Finally</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be VarScopedDeclarations of |Block|.
-        1. Append to _declarations_ the elements of the VarScopedDeclarations of |Catch|.
-        1. Append to _declarations_ the elements of the VarScopedDeclarations of |Finally|.
+        1. Let _declarations_ be |Block|.VarScopedDeclarations().
+        1. Append to _declarations_ the elements of |Catch|.VarScopedDeclarations().
+        1. Append to _declarations_ the elements of |Finally|.VarScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>Catch : `catch` `(` CatchParameter `)` Block</emu-grammar>
       <emu-alg>
-        1. Return the VarScopedDeclarations of |Block|.
+        1. Return |Block|.VarScopedDeclarations().
       </emu-alg>
     </emu-clause>
 
@@ -18634,7 +18634,7 @@
           It is a Syntax Error if |FunctionBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |FormalParameters| is *false*.
         </li>
         <li>
-          It is a Syntax Error if any element of |FormalParameters|.BoundNames() also occurs in the LexicallyDeclaredNames of |FunctionBody|.
+          It is a Syntax Error if any element of |FormalParameters|.BoundNames() also occurs in |FunctionBody|.LexicallyDeclaredNames().
         </li>
         <li>
           It is a Syntax Error if |FormalParameters|.Contains(|SuperProperty|) is *true*.
@@ -18673,7 +18673,7 @@
           It is a Syntax Error if the LexicallyDeclaredNames of |FunctionStatementList| contains any duplicate entries.
         </li>
         <li>
-          It is a Syntax Error if any element of the LexicallyDeclaredNames of |FunctionStatementList| also occurs in the VarDeclaredNames of |FunctionStatementList|.
+          It is a Syntax Error if any element of the LexicallyDeclaredNames of |FunctionStatementList| also occurs in |FunctionStatementList|.VarDeclaredNames().
         </li>
         <li>
           It is a Syntax Error if ContainsDuplicateLabels of |FunctionStatementList| with argument &laquo; &raquo; is *true*.
@@ -18748,13 +18748,13 @@
       </emu-alg>
       <emu-grammar>FormalParameters : FormalParameterList `,` FunctionRestParameter</emu-grammar>
       <emu-alg>
-        1. If ContainsExpression of |FormalParameterList| is *true*, return *true*.
-        1. Return ContainsExpression of |FunctionRestParameter|.
+        1. If |FormalParameterList|.ContainsExpression() is *true*, return *true*.
+        1. Return |FunctionRestParameter|.ContainsExpression().
       </emu-alg>
       <emu-grammar>FormalParameterList : FormalParameterList `,` FormalParameter</emu-grammar>
       <emu-alg>
-        1. If ContainsExpression of |FormalParameterList| is *true*, return *true*.
-        1. Return ContainsExpression of |FormalParameter|.
+        1. If |FormalParameterList|.ContainsExpression() is *true*, return *true*.
+        1. Return |FormalParameter|.ContainsExpression().
       </emu-alg>
     </emu-clause>
 
@@ -18776,15 +18776,15 @@
       </emu-alg>
       <emu-grammar>FormalParameters : FormalParameterList `,` FunctionRestParameter</emu-grammar>
       <emu-alg>
-        1. Return ExpectedArgumentCount of |FormalParameterList|.
+        1. Return |FormalParameterList|.ExpectedArgumentCount().
       </emu-alg>
       <emu-note>
         <p>The ExpectedArgumentCount of a |FormalParameterList| is the number of |FormalParameters| to the left of either the rest parameter or the first |FormalParameter| with an Initializer. A |FormalParameter| without an initializer is allowed after the first parameter with an initializer but such parameters are considered to be optional with *undefined* as their default value.</p>
       </emu-note>
       <emu-grammar>FormalParameterList : FormalParameterList `,` FormalParameter</emu-grammar>
       <emu-alg>
-        1. Let _count_ be ExpectedArgumentCount of |FormalParameterList|.
-        1. If HasInitializer of |FormalParameterList| is *true* or HasInitializer of |FormalParameter| is *true*, return _count_.
+        1. Let _count_ be |FormalParameterList|.ExpectedArgumentCount().
+        1. If |FormalParameterList|.HasInitializer() is *true* or |FormalParameter|.HasInitializer() is *true*, return _count_.
         1. Return _count_ + 1.
       </emu-alg>
     </emu-clause>
@@ -18795,8 +18795,8 @@
       <emu-see-also-para op="HasInitializer"></emu-see-also-para>
       <emu-grammar>FormalParameterList : FormalParameterList `,` FormalParameter</emu-grammar>
       <emu-alg>
-        1. If HasInitializer of |FormalParameterList| is *true*, return *true*.
-        1. Return HasInitializer of |FormalParameter|.
+        1. If |FormalParameterList|.HasInitializer() is *true*, return *true*.
+        1. Return |FormalParameter|.HasInitializer().
       </emu-alg>
     </emu-clause>
 
@@ -18819,8 +18819,8 @@
       <h1>Static Semantics: IsAnonymousFunctionDefinition ( _expr_ )</h1>
       <p>The abstract operation IsAnonymousFunctionDefinition determines if its argument is a function definition that does not bind a name. The argument _expr_ is the result of parsing an |AssignmentExpression| or |Initializer|. The following steps are taken:</p>
       <emu-alg>
-        1. If IsFunctionDefinition of _expr_ is *false*, return *false*.
-        1. Let _hasName_ be the result of HasName of _expr_.
+        1. If _expr_.IsFunctionDefinition() is *false*, return *false*.
+        1. Let _hasName_ be the result of _expr_.HasName().
         1. If _hasName_ is *true*, return *false*.
         1. Return *true*.
       </emu-alg>
@@ -18864,12 +18864,12 @@
       </emu-alg>
       <emu-grammar>FormalParameterList : FormalParameterList `,` FormalParameter</emu-grammar>
       <emu-alg>
-        1. If IsSimpleParameterList of |FormalParameterList| is *false*, return *false*.
-        1. Return IsSimpleParameterList of |FormalParameter|.
+        1. If |FormalParameterList|.IsSimpleParameterList() is *false*, return *false*.
+        1. Return |FormalParameter|.IsSimpleParameterList().
       </emu-alg>
       <emu-grammar>FormalParameter : BindingElement</emu-grammar>
       <emu-alg>
-        1. Return IsSimpleParameterList of |BindingElement|.
+        1. Return |BindingElement|.IsSimpleParameterList().
       </emu-alg>
     </emu-clause>
 
@@ -18883,7 +18883,7 @@
       </emu-alg>
       <emu-grammar>FunctionStatementList : StatementList</emu-grammar>
       <emu-alg>
-        1. Return TopLevelLexicallyDeclaredNames of |StatementList|.
+        1. Return |StatementList|.TopLevelLexicallyDeclaredNames().
       </emu-alg>
     </emu-clause>
 
@@ -18897,7 +18897,7 @@
       </emu-alg>
       <emu-grammar>FunctionStatementList : StatementList</emu-grammar>
       <emu-alg>
-        1. Return the TopLevelLexicallyScopedDeclarations of |StatementList|.
+        1. Return |StatementList|.TopLevelLexicallyScopedDeclarations().
       </emu-alg>
     </emu-clause>
 
@@ -18911,7 +18911,7 @@
       </emu-alg>
       <emu-grammar>FunctionStatementList : StatementList</emu-grammar>
       <emu-alg>
-        1. Return TopLevelVarDeclaredNames of |StatementList|.
+        1. Return |StatementList|.TopLevelVarDeclaredNames().
       </emu-alg>
     </emu-clause>
 
@@ -18925,7 +18925,7 @@
       </emu-alg>
       <emu-grammar>FunctionStatementList : StatementList</emu-grammar>
       <emu-alg>
-        1. Return the TopLevelVarScopedDeclarations of |StatementList|.
+        1. Return |StatementList|.TopLevelVarScopedDeclarations().
       </emu-alg>
     </emu-clause>
 
@@ -18965,7 +18965,7 @@
       </emu-alg>
       <emu-grammar>FormalParameter : BindingElement</emu-grammar>
       <emu-alg>
-        1. If ContainsExpression of |BindingElement| is *false*, return the result of performing IteratorBindingInitialization for |BindingElement| using _iteratorRecord_ and _environment_ as the arguments.
+        1. If |BindingElement|.ContainsExpression() is *false*, return the result of performing IteratorBindingInitialization for |BindingElement| using _iteratorRecord_ and _environment_ as the arguments.
         1. Let _currentContext_ be the running execution context.
         1. Let _originalEnv_ be the VariableEnvironment of _currentContext_.
         1. Assert: The VariableEnvironment and LexicalEnvironment of _currentContext_ are the same.
@@ -18983,7 +18983,7 @@
       </emu-note>
       <emu-grammar>FunctionRestParameter : BindingRestElement</emu-grammar>
       <emu-alg>
-        1. If ContainsExpression of |BindingRestElement| is *false*, return the result of performing IteratorBindingInitialization for |BindingRestElement| using _iteratorRecord_ and _environment_ as the arguments.
+        1. If |BindingRestElement|.ContainsExpression() is *false*, return the result of performing IteratorBindingInitialization for |BindingRestElement| using _iteratorRecord_ and _environment_ as the arguments.
         1. Let _currentContext_ be the running execution context.
         1. Let _originalEnv_ be the VariableEnvironment of _currentContext_.
         1. Assert: The VariableEnvironment and LexicalEnvironment of _currentContext_ are the same.
@@ -19118,7 +19118,7 @@
           It is a Syntax Error if |ConciseBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |ArrowParameters| is *false*.
         </li>
         <li>
-          It is a Syntax Error if any element of |ArrowParameters|.BoundNames() also occurs in the LexicallyDeclaredNames of |ConciseBody|.
+          It is a Syntax Error if any element of |ArrowParameters|.BoundNames() also occurs in |ConciseBody|.LexicallyDeclaredNames().
         </li>
       </ul>
       <emu-grammar>ArrowParameters : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
@@ -19127,7 +19127,7 @@
           It is a Syntax Error if |CoverParenthesizedExpressionAndArrowParameterList| is not covering an |ArrowFormalParameters|.
         </li>
         <li>
-          All early error rules for |ArrowFormalParameters| and its derived productions also apply to CoveredFormalsList of |CoverParenthesizedExpressionAndArrowParameterList|.
+          All early error rules for |ArrowFormalParameters| and its derived productions also apply to |CoverParenthesizedExpressionAndArrowParameterList|.CoveredFormalsList().
         </li>
       </ul>
     </emu-clause>
@@ -19138,7 +19138,7 @@
       <emu-see-also-para op="BoundNames"></emu-see-also-para>
       <emu-grammar>ArrowParameters : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
       <emu-alg>
-        1. Let _formals_ be CoveredFormalsList of |CoverParenthesizedExpressionAndArrowParameterList|.
+        1. Let _formals_ be |CoverParenthesizedExpressionAndArrowParameterList|.CoveredFormalsList().
         1. Return _formals_.BoundNames().
       </emu-alg>
     </emu-clause>
@@ -19158,7 +19158,7 @@
       </emu-note>
       <emu-grammar>ArrowParameters : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
       <emu-alg>
-        1. Let _formals_ be CoveredFormalsList of |CoverParenthesizedExpressionAndArrowParameterList|.
+        1. Let _formals_ be |CoverParenthesizedExpressionAndArrowParameterList|.CoveredFormalsList().
         1. Return _formals_.Contains(_symbol_).
       </emu-alg>
     </emu-clause>
@@ -19212,8 +19212,8 @@
       </emu-alg>
       <emu-grammar>ArrowParameters : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
       <emu-alg>
-        1. Let _formals_ be CoveredFormalsList of |CoverParenthesizedExpressionAndArrowParameterList|.
-        1. Return IsSimpleParameterList of _formals_.
+        1. Let _formals_ be |CoverParenthesizedExpressionAndArrowParameterList|.CoveredFormalsList().
+        1. Return _formals_.IsSimpleParameterList().
       </emu-alg>
     </emu-clause>
 
@@ -19323,7 +19323,7 @@
       <emu-alg>
         1. If the function code for this |ArrowFunction| is strict mode code, let _strict_ be *true*. Otherwise let _strict_ be *false*.
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
-        1. Let _parameters_ be CoveredFormalsList of |ArrowParameters|.
+        1. Let _parameters_ be |ArrowParameters|.CoveredFormalsList().
         1. Let _closure_ be FunctionCreate(~Arrow~, _parameters_, |ConciseBody|, _scope_, _strict_).
         1. Return _closure_.
       </emu-alg>
@@ -19359,7 +19359,7 @@
           It is a Syntax Error if |FunctionBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |UniqueFormalParameters| is *false*.
         </li>
         <li>
-          It is a Syntax Error if any element of |UniqueFormalParameters|.BoundNames() also occurs in the LexicallyDeclaredNames of |FunctionBody|.
+          It is a Syntax Error if any element of |UniqueFormalParameters|.BoundNames() also occurs in |FunctionBody|.LexicallyDeclaredNames().
         </li>
       </ul>
       <emu-grammar>MethodDefinition : `set` PropertyName `(` PropertySetParameterList `)` `{` FunctionBody `}`</emu-grammar>
@@ -19371,7 +19371,7 @@
           It is a Syntax Error if |FunctionBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |PropertySetParameterList| is *false*.
         </li>
         <li>
-          It is a Syntax Error if any element of |PropertySetParameterList|.BoundNames() also occurs in the LexicallyDeclaredNames of |FunctionBody|.
+          It is a Syntax Error if any element of |PropertySetParameterList|.BoundNames() also occurs in |FunctionBody|.LexicallyDeclaredNames().
         </li>
       </ul>
     </emu-clause>
@@ -19398,7 +19398,7 @@
       <emu-see-also-para op="ExpectedArgumentCount"></emu-see-also-para>
       <emu-grammar>PropertySetParameterList : FormalParameter</emu-grammar>
       <emu-alg>
-        1. If HasInitializer of |FormalParameter| is *true*, return 0.
+        1. If |FormalParameter|.HasInitializer() is *true*, return 0.
         1. Return 1.
       </emu-alg>
     </emu-clause>
@@ -19434,7 +19434,7 @@
           `set` PropertyName `(` PropertySetParameterList `)` `{` FunctionBody `}`
       </emu-grammar>
       <emu-alg>
-        1. Return PropName of |PropertyName|.
+        1. Return |PropertyName|.PropName().
       </emu-alg>
     </emu-clause>
 
@@ -19569,7 +19569,7 @@
           It is a Syntax Error if |GeneratorBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |UniqueFormalParameters| is *false*.
         </li>
         <li>
-          It is a Syntax Error if any element of |UniqueFormalParameters|.BoundNames() also occurs in the LexicallyDeclaredNames of |GeneratorBody|.
+          It is a Syntax Error if any element of |UniqueFormalParameters|.BoundNames() also occurs in |GeneratorBody|.LexicallyDeclaredNames().
         </li>
       </ul>
       <emu-grammar>
@@ -19590,7 +19590,7 @@
           It is a Syntax Error if |GeneratorBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |FormalParameters| is *false*.
         </li>
         <li>
-          It is a Syntax Error if any element of |FormalParameters|.BoundNames() also occurs in the LexicallyDeclaredNames of |GeneratorBody|.
+          It is a Syntax Error if any element of |FormalParameters|.BoundNames() also occurs in |GeneratorBody|.LexicallyDeclaredNames().
         </li>
         <li>
           It is a Syntax Error if |FormalParameters|.Contains(|YieldExpression|) is *true*.
@@ -19712,7 +19712,7 @@
       <emu-see-also-para op="PropName"></emu-see-also-para>
       <emu-grammar>GeneratorMethod : `*` PropertyName `(` UniqueFormalParameters `)` `{` GeneratorBody `}`</emu-grammar>
       <emu-alg>
-        1. Return PropName of |PropertyName|.
+        1. Return |PropertyName|.PropName().
       </emu-alg>
     </emu-clause>
 
@@ -19911,7 +19911,7 @@
         <li>It is a Syntax Error if |UniqueFormalParameters|.Contains(|YieldExpression|) is *true*.</li>
         <li>It is a Syntax Error if |UniqueFormalParameters|.Contains(|AwaitExpression|) is *true*.</li>
         <li>It is a Syntax Error if |AsyncGeneratorBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |UniqueFormalParameters| is *false*.</li>
-        <li>It is a Syntax Error if any element of |UniqueFormalParameters|.BoundNames() also occurs in the LexicallyDeclaredNames of |AsyncGeneratorBody|.</li>
+        <li>It is a Syntax Error if any element of |UniqueFormalParameters|.BoundNames() also occurs in |AsyncGeneratorBody|.LexicallyDeclaredNames().</li>
       </ul>
       <emu-grammar>
         AsyncGeneratorDeclaration : `async` `function` `*` BindingIdentifier `(` FormalParameters `)` `{` AsyncGeneratorBody `}`
@@ -19924,7 +19924,7 @@
         <li>If the source code matching this production is strict mode code, the Early Error rules for <emu-grammar>UniqueFormalParameters : FormalParameters</emu-grammar> are applied.</li>
         <li>If the source code matching this production is strict mode code, it is a Syntax Error if |BindingIdentifier| is the |IdentifierName| `eval` or the |IdentifierName| `arguments`.</li>
         <li>It is a Syntax Error if |AsyncGeneratorBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |FormalParameters| is *false*.</li>
-        <li>It is a Syntax Error if any element of |FormalParameters|.BoundNames() also occurs in the LexicallyDeclaredNames of |AsyncGeneratorBody|.</li>
+        <li>It is a Syntax Error if any element of |FormalParameters|.BoundNames() also occurs in |AsyncGeneratorBody|.LexicallyDeclaredNames().</li>
         <li>It is a Syntax Error if |FormalParameters|.Contains(|YieldExpression|) is *true*.</li>
         <li>It is a Syntax Error if |FormalParameters|.Contains(|AwaitExpression|) is *true*.</li>
         <li>It is a Syntax Error if |FormalParameters|.Contains(|SuperProperty|) is *true*.</li>
@@ -20028,7 +20028,7 @@
       <emu-see-also-para op="PropName"></emu-see-also-para>
       <emu-grammar>AsyncGeneratorMethod : `async` `*` PropertyName `(` UniqueFormalParameters `)` `{` AsyncGeneratorBody `}`</emu-grammar>
       <emu-alg>
-        1. Return PropName of |PropertyName|.
+        1. Return |PropertyName|.PropName().
       </emu-alg>
     </emu-clause>
 
@@ -20054,7 +20054,7 @@
       </emu-grammar>
       <emu-alg>
         1. If the function code for |AsyncGeneratorDeclaration| is strict mode code, let _strict_ be *true*. Otherwise let _strict_ be *false*.
-        1. Let _name_ be StringValue of |BindingIdentifier|.
+        1. Let _name_ be |BindingIdentifier|.StringValue().
         1. Let _F_ be ! AsyncGeneratorFunctionCreate(~Normal~, |FormalParameters|, |AsyncGeneratorBody|, _scope_, _strict_).
         1. Let _prototype_ be ! ObjectCreate(%AsyncGeneratorPrototype%).
         1. Perform ! DefinePropertyOrThrow(_F_, `"prototype"`, PropertyDescriptor{[[Value]]: _prototype_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false*}).
@@ -20122,7 +20122,7 @@
         1. Let _scope_ be the running execution context's LexicalEnvironment.
         1. Let _funcEnv_ be ! NewDeclarativeEnvironment(_scope_).
         1. Let _envRec_ be _funcEnv_'s EnvironmentRecord.
-        1. Let _name_ be StringValue of |BindingIdentifier|.
+        1. Let _name_ be |BindingIdentifier|.StringValue().
         1. Perform ! _envRec_.CreateImmutableBinding(_name_).
         1. Let _closure_ be ! AsyncGeneratorFunctionCreate(~Normal~, |FormalParameters|, |AsyncGeneratorBody|, _funcEnv_, _strict_).
         1. Let _prototype_ be ! ObjectCreate(%AsyncGeneratorPrototype%).
@@ -20179,9 +20179,9 @@
         <li>
           <p>It is a Syntax Error if |ClassHeritage| is not present and the following algorithm evaluates to *true*:</p>
           <emu-alg>
-            1. Let _constructor_ be ConstructorMethod of |ClassBody|.
+            1. Let _constructor_ be |ClassBody|.ConstructorMethod().
             1. If _constructor_ is ~empty~, return *false*.
-            1. Return HasDirectSuper of _constructor_.
+            1. Return _constructor_.HasDirectSuper().
           </emu-alg>
         </li>
       </ul>
@@ -20230,17 +20230,17 @@
       <emu-grammar>ClassElementList : ClassElement</emu-grammar>
       <emu-alg>
         1. If |ClassElement| is <emu-grammar>ClassElement : `;`</emu-grammar> , return ~empty~.
-        1. If IsStatic of |ClassElement| is *true*, return ~empty~.
-        1. If PropName of |ClassElement| is not `"constructor"`, return ~empty~.
+        1. If |ClassElement|.IsStatic() is *true*, return ~empty~.
+        1. If |ClassElement|.PropName() is not `"constructor"`, return ~empty~.
         1. Return |ClassElement|.
       </emu-alg>
       <emu-grammar>ClassElementList : ClassElementList ClassElement</emu-grammar>
       <emu-alg>
-        1. Let _head_ be ConstructorMethod of |ClassElementList|.
+        1. Let _head_ be |ClassElementList|.ConstructorMethod().
         1. If _head_ is not ~empty~, return _head_.
         1. If |ClassElement| is <emu-grammar>ClassElement : `;`</emu-grammar> , return ~empty~.
-        1. If IsStatic of |ClassElement| is *true*, return ~empty~.
-        1. If PropName of |ClassElement| is not `"constructor"`, return ~empty~.
+        1. If |ClassElement|.IsStatic() is *true*, return ~empty~.
+        1. If |ClassElement|.PropName() is not `"constructor"`, return ~empty~.
         1. Return |ClassElement|.
       </emu-alg>
       <emu-note>
@@ -20353,14 +20353,14 @@
       <emu-grammar>ClassElementList : ClassElement</emu-grammar>
       <emu-alg>
         1. If |ClassElement| is <emu-grammar>ClassElement : `;`</emu-grammar> , return a new empty List.
-        1. If IsStatic of |ClassElement| is *false* and PropName of |ClassElement| is `"constructor"`, return a new empty List.
+        1. If |ClassElement|.IsStatic() is *false* and |ClassElement|.PropName() is `"constructor"`, return a new empty List.
         1. Return a List containing |ClassElement|.
       </emu-alg>
       <emu-grammar>ClassElementList : ClassElementList ClassElement</emu-grammar>
       <emu-alg>
-        1. Let _list_ be NonConstructorMethodDefinitions of |ClassElementList|.
+        1. Let _list_ be |ClassElementList|.NonConstructorMethodDefinitions().
         1. If |ClassElement| is <emu-grammar>ClassElement : `;`</emu-grammar> , return _list_.
-        1. If IsStatic of |ClassElement| is *false* and PropName of |ClassElement| is `"constructor"`, return _list_.
+        1. If |ClassElement|.IsStatic() is *false* and |ClassElement|.PropName() is `"constructor"`, return _list_.
         1. Append |ClassElement| to the end of _list_.
         1. Return _list_.
       </emu-alg>
@@ -20371,16 +20371,16 @@
       <h1>Static Semantics: PrototypePropertyNameList</h1>
       <emu-grammar>ClassElementList : ClassElement</emu-grammar>
       <emu-alg>
-        1. If PropName of |ClassElement| is ~empty~, return a new empty List.
-        1. If IsStatic of |ClassElement| is *true*, return a new empty List.
-        1. Return a List containing PropName of |ClassElement|.
+        1. If |ClassElement|.PropName() is ~empty~, return a new empty List.
+        1. If |ClassElement|.IsStatic() is *true*, return a new empty List.
+        1. Return a List containing |ClassElement|.PropName().
       </emu-alg>
       <emu-grammar>ClassElementList : ClassElementList ClassElement</emu-grammar>
       <emu-alg>
-        1. Let _list_ be PrototypePropertyNameList of |ClassElementList|.
-        1. If PropName of |ClassElement| is ~empty~, return _list_.
-        1. If IsStatic of |ClassElement| is *true*, return _list_.
-        1. Append PropName of |ClassElement| to the end of _list_.
+        1. Let _list_ be |ClassElementList|.PrototypePropertyNameList().
+        1. If |ClassElement|.PropName() is ~empty~, return _list_.
+        1. If |ClassElement|.IsStatic() is *true*, return _list_.
+        1. Append |ClassElement|.PropName() to the end of _list_.
         1. Return _list_.
       </emu-alg>
     </emu-clause>
@@ -20424,7 +20424,7 @@
             1. Let _constructorParent_ be _superclass_.
         1. Let _proto_ be ObjectCreate(_protoParent_).
         1. If |ClassBody_opt| is not present, let _constructor_ be ~empty~.
-        1. Else, let _constructor_ be ConstructorMethod of |ClassBody|.
+        1. Else, let _constructor_ be |ClassBody|.ConstructorMethod().
         1. If _constructor_ is ~empty~, then
           1. If |ClassHeritage_opt| is present, then
             1. Set _constructor_ to the result of parsing the source text
@@ -20443,9 +20443,9 @@
         1. Perform MakeClassConstructor(_F_).
         1. Perform CreateMethodProperty(_proto_, `"constructor"`, _F_).
         1. If |ClassBody_opt| is not present, let _methods_ be a new empty List.
-        1. Else, let _methods_ be NonConstructorMethodDefinitions of |ClassBody|.
+        1. Else, let _methods_ be |ClassBody|.NonConstructorMethodDefinitions().
         1. For each |ClassElement| _m_ in order from _methods_, do
-          1. If IsStatic of _m_ is *false*, then
+          1. If _m_.IsStatic() is *false*, then
             1. Let _status_ be the result of performing PropertyDefinitionEvaluation for _m_ with arguments _proto_ and *false*.
           1. Else,
             1. Let _status_ be the result of performing PropertyDefinitionEvaluation for _m_ with arguments _F_ and *false*.
@@ -20487,7 +20487,7 @@
       <h1>Runtime Semantics: Evaluate</h1>
       <emu-grammar>ClassDeclaration : `class` BindingIdentifier ClassTail</emu-grammar>
       <emu-alg>
-        1. Perform ? BindingClassDeclarationEvaluation of this |ClassDeclaration|.
+        1. Perform ? |ClassDeclaration|.BindingClassDeclarationEvaluation().
         1. Return NormalCompletion(~empty~).
       </emu-alg>
       <emu-note>
@@ -20559,7 +20559,7 @@
         <li>It is a Syntax Error if |AsyncFunctionBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |UniqueFormalParameters| is *false*.</li>
         <li>It is a Syntax Error if HasDirectSuper of |AsyncMethod| is *true*.</li>
         <li>It is a Syntax Error if |UniqueFormalParameters|.Contains(|AwaitExpression|) is *true*.</li>
-        <li>It is a Syntax Error if any element of |UniqueFormalParameters|.BoundNames() also occurs in the LexicallyDeclaredNames of |AsyncFunctionBody|.</li>
+        <li>It is a Syntax Error if any element of |UniqueFormalParameters|.BoundNames() also occurs in |AsyncFunctionBody|.LexicallyDeclaredNames().</li>
       </ul>
       <emu-grammar>
         AsyncFunctionDeclaration : `async` [no LineTerminator here] `function` BindingIdentifier `(` FormalParameters `)` `{` AsyncFunctionBody `}`
@@ -20575,7 +20575,7 @@
         <li>It is a Syntax Error if |FormalParameters|.Contains(|AwaitExpression|) is *true*.</li>
         <li>If the source code matching this production is strict code, the Early Error rules for <emu-grammar>UniqueFormalParameters : FormalParameters</emu-grammar> are applied.</li>
         <li>If the source code matching this production is strict code, it is a Syntax Error if |BindingIdentifier| is present and |BindingIdentifier|.StringValue() is `"eval"` or `"arguments"`.</li>
-        <li>It is a Syntax Error if any element of |FormalParameters|.BoundNames() also occurs in the LexicallyDeclaredNames of |AsyncFunctionBody|.</li>
+        <li>It is a Syntax Error if any element of |FormalParameters|.BoundNames() also occurs in |AsyncFunctionBody|.LexicallyDeclaredNames().</li>
         <li>It is a Syntax Error if |FormalParameters|.Contains(|SuperProperty|) is *true*.</li>
         <li>It is a Syntax Error if |AsyncFunctionBody|.Contains(|SuperProperty|) is *true*.</li>
         <li>It is a Syntax Error if |FormalParameters|.Contains(|SuperCall|) is *true*.</li>
@@ -20686,7 +20686,7 @@
         AsyncMethod : `async` [no LineTerminator here] PropertyName `(` UniqueFormalParameters `)` `{` AsyncFunctionBody `}`
       </emu-grammar>
       <emu-alg>
-        1. Return PropName of |PropertyName|.
+        1. Return |PropertyName|.PropName().
       </emu-alg>
     </emu-clause>
 
@@ -20834,7 +20834,7 @@
         AsyncArrowFunction : `async` [no LineTerminator here] AsyncArrowBindingIdentifier [no LineTerminator here] `=>` AsyncConciseBody
       </emu-grammar>
       <ul>
-        <li>It is a Syntax Error if any element of |AsyncArrowBindingIdentifier|.BoundNames() also occurs in the LexicallyDeclaredNames of |AsyncConciseBody|.</li>
+        <li>It is a Syntax Error if any element of |AsyncArrowBindingIdentifier|.BoundNames() also occurs in |AsyncConciseBody|.LexicallyDeclaredNames().</li>
       </ul>
       <emu-grammar>
         AsyncArrowFunction : CoverCallExpressionAndAsyncArrowHead [no LineTerminator here] `=>` AsyncConciseBody
@@ -20843,9 +20843,9 @@
         <li>It is a Syntax Error if |CoverCallExpressionAndAsyncArrowHead|.Contains(|YieldExpression|) is *true*.</li>
         <li>It is a Syntax Error if |CoverCallExpressionAndAsyncArrowHead|.Contains(|AwaitExpression|) is *true*.</li>
         <li>It is a Syntax Error if |CoverCallExpressionAndAsyncArrowHead| is not covering an |AsyncArrowHead|.</li>
-        <li>It is a Syntax Error if any element of |CoverCallExpressionAndAsyncArrowHead|.BoundNames() also occurs in the LexicallyDeclaredNames of |AsyncConciseBody|.</li>
+        <li>It is a Syntax Error if any element of |CoverCallExpressionAndAsyncArrowHead|.BoundNames() also occurs in |AsyncConciseBody|.LexicallyDeclaredNames().</li>
         <li>It is a Syntax Error if |AsyncConciseBody|.ContainsUseStrict() is *true* and IsSimpleParameterList of |CoverCallExpressionAndAsyncArrowHead| is *false*.</li>
-        <li>All Early Error rules for |AsyncArrowHead| and its derived productions apply to CoveredAsyncArrowHead of |CoverCallExpressionAndAsyncArrowHead|.</li>
+        <li>All Early Error rules for |AsyncArrowHead| and its derived productions apply to |CoverCallExpressionAndAsyncArrowHead|.CoveredAsyncArrowHead().</li>
       </ul>
     </emu-clause>
 
@@ -20865,7 +20865,7 @@
         CoverCallExpressionAndAsyncArrowHead : MemberExpression Arguments
       </emu-grammar>
       <emu-alg>
-        1. Let _head_ be CoveredAsyncArrowHead of |CoverCallExpressionAndAsyncArrowHead|.
+        1. Let _head_ be |CoverCallExpressionAndAsyncArrowHead|.CoveredAsyncArrowHead().
         1. Return _head_.BoundNames().
       </emu-alg>
     </emu-clause>
@@ -20886,7 +20886,7 @@
       </emu-grammar>
       <emu-alg>
         1. If _symbol_ is not one of |NewTarget|, |SuperProperty|, |SuperCall|, `super`, or `this`, return *false*.
-        2. Let _head_ be CoveredAsyncArrowHead of |CoverCallExpressionAndAsyncArrowHead|.
+        2. Let _head_ be |CoverCallExpressionAndAsyncArrowHead|.CoveredAsyncArrowHead().
         3. If _head_.Contains(_symbol_) is *true*, return *true*.
         4. Return |AsyncConciseBody|.Contains(_symbol_).
       </emu-alg>
@@ -20937,8 +20937,8 @@
         CoverCallExpressionAndAsyncArrowHead : MemberExpression Arguments
       </emu-grammar>
       <emu-alg>
-        1. Let _head_ be CoveredAsyncArrowHead of |CoverCallExpressionAndAsyncArrowHead|.
-        1. Return IsSimpleParameterList of _head_.
+        1. Let _head_ be |CoverCallExpressionAndAsyncArrowHead|.CoveredAsyncArrowHead().
+        1. Return _head_.IsSimpleParameterList().
       </emu-alg>
     </emu-clause>
 
@@ -21044,7 +21044,7 @@
       <emu-alg>
         1. If the function code for this |AsyncArrowFunction| is strict mode code, let _strict_ be *true*. Otherwise, let _strict_ be *false*.
         1. Let _scope_ be the LexicalEnvironment of the running execution context.
-        1. Let _head_ be CoveredAsyncArrowHead of |CoverCallExpressionAndAsyncArrowHead|.
+        1. Let _head_ be |CoverCallExpressionAndAsyncArrowHead|.CoveredAsyncArrowHead().
         1. Let _parameters_ be the |ArrowFormalParameters| of _head_.
         1. Let _closure_ be ! AsyncFunctionCreate(~Arrow~, _parameters_, |AsyncConciseBody|, _scope_, _strict_).
         1. Return _closure_.
@@ -21347,7 +21347,7 @@
         </emu-alg>
         <emu-grammar>PrimaryExpression : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
         <emu-alg>
-          1. Let _expr_ be CoveredParenthesizedExpression of |CoverParenthesizedExpressionAndArrowParameterList|.
+          1. Let _expr_ be |CoverParenthesizedExpressionAndArrowParameterList|.CoveredParenthesizedExpression().
           1. Return HasCallInTailPosition of _expr_ with argument _call_.
         </emu-alg>
         <emu-grammar>
@@ -21403,7 +21403,7 @@
           It is a Syntax Error if the LexicallyDeclaredNames of |ScriptBody| contains any duplicate entries.
         </li>
         <li>
-          It is a Syntax Error if any element of the LexicallyDeclaredNames of |ScriptBody| also occurs in the VarDeclaredNames of |ScriptBody|.
+          It is a Syntax Error if any element of the LexicallyDeclaredNames of |ScriptBody| also occurs in |ScriptBody|.VarDeclaredNames().
         </li>
       </ul>
       <emu-grammar>ScriptBody : StatementList</emu-grammar>
@@ -21441,7 +21441,7 @@
       <emu-see-also-para op="LexicallyDeclaredNames"></emu-see-also-para>
       <emu-grammar>ScriptBody : StatementList</emu-grammar>
       <emu-alg>
-        1. Return TopLevelLexicallyDeclaredNames of |StatementList|.
+        1. Return |StatementList|.TopLevelLexicallyDeclaredNames().
       </emu-alg>
       <emu-note>
         <p>At the top level of a |Script|, function declarations are treated like var declarations rather than like lexical declarations.</p>
@@ -21454,7 +21454,7 @@
       <emu-see-also-para op="LexicallyScopedDeclarations"></emu-see-also-para>
       <emu-grammar>ScriptBody : StatementList</emu-grammar>
       <emu-alg>
-        1. Return TopLevelLexicallyScopedDeclarations of |StatementList|.
+        1. Return |StatementList|.TopLevelLexicallyScopedDeclarations().
       </emu-alg>
     </emu-clause>
 
@@ -21464,7 +21464,7 @@
       <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
       <emu-grammar>ScriptBody : StatementList</emu-grammar>
       <emu-alg>
-        1. Return TopLevelVarDeclaredNames of |StatementList|.
+        1. Return |StatementList|.TopLevelVarDeclaredNames().
       </emu-alg>
     </emu-clause>
 
@@ -21474,7 +21474,7 @@
       <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
       <emu-grammar>ScriptBody : StatementList</emu-grammar>
       <emu-alg>
-        1. Return TopLevelVarScopedDeclarations of |StatementList|.
+        1. Return |StatementList|.TopLevelVarScopedDeclarations().
       </emu-alg>
     </emu-clause>
 
@@ -21614,8 +21614,8 @@
       <emu-alg>
         1. Let _envRec_ be _env_'s EnvironmentRecord.
         1. Assert: _envRec_ is a global Environment Record.
-        1. Let _lexNames_ be the LexicallyDeclaredNames of _script_.
-        1. Let _varNames_ be the VarDeclaredNames of _script_.
+        1. Let _lexNames_ be _script_.LexicallyDeclaredNames().
+        1. Let _varNames_ be _script_.VarDeclaredNames().
         1. For each _name_ in _lexNames_, do
           1. If _envRec_.HasVarDeclaration(_name_) is *true*, throw a *SyntaxError* exception.
           1. If _envRec_.HasLexicalDeclaration(_name_) is *true*, throw a *SyntaxError* exception.
@@ -21623,7 +21623,7 @@
           1. If _hasRestrictedGlobal_ is *true*, throw a *SyntaxError* exception.
         1. For each _name_ in _varNames_, do
           1. If _envRec_.HasLexicalDeclaration(_name_) is *true*, throw a *SyntaxError* exception.
-        1. Let _varDeclarations_ be the VarScopedDeclarations of _script_.
+        1. Let _varDeclarations_ be _script_.VarScopedDeclarations().
         1. Let _functionsToInitialize_ be a new empty List.
         1. Let _declaredFunctionNames_ be a new empty List.
         1. For each _d_ in _varDeclarations_, in reverse list order, do
@@ -21647,11 +21647,11 @@
                   1. Append _vn_ to _declaredVarNames_.
         1. NOTE: No abnormal terminations occur after this algorithm step if the global object is an ordinary object. However, if the global object is a Proxy exotic object it may exhibit behaviours that cause abnormal terminations in some of the following steps.
         1. NOTE: Annex <emu-xref href="#sec-web-compat-globaldeclarationinstantiation"></emu-xref> adds additional steps at this point.
-        1. Let _lexDeclarations_ be the LexicallyScopedDeclarations of _script_.
+        1. Let _lexDeclarations_ be _script_.LexicallyScopedDeclarations().
         1. For each element _d_ in _lexDeclarations_, do
           1. NOTE: Lexically declared names are only instantiated here but not initialized.
           1. For each element _dn_ of _d_.BoundNames(), do
-            1. If IsConstantDeclaration of _d_ is *true*, then
+            1. If _d_.IsConstantDeclaration() is *true*, then
               1. Perform ? _envRec_.CreateImmutableBinding(_dn_, *true*).
             1. Else,
               1. Perform ? _envRec_.CreateMutableBinding(_dn_, *false*).
@@ -21719,13 +21719,13 @@
             It is a Syntax Error if the LexicallyDeclaredNames of |ModuleItemList| contains any duplicate entries.
           </li>
           <li>
-            It is a Syntax Error if any element of the LexicallyDeclaredNames of |ModuleItemList| also occurs in the VarDeclaredNames of |ModuleItemList|.
+            It is a Syntax Error if any element of the LexicallyDeclaredNames of |ModuleItemList| also occurs in |ModuleItemList|.VarDeclaredNames().
           </li>
           <li>
             It is a Syntax Error if the ExportedNames of |ModuleItemList| contains any duplicate entries.
           </li>
           <li>
-            It is a Syntax Error if any element of the ExportedBindings of |ModuleItemList| does not also occur in either the VarDeclaredNames of |ModuleItemList|, or the LexicallyDeclaredNames of |ModuleItemList|.
+            It is a Syntax Error if any element of the ExportedBindings of |ModuleItemList| does not also occur in either the VarDeclaredNames of |ModuleItemList|, or |ModuleItemList|.LexicallyDeclaredNames().
           </li>
           <li>
             It is a Syntax Error if |ModuleItemList|.Contains(`super`) is *true*.
@@ -21820,8 +21820,8 @@
         </emu-note>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _names_ be ExportedBindings of |ModuleItemList|.
-          1. Append to _names_ the elements of the ExportedBindings of |ModuleItem|.
+          1. Let _names_ be |ModuleItemList|.ExportedBindings().
+          1. Append to _names_ the elements of |ModuleItem|.ExportedBindings().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>
@@ -21843,13 +21843,13 @@
         </emu-note>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _names_ be ExportedNames of |ModuleItemList|.
-          1. Append to _names_ the elements of the ExportedNames of |ModuleItem|.
+          1. Let _names_ be |ModuleItemList|.ExportedNames().
+          1. Append to _names_ the elements of |ModuleItem|.ExportedNames().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>ModuleItem : ExportDeclaration</emu-grammar>
         <emu-alg>
-          1. Return the ExportedNames of |ExportDeclaration|.
+          1. Return |ExportDeclaration|.ExportedNames().
         </emu-alg>
         <emu-grammar>
           ModuleItem :
@@ -21871,8 +21871,8 @@
         </emu-alg>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _entries_ be ExportEntries of |ModuleItemList|.
-          1. Append to _entries_ the elements of the ExportEntries of |ModuleItem|.
+          1. Let _entries_ be |ModuleItemList|.ExportEntries().
+          1. Append to _entries_ the elements of |ModuleItem|.ExportEntries().
           1. Return _entries_.
         </emu-alg>
         <emu-grammar>
@@ -21895,8 +21895,8 @@
         </emu-alg>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _entries_ be ImportEntries of |ModuleItemList|.
-          1. Append to _entries_ the elements of the ImportEntries of |ModuleItem|.
+          1. Let _entries_ be |ModuleItemList|.ImportEntries().
+          1. Append to _entries_ the elements of |ModuleItem|.ImportEntries().
           1. Return _entries_.
         </emu-alg>
         <emu-grammar>
@@ -21931,12 +21931,12 @@
         </emu-alg>
         <emu-grammar>ModuleItemList : ModuleItem</emu-grammar>
         <emu-alg>
-          1. Return ModuleRequests of |ModuleItem|.
+          1. Return |ModuleItem|.ModuleRequests().
         </emu-alg>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _moduleNames_ be ModuleRequests of |ModuleItemList|.
-          1. Let _additionalNames_ be ModuleRequests of |ModuleItem|.
+          1. Let _moduleNames_ be |ModuleItemList|.ModuleRequests().
+          1. Let _additionalNames_ be |ModuleItem|.ModuleRequests().
           1. Append to _moduleNames_ each element of _additionalNames_ that is not already an element of _moduleNames_.
           1. Return _moduleNames_.
         </emu-alg>
@@ -21955,8 +21955,8 @@
         </emu-note>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _names_ be LexicallyDeclaredNames of |ModuleItemList|.
-          1. Append to _names_ the elements of the LexicallyDeclaredNames of |ModuleItem|.
+          1. Let _names_ be |ModuleItemList|.LexicallyDeclaredNames().
+          1. Append to _names_ the elements of |ModuleItem|.LexicallyDeclaredNames().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>ModuleItem : ImportDeclaration</emu-grammar>
@@ -21970,7 +21970,7 @@
         </emu-alg>
         <emu-grammar>ModuleItem : StatementListItem</emu-grammar>
         <emu-alg>
-          1. Return LexicallyDeclaredNames of |StatementListItem|.
+          1. Return |StatementListItem|.LexicallyDeclaredNames().
         </emu-alg>
         <emu-note>
           <p>At the top level of a |Module|, function declarations are treated like lexical declarations rather than like var declarations.</p>
@@ -21987,8 +21987,8 @@
         </emu-alg>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _declarations_ be LexicallyScopedDeclarations of |ModuleItemList|.
-          1. Append to _declarations_ the elements of the LexicallyScopedDeclarations of |ModuleItem|.
+          1. Let _declarations_ be |ModuleItemList|.LexicallyScopedDeclarations().
+          1. Append to _declarations_ the elements of |ModuleItem|.LexicallyScopedDeclarations().
           1. Return _declarations_.
         </emu-alg>
         <emu-grammar>ModuleItem : ImportDeclaration</emu-grammar>
@@ -22007,8 +22007,8 @@
         </emu-alg>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _names_ be VarDeclaredNames of |ModuleItemList|.
-          1. Append to _names_ the elements of the VarDeclaredNames of |ModuleItem|.
+          1. Let _names_ be |ModuleItemList|.VarDeclaredNames().
+          1. Append to _names_ the elements of |ModuleItem|.VarDeclaredNames().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>ModuleItem : ImportDeclaration</emu-grammar>
@@ -22032,8 +22032,8 @@
         </emu-alg>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _declarations_ be VarScopedDeclarations of |ModuleItemList|.
-          1. Append to _declarations_ the elements of the VarScopedDeclarations of |ModuleItem|.
+          1. Let _declarations_ be |ModuleItemList|.VarScopedDeclarations().
+          1. Append to _declarations_ the elements of |ModuleItem|.VarScopedDeclarations().
           1. Return _declarations_.
         </emu-alg>
         <emu-grammar>ModuleItem : ImportDeclaration</emu-grammar>
@@ -22042,7 +22042,7 @@
         </emu-alg>
         <emu-grammar>ModuleItem : ExportDeclaration</emu-grammar>
         <emu-alg>
-          1. If |ExportDeclaration| is `export` |VariableStatement|, return VarScopedDeclarations of |VariableStatement|.
+          1. If |ExportDeclaration| is `export` |VariableStatement|, return |VariableStatement|.VarScopedDeclarations().
           1. Return a new empty List.
         </emu-alg>
       </emu-clause>
@@ -22693,13 +22693,13 @@
             1. Assert: _sourceText_ is an ECMAScript source text (see clause <emu-xref href="#sec-ecmascript-language-source-code"></emu-xref>).
             1. Parse _sourceText_ using |Module| as the goal symbol and analyse the parse result for any Early Error conditions. If the parse was successful and no early errors were found, let _body_ be the resulting parse tree. Otherwise, let _body_ be a List of one or more *SyntaxError* or *ReferenceError* objects representing the parsing errors and/or early errors. Parsing and early error detection may be interweaved in an implementation-dependent manner. If more than one parsing error or early error is present, the number and ordering of error objects in the list is implementation-dependent, but at least one must be present.
             1. If _body_ is a List of errors, return _body_.
-            1. Let _requestedModules_ be the ModuleRequests of _body_.
-            1. Let _importEntries_ be ImportEntries of _body_.
+            1. Let _requestedModules_ be _body_.ModuleRequests().
+            1. Let _importEntries_ be _body_.ImportEntries().
             1. Let _importedBoundNames_ be ImportedLocalNames(_importEntries_).
             1. Let _indirectExportEntries_ be a new empty List.
             1. Let _localExportEntries_ be a new empty List.
             1. Let _starExportEntries_ be a new empty List.
-            1. Let _exportEntries_ be ExportEntries of _body_.
+            1. Let _exportEntries_ be _body_.ExportEntries().
             1. For each ExportEntry Record _ee_ in _exportEntries_, do
               1. If _ee_.[[ModuleRequest]] is *null*, then
                 1. If _ee_.[[LocalName]] is not an element of _importedBoundNames_, then
@@ -22898,7 +22898,7 @@
                   1. If _resolution_ is *null* or `"ambiguous"`, throw a *SyntaxError* exception.
                   1. Call _envRec_.CreateImportBinding(_in_.[[LocalName]], _resolution_.[[Module]], _resolution_.[[BindingName]]).
               1. Let _code_ be _module_.[[ECMAScriptCode]].
-              1. Let _varDeclarations_ be the VarScopedDeclarations of _code_.
+              1. Let _varDeclarations_ be _code_.VarScopedDeclarations().
               1. Let _declaredVarNames_ be a new empty List.
               1. For each element _d_ in _varDeclarations_, do
                 1. For each element _dn_ of _d_.BoundNames(), do
@@ -22906,10 +22906,10 @@
                     1. Perform ! _envRec_.CreateMutableBinding(_dn_, *false*).
                     1. Call _envRec_.InitializeBinding(_dn_, *undefined*).
                     1. Append _dn_ to _declaredVarNames_.
-              1. Let _lexDeclarations_ be the LexicallyScopedDeclarations of _code_.
+              1. Let _lexDeclarations_ be _code_.LexicallyScopedDeclarations().
               1. For each element _d_ in _lexDeclarations_, do
                 1. For each element _dn_ of _d_.BoundNames(), do
-                  1. If IsConstantDeclaration of _d_ is *true*, then
+                  1. If _d_.IsConstantDeclaration() is *true*, then
                     1. Perform ! _envRec_.CreateImmutableBinding(_dn_, *true*).
                   1. Else,
                     1. Perform ! _envRec_.CreateMutableBinding(_dn_, *false*).
@@ -23259,7 +23259,7 @@
         <emu-see-also-para op="ImportEntries"></emu-see-also-para>
         <emu-grammar>ImportDeclaration : `import` ImportClause FromClause `;`</emu-grammar>
         <emu-alg>
-          1. Let _module_ be the sole element of ModuleRequests of |FromClause|.
+          1. Let _module_ be the sole element of |FromClause|.ModuleRequests().
           1. Return ImportEntriesForModule of |ImportClause| with argument _module_.
         </emu-alg>
         <emu-grammar>ImportDeclaration : `import` ModuleSpecifier `;`</emu-grammar>
@@ -23327,7 +23327,7 @@
         <emu-see-also-para op="ModuleRequests"></emu-see-also-para>
         <emu-grammar>ImportDeclaration : `import` ImportClause FromClause `;`</emu-grammar>
         <emu-alg>
-          1. Return ModuleRequests of |FromClause|.
+          1. Return |FromClause|.ModuleRequests().
         </emu-alg>
         <emu-grammar>ModuleSpecifier : StringLiteral</emu-grammar>
         <emu-alg>
@@ -23431,7 +23431,7 @@
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` ExportClause `;`</emu-grammar>
         <emu-alg>
-          1. Return the ExportedBindings of |ExportClause|.
+          1. Return |ExportClause|.ExportedBindings().
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` VariableStatement</emu-grammar>
         <emu-alg>
@@ -23457,8 +23457,8 @@
         </emu-alg>
         <emu-grammar>ExportsList : ExportsList `,` ExportSpecifier</emu-grammar>
         <emu-alg>
-          1. Let _names_ be the ExportedBindings of |ExportsList|.
-          1. Append to _names_ the elements of the ExportedBindings of |ExportSpecifier|.
+          1. Let _names_ be |ExportsList|.ExportedBindings().
+          1. Append to _names_ the elements of |ExportSpecifier|.ExportedBindings().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>ExportSpecifier : IdentifierName</emu-grammar>
@@ -23486,7 +23486,7 @@
           ExportDeclaration : `export` ExportClause `;`
         </emu-grammar>
         <emu-alg>
-          1. Return the ExportedNames of |ExportClause|.
+          1. Return |ExportClause|.ExportedNames().
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` VariableStatement</emu-grammar>
         <emu-alg>
@@ -23512,8 +23512,8 @@
         </emu-alg>
         <emu-grammar>ExportsList : ExportsList `,` ExportSpecifier</emu-grammar>
         <emu-alg>
-          1. Let _names_ be the ExportedNames of |ExportsList|.
-          1. Append to _names_ the elements of the ExportedNames of |ExportSpecifier|.
+          1. Let _names_ be |ExportsList|.ExportedNames().
+          1. Append to _names_ the elements of |ExportSpecifier|.ExportedNames().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>ExportSpecifier : IdentifierName</emu-grammar>
@@ -23532,13 +23532,13 @@
         <emu-see-also-para op="ExportEntries"></emu-see-also-para>
         <emu-grammar>ExportDeclaration : `export` `*` FromClause `;`</emu-grammar>
         <emu-alg>
-          1. Let _module_ be the sole element of ModuleRequests of |FromClause|.
+          1. Let _module_ be the sole element of |FromClause|.ModuleRequests().
           1. Let _entry_ be the ExportEntry Record {[[ModuleRequest]]: _module_, [[ImportName]]: `"*"`, [[LocalName]]: *null*, [[ExportName]]: *null* }.
           1. Return a new List containing _entry_.
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` ExportClause FromClause `;`</emu-grammar>
         <emu-alg>
-          1. Let _module_ be the sole element of ModuleRequests of |FromClause|.
+          1. Let _module_ be the sole element of |FromClause|.ModuleRequests().
           1. Return ExportEntriesForModule of |ExportClause| with argument _module_.
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` ExportClause `;`</emu-grammar>
@@ -23657,11 +23657,11 @@
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` Declaration</emu-grammar>
         <emu-alg>
-          1. Return a new List containing DeclarationPart of |Declaration|.
+          1. Return a new List containing |Declaration|.DeclarationPart().
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` `default` HoistableDeclaration</emu-grammar>
         <emu-alg>
-          1. Return a new List containing DeclarationPart of |HoistableDeclaration|.
+          1. Return a new List containing |HoistableDeclaration|.DeclarationPart().
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` `default` ClassDeclaration</emu-grammar>
         <emu-alg>
@@ -23683,7 +23683,7 @@
           ExportDeclaration : `export` ExportClause FromClause `;`
         </emu-grammar>
         <emu-alg>
-          1. Return the ModuleRequests of |FromClause|.
+          1. Return |FromClause|.ModuleRequests().
         </emu-alg>
         <emu-grammar>
           ExportDeclaration :
@@ -23708,8 +23708,8 @@
         </emu-alg>
         <emu-grammar>ExportsList : ExportsList `,` ExportSpecifier</emu-grammar>
         <emu-alg>
-          1. Let _names_ be the ReferencedBindings of |ExportsList|.
-          1. Append to _names_ the elements of the ReferencedBindings of |ExportSpecifier|.
+          1. Let _names_ be |ExportsList|.ReferencedBindings().
+          1. Append to _names_ the elements of |ExportSpecifier|.ReferencedBindings().
           1. Return _names_.
         </emu-alg>
         <emu-grammar>ExportSpecifier : IdentifierName</emu-grammar>
@@ -23748,7 +23748,7 @@
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` `default` ClassDeclaration</emu-grammar>
         <emu-alg>
-          1. Let _value_ be the result of BindingClassDeclarationEvaluation of |ClassDeclaration|.
+          1. Let _value_ be |ClassDeclaration|.BindingClassDeclarationEvaluation().
           1. ReturnIfAbrupt(_value_).
           1. Let _className_ be the sole element of |ClassDeclaration|.BoundNames().
           1. If _className_ is `"*default*"`, then
@@ -23937,7 +23937,7 @@
           1. If _script_.Contains(|ScriptBody|) is *false*, return *undefined*.
           1. Let _body_ be the |ScriptBody| of _script_.
           1. If _strictCaller_ is *true*, let _strictEval_ be *true*.
-          1. Else, let _strictEval_ be IsStrict of _script_.
+          1. Else, let _strictEval_ be _script_.IsStrict().
           1. Let _ctx_ be the running execution context.
           1. NOTE: If _direct_ is *true*, _ctx_ will be the execution context that performed the direct eval. If _direct_ is *false*, _ctx_ will be the execution context for the invocation of the `eval` function.
           1. If _direct_ is *true*, then
@@ -24015,8 +24015,8 @@
                    #sec-variablestatements-in-catch-blocks accordingly.
         -->
         <emu-alg>
-          1. Let _varNames_ be the VarDeclaredNames of _body_.
-          1. Let _varDeclarations_ be the VarScopedDeclarations of _body_.
+          1. Let _varNames_ be _body_.VarDeclaredNames().
+          1. Let _varDeclarations_ be _body_.VarScopedDeclarations().
           1. Let _lexEnvRec_ be _lexEnv_'s EnvironmentRecord.
           1. Let _varEnvRec_ be _varEnv_'s EnvironmentRecord.
           1. If _strict_ is *false*, then
@@ -24061,11 +24061,11 @@
                   1. If _vn_ is not an element of _declaredVarNames_, then
                     1. Append _vn_ to _declaredVarNames_.
           1. NOTE: No abnormal terminations occur after this algorithm step unless _varEnvRec_ is a global Environment Record and the global object is a Proxy exotic object.
-          1. Let _lexDeclarations_ be the LexicallyScopedDeclarations of _body_.
+          1. Let _lexDeclarations_ be _body_.LexicallyScopedDeclarations().
           1. For each element _d_ in _lexDeclarations_, do
             1. NOTE: Lexically declared names are only instantiated here but not initialized.
             1. For each element _dn_ of _d_.BoundNames(), do
-              1. If IsConstantDeclaration of _d_ is *true*, then
+              1. If _d_.IsConstantDeclaration() is *true*, then
                 1. Perform ? _lexEnvRec_.CreateImmutableBinding(_dn_, *true*).
               1. Else,
                 1. Perform ? _lexEnvRec_.CreateMutableBinding(_dn_, *false*).
@@ -25298,8 +25298,8 @@
             1. Let _body_ be the result of parsing _bodyText_, interpreted as UTF-16 encoded Unicode text as described in <emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>, using _goal_ as the goal symbol. Throw a *SyntaxError* exception if the parse fails.
             1. Let _strict_ be _body_.ContainsUseStrict().
             1. If any static semantics errors are detected for _parameters_ or _body_, throw a *SyntaxError* or a *ReferenceError* exception, depending on the type of the error. If _strict_ is *true*, the Early Error rules for <emu-grammar>UniqueFormalParameters : FormalParameters</emu-grammar> are applied. Parsing and early error detection may be interweaved in an implementation-dependent manner.
-            1. If _strict_ is *true* and IsSimpleParameterList of _parameters_ is *false*, throw a *SyntaxError* exception.
-            1. If any element of _parameters_.BoundNames() also occurs in the LexicallyDeclaredNames of _body_, throw a *SyntaxError* exception.
+            1. If _strict_ is *true* and _parameters_.IsSimpleParameterList() is *false*, throw a *SyntaxError* exception.
+            1. If any element of _parameters_.BoundNames() also occurs in _body_.LexicallyDeclaredNames(), throw a *SyntaxError* exception.
             1. If _body_.Contains(|SuperCall|) is *true*, throw a *SyntaxError* exception.
             1. If _parameters_.Contains(|SuperCall|) is *true*, throw a *SyntaxError* exception.
             1. If _body_.Contains(|SuperProperty|) is *true*, throw a *SyntaxError* exception.
@@ -28848,7 +28848,7 @@ THH:mm:ss.sss
             1. Let _nextCP_ be ? ToNumber(_next_).
             1. If SameValue(_nextCP_, ToInteger(_nextCP_)) is *false*, throw a *RangeError* exception.
             1. If _nextCP_ &lt; 0 or _nextCP_ &gt; 0x10FFFF, throw a *RangeError* exception.
-            1. Append the elements of the UTF16Encoding of _nextCP_ to the end of _elements_.
+            1. Append the elements of _nextCP_.UTF16Encoding() to the end of _elements_.
             1. Let _nextIndex_ be _nextIndex_ + 1.
           1. Return the String value whose elements are, in order, the elements in the List _elements_. If _length_ is 0, the empty string is returned.
         </emu-alg>
@@ -30052,7 +30052,7 @@ THH:mm:ss.sss
             It is a Syntax Error if IsCharacterClass of |ClassAtomNoDash| is *true* or IsCharacterClass of |ClassAtom| is *true*.
           </li>
           <li>
-            It is a Syntax Error if IsCharacterClass of |ClassAtomNoDash| is *false* and IsCharacterClass of |ClassAtom| is *false* and the CharacterValue of |ClassAtomNoDash| is larger than the CharacterValue of |ClassAtom|.
+            It is a Syntax Error if IsCharacterClass of |ClassAtomNoDash| is *false* and IsCharacterClass of |ClassAtom| is *false* and the CharacterValue of |ClassAtomNoDash| is larger than |ClassAtom|.CharacterValue().
           </li>
         </ul>
         <emu-grammar>RegExpIdentifierStart[U] :: `\` RegExpUnicodeEscapeSequence[?U]</emu-grammar>
@@ -30278,22 +30278,22 @@ THH:mm:ss.sss
         </emu-alg>
         <emu-grammar>RegExpUnicodeEscapeSequence :: `u` LeadSurrogate `\u` TrailSurrogate</emu-grammar>
         <emu-alg>
-          1. Let _lead_ be the CharacterValue of |LeadSurrogate|.
-          1. Let _trail_ be the CharacterValue of |TrailSurrogate|.
+          1. Let _lead_ be |LeadSurrogate|.CharacterValue().
+          1. Let _trail_ be |TrailSurrogate|.CharacterValue().
           1. Let _cp_ be UTF16Decode(_lead_, _trail_).
           1. Return the code point value of _cp_.
         </emu-alg>
         <emu-grammar>RegExpUnicodeEscapeSequence :: `u` LeadSurrogate</emu-grammar>
         <emu-alg>
-          1. Return the CharacterValue of |LeadSurrogate|.
+          1. Return |LeadSurrogate|.CharacterValue().
         </emu-alg>
         <emu-grammar>RegExpUnicodeEscapeSequence :: `u` TrailSurrogate</emu-grammar>
         <emu-alg>
-          1. Return the CharacterValue of |TrailSurrogate|.
+          1. Return |TrailSurrogate|.CharacterValue().
         </emu-alg>
         <emu-grammar>RegExpUnicodeEscapeSequence :: `u` NonSurrogate</emu-grammar>
         <emu-alg>
-          1. Return the CharacterValue of |NonSurrogate|.
+          1. Return |NonSurrogate|.CharacterValue().
         </emu-alg>
         <emu-grammar>RegExpUnicodeEscapeSequence :: `u` Hex4Digits</emu-grammar>
         <emu-alg>
@@ -31195,7 +31195,7 @@ THH:mm:ss.sss
             IdentityEscape
         </emu-grammar>
         <emu-alg>
-          1. Let _cv_ be the CharacterValue of this |CharacterEscape|.
+          1. Let _cv_ be |CharacterEscape|.CharacterValue().
           1. Return the character whose character value is _cv_.
         </emu-alg>
       </emu-clause>
@@ -31206,7 +31206,7 @@ THH:mm:ss.sss
         <p>The |DecimalEscape| productions evaluate as follows:</p>
         <emu-grammar>DecimalEscape :: NonZeroDigit DecimalDigits?</emu-grammar>
         <emu-alg>
-          1. Return the CapturingGroupNumber of this |DecimalEscape|.
+          1. Return |DecimalEscape|.CapturingGroupNumber().
         </emu-alg>
         <emu-note>
           <p>If `\\` is followed by a decimal number _n_ whose first digit is not `0`, then the escape sequence is considered to be a backreference. It is an error if _n_ is greater than the total number of left-capturing parentheses in the entire regular expression.</p>
@@ -31244,16 +31244,16 @@ THH:mm:ss.sss
         <p>The production <emu-grammar>CharacterClassEscape :: `P{` UnicodePropertyValueExpression `}`</emu-grammar> evaluates by returning the CharSet containing all Unicode code points not included in the CharSet returned by |UnicodePropertyValueExpression|.</p>
         <p>The production <emu-grammar>UnicodePropertyValueExpression :: UnicodePropertyName `=` UnicodePropertyValue</emu-grammar> evaluates as follows:</p>
         <emu-alg>
-          1. Let _ps_ be SourceText of |UnicodePropertyName|.
+          1. Let _ps_ be |UnicodePropertyName|.SourceText().
           1. Let _p_ be ! UnicodeMatchProperty(_ps_).
           1. Assert: _p_ is a Unicode property name or property alias listed in the &ldquo;Property name and aliases&rdquo; column of <emu-xref href="#table-nonbinary-unicode-properties"></emu-xref>.
-          1. Let _vs_ be SourceText of |UnicodePropertyValue|.
+          1. Let _vs_ be |UnicodePropertyValue|.SourceText().
           1. Let _v_ be ! UnicodeMatchPropertyValue(_p_, _vs_).
           1. Return the CharSet containing all Unicode code points whose character database definition includes the property _p_ with value _v_.
         </emu-alg>
         <p>The production <emu-grammar>UnicodePropertyValueExpression :: LoneUnicodePropertyNameOrValue</emu-grammar> evaluates as follows:</p>
         <emu-alg>
-          1. Let _s_ be SourceText of |LoneUnicodePropertyNameOrValue|.
+          1. Let _s_ be |LoneUnicodePropertyNameOrValue|.SourceText().
           1. If ! UnicodeMatchPropertyValue(`"General_Category"`, _s_) is identical to a List of Unicode code points that is the name of a Unicode general category or general category alias listed in the &ldquo;Property value and aliases&rdquo; column of <emu-xref href="#table-unicode-general-category-values"></emu-xref>, then
             1. Return the CharSet containing all Unicode code points whose character database definition includes the property &ldquo;General_Category&rdquo; with value _s_.
           1. Let _p_ be ! UnicodeMatchProperty(_s_).
@@ -31398,7 +31398,7 @@ THH:mm:ss.sss
           ClassEscape :: CharacterEscape
         </emu-grammar>
         <emu-alg>
-          1. Let _cv_ be the CharacterValue of this |ClassEscape|.
+          1. Let _cv_ be |ClassEscape|.CharacterValue().
           1. Let _c_ be the character whose character value is _cv_.
           1. Return the CharSet containing the single character _c_.
         </emu-alg>
@@ -40940,7 +40940,7 @@ THH:mm:ss.sss
         <p>CharacterEscape (<emu-xref href="#sec-characterescape"></emu-xref>) includes the following additional evaluation rule:</p>
         <p>The production <emu-grammar>CharacterEscape :: LegacyOctalEscapeSequence</emu-grammar> evaluates as follows:</p>
         <emu-alg>
-          1. Let _cv_ be the CharacterValue of this |CharacterEscape|.
+          1. Let _cv_ be |CharacterEscape|.CharacterValue().
           1. Return the character whose character value is _cv_.
         </emu-alg>
 
@@ -40967,7 +40967,7 @@ THH:mm:ss.sss
         <p>ClassEscape (<emu-xref href="#sec-classescape"></emu-xref>) includes the following additional evaluation rule:</p>
         <p>The production <emu-grammar>ClassEscape :: `c` ClassControlLetter</emu-grammar> evaluates as follows:</p>
         <emu-alg>
-          1. Let _cv_ be the CharacterValue of this |ClassEscape|.
+          1. Let _cv_ be |ClassEscape|.CharacterValue().
           1. Let _c_ be the character whose character value is _cv_.
           1. Return the CharSet containing the single character _c_.
         </emu-alg>
@@ -41595,7 +41595,7 @@ THH:mm:ss.sss
         <h1>Changes to GlobalDeclarationInstantiation</h1>
         <p>During GlobalDeclarationInstantiation the following steps are performed in place of step 14:</p>
         <emu-alg>
-          1. Let _strict_ be IsStrict of _script_.
+          1. Let _strict_ be _script_.IsStrict().
           1. If _strict_ is *false*, then
             1. Let _declaredFunctionOrVarNames_ be a new empty List.
             1. Append to _declaredFunctionOrVarNames_ the elements of _declaredFunctionNames_.
@@ -41729,7 +41729,7 @@ THH:mm:ss.sss
           It is a Syntax Error if |CatchParameter|.BoundNames() contains any duplicate elements.
         </li>
         <li>
-          It is a Syntax Error if any element of |CatchParameter|.BoundNames() also occurs in the LexicallyDeclaredNames of |Block|.
+          It is a Syntax Error if any element of |CatchParameter|.BoundNames() also occurs in |Block|.LexicallyDeclaredNames().
         </li>
         <li>
           It is a Syntax Error if any element of |CatchParameter|.BoundNames() also occurs in the VarDeclaredNames of |Block| unless |CatchParameter| is <emu-grammar>CatchParameter : BindingIdentifier</emu-grammar> and that element is only bound by a |VariableStatement|, the |VariableDeclarationList| of a for statement, the |ForBinding| of a for-in statement, or the |BindingIdentifier| of a for-in statement.
@@ -41788,14 +41788,14 @@ THH:mm:ss.sss
       <emu-grammar>IterationStatement : `for` `(` `var` BindingIdentifier Initializer `in` Expression `)` Statement</emu-grammar>
       <emu-alg>
         1. Let _names_ be |BindingIdentifier|.BoundNames().
-        1. Append to _names_ the elements of the VarDeclaredNames of |Statement|.
+        1. Append to _names_ the elements of |Statement|.VarDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <p>The static semantics of VarScopedDeclarations in <emu-xref href="#sec-for-in-and-for-of-statements-static-semantics-varscopeddeclarations"></emu-xref> are augmented with the following:</p>
       <emu-grammar>IterationStatement : `for` `(` `var` BindingIdentifier Initializer `in` Expression `)` Statement</emu-grammar>
       <emu-alg>
         1. Let _declarations_ be a List containing |BindingIdentifier|.
-        1. Append to _declarations_ the elements of the VarScopedDeclarations of |Statement|.
+        1. Append to _declarations_ the elements of |Statement|.VarScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <p>The runtime semantics of LabelledEvaluation in <emu-xref href="#sec-for-in-and-for-of-statements-runtime-semantics-labelledevaluation"></emu-xref> are augmented with the following:</p>
