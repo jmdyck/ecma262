@@ -7871,7 +7871,7 @@
               1. Perform ! _lexEnvRec_.CreateMutableBinding(_dn_, *false*).
         1. For each Parse Node _f_ in _functionsToInitialize_, do
           1. Let _fn_ be the sole element of _f_.BoundNames().
-          1. Let _fo_ be the result of performing InstantiateFunctionObject for _f_ with argument _lexEnv_.
+          1. Let _fo_ be _f_.InstantiateFunctionObject(_lexEnv_).
           1. Perform ! _varEnvRec_.SetMutableBinding(_fn_, _fo_, *false*).
         1. Return NormalCompletion(~empty~).
       </emu-alg>
@@ -11966,7 +11966,7 @@
         <emu-grammar>PropertyDefinition : MethodDefinition</emu-grammar>
         <emu-alg>
           1. If _symbol_ is |MethodDefinition|, return *true*.
-          1. Return the result of ComputedPropertyContains for |MethodDefinition| with argument _symbol_.
+          1. Return |MethodDefinition|.ComputedPropertyContains(_symbol_).
         </emu-alg>
         <emu-note>
           <p>Static semantic rules that depend upon substructure generally do not look into function definitions.</p>
@@ -12250,7 +12250,7 @@
             1. Let _head_ be the TV of |TemplateHead|.
           1. Else,
             1. Let _head_ be the TRV of |TemplateHead|.
-          1. Let _tail_ be TemplateStrings of |TemplateSpans| with argument _raw_.
+          1. Let _tail_ be |TemplateSpans|.TemplateStrings(_raw_).
           1. Return a List containing _head_ followed by the elements, in order, of _tail_.
         </emu-alg>
         <emu-grammar>TemplateSpans : TemplateTail</emu-grammar>
@@ -12263,7 +12263,7 @@
         </emu-alg>
         <emu-grammar>TemplateSpans : TemplateMiddleList TemplateTail</emu-grammar>
         <emu-alg>
-          1. Let _middle_ be TemplateStrings of |TemplateMiddleList| with argument _raw_.
+          1. Let _middle_ be |TemplateMiddleList|.TemplateStrings(_raw_).
           1. If _raw_ is *false*, then
             1. Let _tail_ be the TV of |TemplateTail|.
           1. Else,
@@ -12280,7 +12280,7 @@
         </emu-alg>
         <emu-grammar>TemplateMiddleList : TemplateMiddleList TemplateMiddle Expression</emu-grammar>
         <emu-alg>
-          1. Let _front_ be TemplateStrings of |TemplateMiddleList| with argument _raw_.
+          1. Let _front_ be |TemplateMiddleList|.TemplateStrings(_raw_).
           1. If _raw_ is *false*, then
             1. Let _last_ be the TV of |TemplateMiddle|.
           1. Else,
@@ -12318,13 +12318,13 @@
         <h1>Runtime Semantics: GetTemplateObject ( _templateLiteral_ )</h1>
         <p>The abstract operation GetTemplateObject is called with a Parse Node, _templateLiteral_, as an argument. It performs the following steps:</p>
         <emu-alg>
-          1. Let _rawStrings_ be TemplateStrings of _templateLiteral_ with argument *true*.
+          1. Let _rawStrings_ be _templateLiteral_.TemplateStrings(*true*).
           1. Let _realm_ be the current Realm Record.
           1. Let _templateRegistry_ be _realm_.[[TemplateMap]].
           1. For each element _e_ of _templateRegistry_, do
             1. If _e_.[[Site]] is the same Parse Node as _templateLiteral_, then
               1. Return _e_.[[Array]].
-          1. Let _cookedStrings_ be TemplateStrings of _templateLiteral_ with argument *false*.
+          1. Let _cookedStrings_ be _templateLiteral_.TemplateStrings(*false*).
           1. Let _count_ be the number of elements in the List _cookedStrings_.
           1. Assert: _count_ &le; 2<sup>32</sup>-1.
           1. Let _template_ be ! ArrayCreate(_count_).
@@ -14638,7 +14638,7 @@
         </emu-grammar>
         <emu-alg>
           1. Perform ? RequireObjectCoercible(_value_).
-          1. Perform ? PropertyDestructuringAssignmentEvaluation for |AssignmentPropertyList| using _value_ as the argument.
+          1. Perform ? |AssignmentPropertyList|.PropertyDestructuringAssignmentEvaluation(_value_).
           1. Return NormalCompletion(~empty~).
         </emu-alg>
         <emu-grammar>ArrayAssignmentPattern : `[` `]`</emu-grammar>
@@ -14649,7 +14649,7 @@
         <emu-grammar>ArrayAssignmentPattern : `[` Elision `]`</emu-grammar>
         <emu-alg>
           1. Let _iteratorRecord_ be ? GetIterator(_value_).
-          1. Let _result_ be the result of performing IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
+          1. Let _result_ be |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
           1. If _iteratorRecord_.[[Done]] is *false*, return ? IteratorClose(_iteratorRecord_, _result_).
           1. Return _result_.
         </emu-alg>
@@ -14657,35 +14657,35 @@
         <emu-alg>
           1. Let _iteratorRecord_ be ? GetIterator(_value_).
           1. If |Elision| is present, then
-            1. Let _status_ be the result of performing IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
+            1. Let _status_ be |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
             1. If _status_ is an abrupt completion, then
               1. Assert: _iteratorRecord_.[[Done]] is *true*.
               1. Return Completion(_status_).
-          1. Let _result_ be the result of performing IteratorDestructuringAssignmentEvaluation of |AssignmentRestElement| with _iteratorRecord_ as the argument.
+          1. Let _result_ be |AssignmentRestElement|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
           1. If _iteratorRecord_.[[Done]] is *false*, return ? IteratorClose(_iteratorRecord_, _result_).
           1. Return _result_.
         </emu-alg>
         <emu-grammar>ArrayAssignmentPattern : `[` AssignmentElementList `]`</emu-grammar>
         <emu-alg>
           1. Let _iteratorRecord_ be ? GetIterator(_value_).
-          1. Let _result_ be the result of performing IteratorDestructuringAssignmentEvaluation of |AssignmentElementList| using _iteratorRecord_ as the argument.
+          1. Let _result_ be |AssignmentElementList|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
           1. If _iteratorRecord_.[[Done]] is *false*, return ? IteratorClose(_iteratorRecord_, _result_).
           1. Return _result_.
         </emu-alg>
         <emu-grammar>ArrayAssignmentPattern : `[` AssignmentElementList `,` Elision? AssignmentRestElement? `]`</emu-grammar>
         <emu-alg>
           1. Let _iteratorRecord_ be ? GetIterator(_value_).
-          1. Let _status_ be the result of performing IteratorDestructuringAssignmentEvaluation of |AssignmentElementList| using _iteratorRecord_ as the argument.
+          1. Let _status_ be |AssignmentElementList|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
           1. If _status_ is an abrupt completion, then
             1. If _iteratorRecord_.[[Done]] is *false*, return ? IteratorClose(_iteratorRecord_, _status_).
             1. Return Completion(_status_).
           1. If |Elision| is present, then
-            1. Set _status_ to the result of performing IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
+            1. Set _status_ to |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
             1. If _status_ is an abrupt completion, then
               1. Assert: _iteratorRecord_.[[Done]] is *true*.
               1. Return Completion(_status_).
           1. If |AssignmentRestElement| is present, then
-            1. Set _status_ to the result of performing IteratorDestructuringAssignmentEvaluation of |AssignmentRestElement| with _iteratorRecord_ as the argument.
+            1. Set _status_ to |AssignmentRestElement|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
           1. If _iteratorRecord_.[[Done]] is *false*, return ? IteratorClose(_iteratorRecord_, _status_).
           1. Return Completion(_status_).
         </emu-alg>
@@ -14697,7 +14697,7 @@
 
         <emu-grammar>ObjectAssignmentPattern : `{` AssignmentPropertyList `,` AssignmentRestProperty `}`</emu-grammar>
         <emu-alg>
-          1. Let _excludedNames_ be the result of performing ? PropertyDestructuringAssignmentEvaluation for |AssignmentPropertyList| using _value_ as the argument.
+          1. Let _excludedNames_ be ? |AssignmentPropertyList|.PropertyDestructuringAssignmentEvaluation(_value_).
           1. Return the result of performing RestDestructuringAssignmentEvaluation of |AssignmentRestProperty| with _value_ and _excludedNames_ as the arguments.
         </emu-alg>
       </emu-clause>
@@ -14711,8 +14711,8 @@
 
         <emu-grammar>AssignmentPropertyList : AssignmentPropertyList `,` AssignmentProperty</emu-grammar>
         <emu-alg>
-          1. Let _propertyNames_ be the result of performing ? PropertyDestructuringAssignmentEvaluation for |AssignmentPropertyList| using _value_ as the argument.
-          1. Let _nextNames_ be the result of performing ? PropertyDestructuringAssignmentEvaluation for |AssignmentProperty| using _value_ as the argument.
+          1. Let _propertyNames_ be ? |AssignmentPropertyList|.PropertyDestructuringAssignmentEvaluation(_value_).
+          1. Let _nextNames_ be ? |AssignmentProperty|.PropertyDestructuringAssignmentEvaluation(_value_).
           1. Append each item in _nextNames_ to the end of _propertyNames_.
           1. Return _propertyNames_.
         </emu-alg>
@@ -14761,21 +14761,21 @@
         <p>With parameter _iteratorRecord_.</p>
         <emu-grammar>AssignmentElementList : AssignmentElisionElement</emu-grammar>
         <emu-alg>
-          1. Return the result of performing IteratorDestructuringAssignmentEvaluation of |AssignmentElisionElement| using _iteratorRecord_ as the argument.
+          1. Return |AssignmentElisionElement|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
         </emu-alg>
         <emu-grammar>AssignmentElementList : AssignmentElementList `,` AssignmentElisionElement</emu-grammar>
         <emu-alg>
-          1. Perform ? IteratorDestructuringAssignmentEvaluation of |AssignmentElementList| using _iteratorRecord_ as the argument.
-          1. Return the result of performing IteratorDestructuringAssignmentEvaluation of |AssignmentElisionElement| using _iteratorRecord_ as the argument.
+          1. Perform ? |AssignmentElementList|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
+          1. Return |AssignmentElisionElement|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
         </emu-alg>
         <emu-grammar>AssignmentElisionElement : AssignmentElement</emu-grammar>
         <emu-alg>
-          1. Return the result of performing IteratorDestructuringAssignmentEvaluation of |AssignmentElement| with _iteratorRecord_ as the argument.
+          1. Return |AssignmentElement|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
         </emu-alg>
         <emu-grammar>AssignmentElisionElement : Elision AssignmentElement</emu-grammar>
         <emu-alg>
-          1. Perform ? IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
-          1. Return the result of performing IteratorDestructuringAssignmentEvaluation of |AssignmentElement| with _iteratorRecord_ as the argument.
+          1. Perform ? |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
+          1. Return |AssignmentElement|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
         </emu-alg>
         <emu-grammar>Elision : `,`</emu-grammar>
         <emu-alg>
@@ -14788,7 +14788,7 @@
         </emu-alg>
         <emu-grammar>Elision : Elision `,`</emu-grammar>
         <emu-alg>
-          1. Perform ? IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
+          1. Perform ? |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
           1. If _iteratorRecord_.[[Done]] is *false*, then
             1. Let _next_ be IteratorStep(_iteratorRecord_).
             1. If _next_ is an abrupt completion, set _iteratorRecord_.[[Done]] to *true*.
@@ -14817,7 +14817,7 @@
           1. Else, let _v_ be _value_.
           1. If |DestructuringAssignmentTarget| is an |ObjectLiteral| or an |ArrayLiteral|, then
             1. Let _nestedAssignmentPattern_ be the |AssignmentPattern| that is covered by |DestructuringAssignmentTarget|.
-            1. Return the result of performing DestructuringAssignmentEvaluation of _nestedAssignmentPattern_ with _v_ as the argument.
+            1. Return _nestedAssignmentPattern_.DestructuringAssignmentEvaluation(_v_).
           1. If |Initializer| is present and _value_ is *undefined* and IsAnonymousFunctionDefinition(|Initializer|) and |DestructuringAssignmentTarget|.IsIdentifierRef() are both *true*, then
             1. Let _hasNameProperty_ be ? HasOwnProperty(_v_, `"name"`).
             1. If _hasNameProperty_ is *false*, perform SetFunctionName(_v_, GetReferencedName(_lref_)).
@@ -14848,7 +14848,7 @@
           1. If |DestructuringAssignmentTarget| is neither an |ObjectLiteral| nor an |ArrayLiteral|, then
             1. Return ? PutValue(_lref_, _A_).
           1. Let _nestedAssignmentPattern_ be the |AssignmentPattern| that is covered by |DestructuringAssignmentTarget|.
-          1. Return the result of performing DestructuringAssignmentEvaluation of _nestedAssignmentPattern_ with _A_ as the argument.
+          1. Return _nestedAssignmentPattern_.DestructuringAssignmentEvaluation(_A_).
         </emu-alg>
       </emu-clause>
 
@@ -14868,7 +14868,7 @@
           1. Else, let _rhsValue_ be _v_.
           1. If |DestructuringAssignmentTarget| is an |ObjectLiteral| or an |ArrayLiteral|, then
             1. Let _assignmentPattern_ be the |AssignmentPattern| that is covered by |DestructuringAssignmentTarget|.
-            1. Return the result of performing DestructuringAssignmentEvaluation of _assignmentPattern_ with _rhsValue_ as the argument.
+            1. Return _assignmentPattern_.DestructuringAssignmentEvaluation(_rhsValue_).
           1. If |Initializer| is present and _v_ is *undefined* and IsAnonymousFunctionDefinition(|Initializer|) and |DestructuringAssignmentTarget|.IsIdentifierRef() are both *true*, then
             1. Let _hasNameProperty_ be ? HasOwnProperty(_rhsValue_, `"name"`).
             1. If _hasNameProperty_ is *false*, perform SetFunctionName(_rhsValue_, GetReferencedName(_lref_)).
@@ -15106,7 +15106,7 @@
       <emu-see-also-para op="LabelledEvaluation"></emu-see-also-para>
       <emu-grammar>BreakableStatement : IterationStatement</emu-grammar>
       <emu-alg>
-        1. Let _stmtResult_ be the result of performing LabelledEvaluation of |IterationStatement| with argument _labelSet_.
+        1. Let _stmtResult_ be |IterationStatement|.LabelledEvaluation(_labelSet_).
         1. If _stmtResult_.[[Type]] is ~break~, then
           1. If _stmtResult_.[[Target]] is ~empty~, then
             1. If _stmtResult_.[[Value]] is ~empty~, set _stmtResult_ to NormalCompletion(*undefined*).
@@ -15153,7 +15153,7 @@
       </emu-grammar>
       <emu-alg>
         1. Let _newLabelSet_ be a new empty List.
-        1. Return the result of performing LabelledEvaluation of this |BreakableStatement| with argument _newLabelSet_.
+        1. Return |BreakableStatement|.LabelledEvaluation(_newLabelSet_).
       </emu-alg>
     </emu-clause>
   </emu-clause>
@@ -15203,9 +15203,9 @@
       </emu-alg>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _hasDuplicates_ be ContainsDuplicateLabels of |StatementList| with argument _labelSet_.
+        1. Let _hasDuplicates_ be |StatementList|.ContainsDuplicateLabels(_labelSet_).
         1. If _hasDuplicates_ is *true*, return *true*.
-        1. Return ContainsDuplicateLabels of |StatementListItem| with argument _labelSet_.
+        1. Return |StatementListItem|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
       <emu-grammar>StatementListItem : Declaration</emu-grammar>
       <emu-alg>
@@ -15224,9 +15224,9 @@
       </emu-alg>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of |StatementList| with argument _labelSet_.
+        1. Let _hasUndefinedLabels_ be |StatementList|.ContainsUndefinedBreakTarget(_labelSet_).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedBreakTarget of |StatementListItem| with argument _labelSet_.
+        1. Return |StatementListItem|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
       <emu-grammar>StatementListItem : Declaration</emu-grammar>
       <emu-alg>
@@ -15511,7 +15511,7 @@
               1. Perform ! _envRec_.CreateMutableBinding(_dn_, *false*).
           1. If _d_ is a |FunctionDeclaration|, a |GeneratorDeclaration|, an |AsyncFunctionDeclaration|, or an |AsyncGeneratorDeclaration|, then
             1. Let _fn_ be the sole element of _d_.BoundNames().
-            1. Let _fo_ be the result of performing InstantiateFunctionObject for _d_ with argument _env_.
+            1. Let _fo_ be _d_.InstantiateFunctionObject(_env_).
             1. Perform _envRec_.InitializeBinding(_fn_, _fo_).
       </emu-alg>
     </emu-clause>
@@ -16081,12 +16081,12 @@
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` Elision `]`</emu-grammar>
         <emu-alg>
-          1. Return the result of performing IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
+          1. Return |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` Elision? BindingRestElement `]`</emu-grammar>
         <emu-alg>
           1. If |Elision| is present, then
-            1. Perform ? IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
+            1. Perform ? |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
           1. Return the result of performing IteratorBindingInitialization for |BindingRestElement| with _iteratorRecord_ and _environment_ as arguments.
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` BindingElementList `]`</emu-grammar>
@@ -16100,13 +16100,13 @@
         <emu-grammar>ArrayBindingPattern : `[` BindingElementList `,` Elision `]`</emu-grammar>
         <emu-alg>
           1. Perform ? IteratorBindingInitialization for |BindingElementList| with _iteratorRecord_ and _environment_ as arguments.
-          1. Return the result of performing IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
+          1. Return |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` BindingElementList `,` Elision? BindingRestElement `]`</emu-grammar>
         <emu-alg>
           1. Perform ? IteratorBindingInitialization for |BindingElementList| with _iteratorRecord_ and _environment_ as arguments.
           1. If |Elision| is present, then
-            1. Perform ? IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
+            1. Perform ? |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
           1. Return the result of performing IteratorBindingInitialization for |BindingRestElement| with _iteratorRecord_ and _environment_ as arguments.
         </emu-alg>
         <emu-grammar>BindingElementList : BindingElisionElement</emu-grammar>
@@ -16124,7 +16124,7 @@
         </emu-alg>
         <emu-grammar>BindingElisionElement : Elision BindingElement</emu-grammar>
         <emu-alg>
-          1. Perform ? IteratorDestructuringAssignmentEvaluation of |Elision| with _iteratorRecord_ as the argument.
+          1. Perform ? |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
           1. Return the result of performing IteratorBindingInitialization of |BindingElement| with _iteratorRecord_ and _environment_ as the arguments.
         </emu-alg>
         <emu-grammar>BindingElement : SingleNameBinding</emu-grammar>
@@ -16330,7 +16330,7 @@
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return ContainsDuplicateLabels of |Statement| with argument _labelSet_.
+        1. Return |Statement|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
     </emu-clause>
 
@@ -16347,7 +16347,7 @@
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedBreakTarget of |Statement| with argument _labelSet_.
+        1. Return |Statement|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
     </emu-clause>
 
@@ -16526,7 +16526,7 @@
         <emu-see-also-para op="ContainsDuplicateLabels"></emu-see-also-para>
         <emu-grammar>IterationStatement : `do` Statement `while` `(` Expression `)` `;`</emu-grammar>
         <emu-alg>
-          1. Return ContainsDuplicateLabels of |Statement| with argument _labelSet_.
+          1. Return |Statement|.ContainsDuplicateLabels(_labelSet_).
         </emu-alg>
       </emu-clause>
 
@@ -16537,7 +16537,7 @@
         <emu-see-also-para op="ContainsUndefinedBreakTarget"></emu-see-also-para>
         <emu-grammar>IterationStatement : `do` Statement `while` `(` Expression `)` `;`</emu-grammar>
         <emu-alg>
-          1. Return ContainsUndefinedBreakTarget of |Statement| with argument _labelSet_.
+          1. Return |Statement|.ContainsUndefinedBreakTarget(_labelSet_).
         </emu-alg>
       </emu-clause>
 
@@ -16602,7 +16602,7 @@
         <emu-see-also-para op="ContainsDuplicateLabels"></emu-see-also-para>
         <emu-grammar>IterationStatement : `while` `(` Expression `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return ContainsDuplicateLabels of |Statement| with argument _labelSet_.
+          1. Return |Statement|.ContainsDuplicateLabels(_labelSet_).
         </emu-alg>
       </emu-clause>
 
@@ -16613,7 +16613,7 @@
         <emu-see-also-para op="ContainsUndefinedBreakTarget"></emu-see-also-para>
         <emu-grammar>IterationStatement : `while` `(` Expression `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return ContainsUndefinedBreakTarget of |Statement| with argument _labelSet_.
+          1. Return |Statement|.ContainsUndefinedBreakTarget(_labelSet_).
         </emu-alg>
       </emu-clause>
 
@@ -16694,7 +16694,7 @@
             `for` `(` LexicalDeclaration Expression? `;` Expression? `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return ContainsDuplicateLabels of |Statement| with argument _labelSet_.
+          1. Return |Statement|.ContainsDuplicateLabels(_labelSet_).
         </emu-alg>
       </emu-clause>
 
@@ -16710,7 +16710,7 @@
             `for` `(` LexicalDeclaration Expression? `;` Expression? `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return ContainsUndefinedBreakTarget of |Statement| with argument _labelSet_.
+          1. Return |Statement|.ContainsUndefinedBreakTarget(_labelSet_).
         </emu-alg>
       </emu-clause>
 
@@ -16934,7 +16934,7 @@
 
         </emu-grammar>
         <emu-alg>
-          1. Return ContainsDuplicateLabels of |Statement| with argument _labelSet_.
+          1. Return |Statement|.ContainsDuplicateLabels(_labelSet_).
         </emu-alg>
         <emu-note>
           <p>This section is extended by Annex <emu-xref href="#sec-initializers-in-forin-statement-heads"></emu-xref>.</p>
@@ -16959,7 +16959,7 @@
             `for` `await` `(` ForDeclaration `of` AssignmentExpression `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return ContainsUndefinedBreakTarget of |Statement| with argument _labelSet_.
+          1. Return |Statement|.ContainsUndefinedBreakTarget(_labelSet_).
         </emu-alg>
         <emu-note>
           <p>This section is extended by Annex <emu-xref href="#sec-initializers-in-forin-statement-heads"></emu-xref>.</p>
@@ -17258,7 +17258,7 @@
               1. Assert: _lhsKind_ is ~lexicalBinding~.
               1. Assert: _lhs_ is a |ForDeclaration|.
               1. Let _iterationEnv_ be NewDeclarativeEnvironment(_oldEnv_).
-              1. Perform BindingInstantiation for _lhs_ passing _iterationEnv_ as the argument.
+              1. Perform _lhs_.BindingInstantiation(_iterationEnv_).
               1. Set the running execution context's LexicalEnvironment to _iterationEnv_.
               1. If _destructuring_ is *false*, then
                 1. Assert: _lhs_ binds a single name.
@@ -17273,7 +17273,7 @@
                 1. Let _status_ be PutValue(_lhsRef_, _nextValue_).
             1. Else,
               1. If _lhsKind_ is ~assignment~, then
-                1. Let _status_ be the result of performing DestructuringAssignmentEvaluation of _assignmentPattern_ using _nextValue_ as the argument.
+                1. Let _status_ be _assignmentPattern_.DestructuringAssignmentEvaluation(_nextValue_).
               1. Else if _lhsKind_ is ~varBinding~, then
                 1. Assert: _lhs_ is a |ForBinding|.
                 1. Let _status_ be the result of performing BindingInitialization for _lhs_ passing _nextValue_ and *undefined* as the arguments.
@@ -17522,7 +17522,7 @@
       <emu-see-also-para op="ContainsDuplicateLabels"></emu-see-also-para>
       <emu-grammar>WithStatement : `with` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return ContainsDuplicateLabels of |Statement| with argument _labelSet_.
+        1. Return |Statement|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
     </emu-clause>
 
@@ -17533,7 +17533,7 @@
       <emu-see-also-para op="ContainsUndefinedBreakTarget"></emu-see-also-para>
       <emu-grammar>WithStatement : `with` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedBreakTarget of |Statement| with argument _labelSet_.
+        1. Return |Statement|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
     </emu-clause>
 
@@ -17633,7 +17633,7 @@
       <emu-see-also-para op="ContainsDuplicateLabels"></emu-see-also-para>
       <emu-grammar>SwitchStatement : `switch` `(` Expression `)` CaseBlock</emu-grammar>
       <emu-alg>
-        1. Return ContainsDuplicateLabels of |CaseBlock| with argument _labelSet_.
+        1. Return |CaseBlock|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
       <emu-grammar>CaseBlock : `{` `}`</emu-grammar>
       <emu-alg>
@@ -17644,25 +17644,25 @@
         1. If the first |CaseClauses| is present, then
           1. Let _hasDuplicates_ be ContainsDuplicateLabels of the first |CaseClauses| with argument _labelSet_.
           1. If _hasDuplicates_ is *true*, return *true*.
-        1. Let _hasDuplicates_ be ContainsDuplicateLabels of |DefaultClause| with argument _labelSet_.
+        1. Let _hasDuplicates_ be |DefaultClause|.ContainsDuplicateLabels(_labelSet_).
         1. If _hasDuplicates_ is *true*, return *true*.
         1. If the second |CaseClauses| is not present, return *false*.
         1. Return ContainsDuplicateLabels of the second |CaseClauses| with argument _labelSet_.
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
-        1. Let _hasDuplicates_ be ContainsDuplicateLabels of |CaseClauses| with argument _labelSet_.
+        1. Let _hasDuplicates_ be |CaseClauses|.ContainsDuplicateLabels(_labelSet_).
         1. If _hasDuplicates_ is *true*, return *true*.
-        1. Return ContainsDuplicateLabels of |CaseClause| with argument _labelSet_.
+        1. Return |CaseClause|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
       <emu-grammar>CaseClause : `case` Expression `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return ContainsDuplicateLabels of |StatementList| with argument _labelSet_.
+        1. If the |StatementList| is present, return |StatementList|.ContainsDuplicateLabels(_labelSet_).
         1. Return *false*.
       </emu-alg>
       <emu-grammar>DefaultClause : `default` `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return ContainsDuplicateLabels of |StatementList| with argument _labelSet_.
+        1. If the |StatementList| is present, return |StatementList|.ContainsDuplicateLabels(_labelSet_).
         1. Return *false*.
       </emu-alg>
     </emu-clause>
@@ -17674,7 +17674,7 @@
       <emu-see-also-para op="ContainsUndefinedBreakTarget"></emu-see-also-para>
       <emu-grammar>SwitchStatement : `switch` `(` Expression `)` CaseBlock</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedBreakTarget of |CaseBlock| with argument _labelSet_.
+        1. Return |CaseBlock|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
       <emu-grammar>CaseBlock : `{` `}`</emu-grammar>
       <emu-alg>
@@ -17685,25 +17685,25 @@
         1. If the first |CaseClauses| is present, then
           1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of the first |CaseClauses| with argument _labelSet_.
           1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of |DefaultClause| with argument _labelSet_.
+        1. Let _hasUndefinedLabels_ be |DefaultClause|.ContainsUndefinedBreakTarget(_labelSet_).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
         1. If the second |CaseClauses| is not present, return *false*.
         1. Return ContainsUndefinedBreakTarget of the second |CaseClauses| with argument _labelSet_.
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of |CaseClauses| with argument _labelSet_.
+        1. Let _hasUndefinedLabels_ be |CaseClauses|.ContainsUndefinedBreakTarget(_labelSet_).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedBreakTarget of |CaseClause| with argument _labelSet_.
+        1. Return |CaseClause|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
       <emu-grammar>CaseClause : `case` Expression `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return ContainsUndefinedBreakTarget of |StatementList| with argument _labelSet_.
+        1. If the |StatementList| is present, return |StatementList|.ContainsUndefinedBreakTarget(_labelSet_).
         1. Return *false*.
       </emu-alg>
       <emu-grammar>DefaultClause : `default` `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return ContainsUndefinedBreakTarget of |StatementList| with argument _labelSet_.
+        1. If the |StatementList| is present, return |StatementList|.ContainsUndefinedBreakTarget(_labelSet_).
         1. Return *false*.
       </emu-alg>
     </emu-clause>
@@ -17993,7 +17993,7 @@
         1. Let _blockEnv_ be NewDeclarativeEnvironment(_oldEnv_).
         1. Perform BlockDeclarationInstantiation(|CaseBlock|, _blockEnv_).
         1. Set the running execution context's LexicalEnvironment to _blockEnv_.
-        1. Let _R_ be the result of performing CaseBlockEvaluation of |CaseBlock| with argument _switchValue_.
+        1. Let _R_ be |CaseBlock|.CaseBlockEvaluation(_switchValue_).
         1. Set the running execution context's LexicalEnvironment to _oldEnv_.
         1. Return _R_.
       </emu-alg>
@@ -18059,7 +18059,7 @@
         1. Let _label_ be |LabelIdentifier|.StringValue().
         1. If _label_ is an element of _labelSet_, return *true*.
         1. Let _newLabelSet_ be a copy of _labelSet_ with _label_ appended.
-        1. Return ContainsDuplicateLabels of |LabelledItem| with argument _newLabelSet_.
+        1. Return |LabelledItem|.ContainsDuplicateLabels(_newLabelSet_).
       </emu-alg>
       <emu-grammar>LabelledItem : FunctionDeclaration</emu-grammar>
       <emu-alg>
@@ -18076,7 +18076,7 @@
       <emu-alg>
         1. Let _label_ be |LabelIdentifier|.StringValue().
         1. Let _newLabelSet_ be a copy of _labelSet_ with _label_ appended.
-        1. Return ContainsUndefinedBreakTarget of |LabelledItem| with argument _newLabelSet_.
+        1. Return |LabelledItem|.ContainsUndefinedBreakTarget(_newLabelSet_).
       </emu-alg>
       <emu-grammar>LabelledItem : FunctionDeclaration</emu-grammar>
       <emu-alg>
@@ -18245,7 +18245,7 @@
       <emu-alg>
         1. Let _label_ be |LabelIdentifier|.StringValue().
         1. Append _label_ as an element of _labelSet_.
-        1. Let _stmtResult_ be LabelledEvaluation of |LabelledItem| with argument _labelSet_.
+        1. Let _stmtResult_ be |LabelledItem|.LabelledEvaluation(_labelSet_).
         1. If _stmtResult_.[[Type]] is ~break~ and SameValue(_stmtResult_.[[Target]], _label_) is *true*, then
           1. Set _stmtResult_ to NormalCompletion(_stmtResult_.[[Value]]).
         1. Return Completion(_stmtResult_).
@@ -18253,7 +18253,7 @@
       <emu-grammar>LabelledItem : Statement</emu-grammar>
       <emu-alg>
         1. If |Statement| is either a |LabelledStatement| or a |BreakableStatement|, then
-          1. Return LabelledEvaluation of |Statement| with argument _labelSet_.
+          1. Return |Statement|.LabelledEvaluation(_labelSet_).
         1. Else,
           1. Return |Statement|.Evaluate().
       </emu-alg>
@@ -18269,7 +18269,7 @@
       <emu-grammar>LabelledStatement : LabelIdentifier `:` LabelledItem</emu-grammar>
       <emu-alg>
         1. Let _newLabelSet_ be a new empty List.
-        1. Return LabelledEvaluation of this |LabelledStatement| with argument _newLabelSet_.
+        1. Return |LabelledStatement|.LabelledEvaluation(_newLabelSet_).
       </emu-alg>
     </emu-clause>
   </emu-clause>
@@ -18346,27 +18346,27 @@
       <emu-see-also-para op="ContainsDuplicateLabels"></emu-see-also-para>
       <emu-grammar>TryStatement : `try` Block Catch</emu-grammar>
       <emu-alg>
-        1. Let _hasDuplicates_ be ContainsDuplicateLabels of |Block| with argument _labelSet_.
+        1. Let _hasDuplicates_ be |Block|.ContainsDuplicateLabels(_labelSet_).
         1. If _hasDuplicates_ is *true*, return *true*.
-        1. Return ContainsDuplicateLabels of |Catch| with argument _labelSet_.
+        1. Return |Catch|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Finally</emu-grammar>
       <emu-alg>
-        1. Let _hasDuplicates_ be ContainsDuplicateLabels of |Block| with argument _labelSet_.
+        1. Let _hasDuplicates_ be |Block|.ContainsDuplicateLabels(_labelSet_).
         1. If _hasDuplicates_ is *true*, return *true*.
-        1. Return ContainsDuplicateLabels of |Finally| with argument _labelSet_.
+        1. Return |Finally|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Catch Finally</emu-grammar>
       <emu-alg>
-        1. Let _hasDuplicates_ be ContainsDuplicateLabels of |Block| with argument _labelSet_.
+        1. Let _hasDuplicates_ be |Block|.ContainsDuplicateLabels(_labelSet_).
         1. If _hasDuplicates_ is *true*, return *true*.
-        1. Let _hasDuplicates_ be ContainsDuplicateLabels of |Catch| with argument _labelSet_.
+        1. Let _hasDuplicates_ be |Catch|.ContainsDuplicateLabels(_labelSet_).
         1. If _hasDuplicates_ is *true*, return *true*.
-        1. Return ContainsDuplicateLabels of |Finally| with argument _labelSet_.
+        1. Return |Finally|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
       <emu-grammar>Catch : `catch` `(` CatchParameter `)` Block</emu-grammar>
       <emu-alg>
-        1. Return ContainsDuplicateLabels of |Block| with argument _labelSet_.
+        1. Return |Block|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
     </emu-clause>
 
@@ -18377,27 +18377,27 @@
       <emu-see-also-para op="ContainsUndefinedBreakTarget"></emu-see-also-para>
       <emu-grammar>TryStatement : `try` Block Catch</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of |Block| with argument _labelSet_.
+        1. Let _hasUndefinedLabels_ be |Block|.ContainsUndefinedBreakTarget(_labelSet_).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedBreakTarget of |Catch| with argument _labelSet_.
+        1. Return |Catch|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Finally</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of |Block| with argument _labelSet_.
+        1. Let _hasUndefinedLabels_ be |Block|.ContainsUndefinedBreakTarget(_labelSet_).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedBreakTarget of |Finally| with argument _labelSet_.
+        1. Return |Finally|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Catch Finally</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of |Block| with argument _labelSet_.
+        1. Let _hasUndefinedLabels_ be |Block|.ContainsUndefinedBreakTarget(_labelSet_).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of |Catch| with argument _labelSet_.
+        1. Let _hasUndefinedLabels_ be |Catch|.ContainsUndefinedBreakTarget(_labelSet_).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedBreakTarget of |Finally| with argument _labelSet_.
+        1. Return |Finally|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
       <emu-grammar>Catch : `catch` `(` CatchParameter `)` Block</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedBreakTarget of |Block| with argument _labelSet_.
+        1. Return |Block|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
     </emu-clause>
 
@@ -18521,7 +18521,7 @@
       <emu-grammar>TryStatement : `try` Block Catch</emu-grammar>
       <emu-alg>
         1. Let _B_ be |Block|.Evaluate().
-        1. If _B_.[[Type]] is ~throw~, let _C_ be CatchClauseEvaluation of |Catch| with argument _B_.[[Value]].
+        1. If _B_.[[Type]] is ~throw~, let _C_ be |Catch|.CatchClauseEvaluation(_B_.[[Value]]).
         1. Else, let _C_ be _B_.
         1. Return Completion(UpdateEmpty(_C_, *undefined*)).
       </emu-alg>
@@ -18535,7 +18535,7 @@
       <emu-grammar>TryStatement : `try` Block Catch Finally</emu-grammar>
       <emu-alg>
         1. Let _B_ be |Block|.Evaluate().
-        1. If _B_.[[Type]] is ~throw~, let _C_ be CatchClauseEvaluation of |Catch| with argument _B_.[[Value]].
+        1. If _B_.[[Type]] is ~throw~, let _C_ be |Catch|.CatchClauseEvaluation(_B_.[[Value]]).
         1. Else, let _C_ be _B_.
         1. Let _F_ be |Finally|.Evaluate().
         1. If _F_.[[Type]] is ~normal~, set _F_ to _C_.
@@ -19404,7 +19404,7 @@
           `set` PropertyName `(` PropertySetParameterList `)` `{` FunctionBody `}`
       </emu-grammar>
       <emu-alg>
-        1. Return the result of ComputedPropertyContains for |PropertyName| with argument _symbol_.
+        1. Return |PropertyName|.ComputedPropertyContains(_symbol_).
       </emu-alg>
     </emu-clause>
 
@@ -19503,7 +19503,7 @@
       <emu-see-also-para op="PropertyDefinitionEvaluation"></emu-see-also-para>
       <emu-grammar>MethodDefinition : PropertyName `(` UniqueFormalParameters `)` `{` FunctionBody `}`</emu-grammar>
       <emu-alg>
-        1. Let _methodDef_ be DefineMethod of |MethodDefinition| with argument _object_.
+        1. Let _methodDef_ be |MethodDefinition|.DefineMethod(_object_).
         1. ReturnIfAbrupt(_methodDef_).
         1. Perform SetFunctionName(_methodDef_.[[Closure]], _methodDef_.[[Key]]).
         1. Let _desc_ be the PropertyDescriptor{[[Value]]: _methodDef_.[[Closure]], [[Writable]]: *true*, [[Enumerable]]: _enumerable_, [[Configurable]]: *true*}.
@@ -19649,7 +19649,7 @@
       <emu-see-also-para op="ComputedPropertyContains"></emu-see-also-para>
       <emu-grammar>GeneratorMethod : `*` PropertyName `(` UniqueFormalParameters `)` `{` GeneratorBody `}`</emu-grammar>
       <emu-alg>
-        1. Return the result of ComputedPropertyContains for |PropertyName| with argument _symbol_.
+        1. Return |PropertyName|.ComputedPropertyContains(_symbol_).
       </emu-alg>
     </emu-clause>
 
@@ -19972,7 +19972,7 @@
       <emu-see-also-para op="ComputedPropertyContains"></emu-see-also-para>
       <emu-grammar>AsyncGeneratorMethod : `async` `*` PropertyName `(` UniqueFormalParameters `)` `{` AsyncGeneratorBody `}`</emu-grammar>
       <emu-alg>
-        1. Return the result of ComputedPropertyContains for |PropertyName| with argument _symbol_.
+        1. Return |PropertyName|.ComputedPropertyContains(_symbol_).
       </emu-alg>
     </emu-clause>
 
@@ -20276,7 +20276,7 @@
           1. If |ClassHeritage| is present, return *true*; otherwise return *false*.
         1. Let _inHeritage_ be |ClassHeritage|.Contains(_symbol_).
         1. If _inHeritage_ is *true*, return *true*.
-        1. Return the result of ComputedPropertyContains for |ClassBody| with argument _symbol_.
+        1. Return |ClassBody|.ComputedPropertyContains(_symbol_).
       </emu-alg>
       <emu-note>
         <p>Static semantic rules that depend upon substructure generally do not look into class bodies except for |PropertyName|s.</p>
@@ -20290,17 +20290,17 @@
       <emu-see-also-para op="ComputedPropertyContains"></emu-see-also-para>
       <emu-grammar>ClassElementList : ClassElementList ClassElement</emu-grammar>
       <emu-alg>
-        1. Let _inList_ be the result of ComputedPropertyContains for |ClassElementList| with argument _symbol_.
+        1. Let _inList_ be |ClassElementList|.ComputedPropertyContains(_symbol_).
         1. If _inList_ is *true*, return *true*.
-        1. Return the result of ComputedPropertyContains for |ClassElement| with argument _symbol_.
+        1. Return |ClassElement|.ComputedPropertyContains(_symbol_).
       </emu-alg>
       <emu-grammar>ClassElement : MethodDefinition</emu-grammar>
       <emu-alg>
-        1. Return the result of ComputedPropertyContains for |MethodDefinition| with argument _symbol_.
+        1. Return |MethodDefinition|.ComputedPropertyContains(_symbol_).
       </emu-alg>
       <emu-grammar>ClassElement : `static` MethodDefinition</emu-grammar>
       <emu-alg>
-        1. Return the result of ComputedPropertyContains for |MethodDefinition| with argument _symbol_.
+        1. Return |MethodDefinition|.ComputedPropertyContains(_symbol_).
       </emu-alg>
       <emu-grammar>ClassElement : `;`</emu-grammar>
       <emu-alg>
@@ -20481,7 +20481,7 @@
       <emu-grammar>ClassDeclaration : `class` BindingIdentifier ClassTail</emu-grammar>
       <emu-alg>
         1. Let _className_ be |BindingIdentifier|.StringValue().
-        1. Let _value_ be the result of ClassDefinitionEvaluation of |ClassTail| with argument _className_.
+        1. Let _value_ be |ClassTail|.ClassDefinitionEvaluation(_className_).
         1. ReturnIfAbrupt(_value_).
         1. Let _hasNameProperty_ be ? HasOwnProperty(_value_, `"name"`).
         1. If _hasNameProperty_ is *false*, perform SetFunctionName(_value_, _className_).
@@ -20491,7 +20491,7 @@
       </emu-alg>
       <emu-grammar>ClassDeclaration : `class` ClassTail</emu-grammar>
       <emu-alg>
-        1. Return the result of ClassDefinitionEvaluation of |ClassTail| with argument *undefined*.
+        1. Return |ClassTail|.ClassDefinitionEvaluation(*undefined*).
       </emu-alg>
       <emu-note>
         <p><emu-grammar>ClassDeclaration : `class` ClassTail</emu-grammar> only occurs as part of an |ExportDeclaration| and the setting of a name property and establishing its binding are handled as part of the evaluation action for that production. See <emu-xref href="#sec-exports-runtime-semantics-evaluation"></emu-xref>.</p>
@@ -20513,7 +20513,7 @@
       <emu-alg>
         1. If |BindingIdentifier_opt| is not present, let _className_ be *undefined*.
         1. Else, let _className_ be |BindingIdentifier|.StringValue().
-        1. Let _value_ be the result of ClassDefinitionEvaluation of |ClassTail| with argument _className_.
+        1. Let _value_ be |ClassTail|.ClassDefinitionEvaluation(_className_).
         1. ReturnIfAbrupt(_value_).
         1. If _className_ is not *undefined*, then
           1. Let _hasNameProperty_ be ? HasOwnProperty(_value_, `"name"`).
@@ -20623,7 +20623,7 @@
         AsyncMethod : `async` [no LineTerminator here] PropertyName `(` UniqueFormalParameters `)` `{` AsyncFunctionBody `}`
       </emu-grammar>
       <emu-alg>
-        1. Return the result of ComputedPropertyContains for |PropertyName| with argument _symbol_.
+        1. Return |PropertyName|.ComputedPropertyContains(_symbol_).
       </emu-alg>
     </emu-clause>
 
@@ -21085,7 +21085,7 @@
         1. If _body_ is the |FunctionBody| of an |AsyncFunctionBody|, return *false*.
         1. If _body_ is the |FunctionBody| of an |AsyncGeneratorBody|, return *false*.
         1. If _body_ is an |AsyncConciseBody|, return *false*.
-        1. Return the result of HasCallInTailPosition of _body_ with argument _call_.
+        1. Return _body_.HasCallInTailPosition(_call_).
       </emu-alg>
       <emu-note>
         <p>Tail Position calls are only defined in strict mode code because of a common non-standard language extension (see <emu-xref href="#sec-addrestrictedfunctionproperties"></emu-xref>) that enables observation of the chain of caller contexts.</p>
@@ -21105,13 +21105,13 @@
         <h1>Statement Rules</h1>
         <emu-grammar>ConciseBody : AssignmentExpression</emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |AssignmentExpression| with argument _call_.
+          1. Return |AssignmentExpression|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
         <emu-alg>
-          1. Let _has_ be HasCallInTailPosition of |StatementList| with argument _call_.
+          1. Let _has_ be |StatementList|.HasCallInTailPosition(_call_).
           1. If _has_ is *true*, return *true*.
-          1. Return HasCallInTailPosition of |StatementListItem| with argument _call_.
+          1. Return |StatementListItem|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>
           FunctionStatementList : [empty]
@@ -21165,38 +21165,38 @@
           WithStatement : `with` `(` Expression `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |Statement| with argument _call_.
+          1. Return |Statement|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>
           LabelledStatement :
             LabelIdentifier `:` LabelledItem
         </emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |LabelledItem| with argument _call_.
+          1. Return |LabelledItem|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>ReturnStatement : `return` Expression `;`</emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |Expression| with argument _call_.
+          1. Return |Expression|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>SwitchStatement : `switch` `(` Expression `)` CaseBlock</emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |CaseBlock| with argument _call_.
+          1. Return |CaseBlock|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>CaseBlock : `{` CaseClauses? DefaultClause CaseClauses? `}`</emu-grammar>
         <emu-alg>
           1. Let _has_ be *false*.
           1. If the first |CaseClauses| is present, let _has_ be HasCallInTailPosition of the first |CaseClauses| with argument _call_.
           1. If _has_ is *true*, return *true*.
-          1. Let _has_ be HasCallInTailPosition of the |DefaultClause| with argument _call_.
+          1. Let _has_ be |DefaultClause|.HasCallInTailPosition(_call_).
           1. If _has_ is *true*, return *true*.
           1. If the second |CaseClauses| is present, let _has_ be HasCallInTailPosition of the second |CaseClauses| with argument _call_.
           1. Return _has_.
         </emu-alg>
         <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
         <emu-alg>
-          1. Let _has_ be HasCallInTailPosition of |CaseClauses| with argument _call_.
+          1. Let _has_ be |CaseClauses|.HasCallInTailPosition(_call_).
           1. If _has_ is *true*, return *true*.
-          1. Return HasCallInTailPosition of |CaseClause| with argument _call_.
+          1. Return |CaseClause|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>
           CaseClause : `case` Expression `:` StatementList?
@@ -21204,12 +21204,12 @@
           DefaultClause : `default` `:` StatementList?
         </emu-grammar>
         <emu-alg>
-          1. If |StatementList| is present, return HasCallInTailPosition of |StatementList| with argument _call_.
+          1. If |StatementList| is present, return |StatementList|.HasCallInTailPosition(_call_).
           1. Return *false*.
         </emu-alg>
         <emu-grammar>TryStatement : `try` Block Catch</emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |Catch| with argument _call_.
+          1. Return |Catch|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>
           TryStatement : `try` Block Finally
@@ -21217,11 +21217,11 @@
           TryStatement : `try` Block Catch Finally
         </emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |Finally| with argument _call_.
+          1. Return |Finally|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>Catch : `catch` `(` CatchParameter `)` Block</emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |Block| with argument _call_.
+          1. Return |Block|.HasCallInTailPosition(_call_).
         </emu-alg>
       </emu-clause>
 
@@ -21327,7 +21327,7 @@
             Expression `,` AssignmentExpression
         </emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |AssignmentExpression| with argument _call_.
+          1. Return |AssignmentExpression|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>ConditionalExpression : LogicalORExpression `?` AssignmentExpression `:` AssignmentExpression</emu-grammar>
         <emu-alg>
@@ -21337,11 +21337,11 @@
         </emu-alg>
         <emu-grammar>LogicalANDExpression : LogicalANDExpression `&amp;&amp;` BitwiseORExpression</emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |BitwiseORExpression| with argument _call_.
+          1. Return |BitwiseORExpression|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>LogicalORExpression : LogicalORExpression `||` LogicalANDExpression</emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |LogicalANDExpression| with argument _call_.
+          1. Return |LogicalANDExpression|.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>
           CallExpression :
@@ -21364,14 +21364,14 @@
         <emu-grammar>PrimaryExpression : CoverParenthesizedExpressionAndArrowParameterList</emu-grammar>
         <emu-alg>
           1. Let _expr_ be |CoverParenthesizedExpressionAndArrowParameterList|.CoveredParenthesizedExpression().
-          1. Return HasCallInTailPosition of _expr_ with argument _call_.
+          1. Return _expr_.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>
           ParenthesizedExpression :
             `(` Expression `)`
         </emu-grammar>
         <emu-alg>
-          1. Return HasCallInTailPosition of |Expression| with argument _call_.
+          1. Return |Expression|.HasCallInTailPosition(_call_).
         </emu-alg>
       </emu-clause>
     </emu-clause>
@@ -21673,7 +21673,7 @@
               1. Perform ? _envRec_.CreateMutableBinding(_dn_, *false*).
         1. For each Parse Node _f_ in _functionsToInitialize_, do
           1. Let _fn_ be the sole element of _f_.BoundNames().
-          1. Let _fo_ be the result of performing InstantiateFunctionObject for _f_ with argument _env_.
+          1. Let _fo_ be _f_.InstantiateFunctionObject(_env_).
           1. Perform ? _envRec_.CreateGlobalFunctionBinding(_fn_, _fo_, *false*).
         1. For each String _vn_ in _declaredVarNames_, in list order, do
           1. Perform ? _envRec_.CreateGlobalVarBinding(_vn_, *false*).
@@ -21771,9 +21771,9 @@
         <emu-see-also-para op="ContainsDuplicateLabels"></emu-see-also-para>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _hasDuplicates_ be ContainsDuplicateLabels of |ModuleItemList| with argument _labelSet_.
+          1. Let _hasDuplicates_ be |ModuleItemList|.ContainsDuplicateLabels(_labelSet_).
           1. If _hasDuplicates_ is *true*, return *true*.
-          1. Return ContainsDuplicateLabels of |ModuleItem| with argument _labelSet_.
+          1. Return |ModuleItem|.ContainsDuplicateLabels(_labelSet_).
         </emu-alg>
         <emu-grammar>
           ModuleItem :
@@ -21792,9 +21792,9 @@
         <emu-see-also-para op="ContainsUndefinedBreakTarget"></emu-see-also-para>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of |ModuleItemList| with argument _labelSet_.
+          1. Let _hasUndefinedLabels_ be |ModuleItemList|.ContainsUndefinedBreakTarget(_labelSet_).
           1. If _hasUndefinedLabels_ is *true*, return *true*.
-          1. Return ContainsUndefinedBreakTarget of |ModuleItem| with argument _labelSet_.
+          1. Return |ModuleItem|.ContainsUndefinedBreakTarget(_labelSet_).
         </emu-alg>
         <emu-grammar>
           ModuleItem :
@@ -22930,7 +22930,7 @@
                   1. Else,
                     1. Perform ! _envRec_.CreateMutableBinding(_dn_, *false*).
                   1. If _d_ is a |FunctionDeclaration|, a |GeneratorDeclaration|, an |AsyncFunctionDeclaration|, or an |AsyncGeneratorDeclaration|, then
-                    1. Let _fo_ be the result of performing InstantiateFunctionObject for _d_ with argument _env_.
+                    1. Let _fo_ be _d_.InstantiateFunctionObject(_env_).
                     1. Call _envRec_.InitializeBinding(_dn_, _fo_).
             </emu-alg>
           </emu-clause>
@@ -23276,7 +23276,7 @@
         <emu-grammar>ImportDeclaration : `import` ImportClause FromClause `;`</emu-grammar>
         <emu-alg>
           1. Let _module_ be the sole element of |FromClause|.ModuleRequests().
-          1. Return ImportEntriesForModule of |ImportClause| with argument _module_.
+          1. Return |ImportClause|.ImportEntriesForModule(_module_).
         </emu-alg>
         <emu-grammar>ImportDeclaration : `import` ModuleSpecifier `;`</emu-grammar>
         <emu-alg>
@@ -23290,14 +23290,14 @@
         <p>With parameter _module_.</p>
         <emu-grammar>ImportClause : ImportedDefaultBinding `,` NameSpaceImport</emu-grammar>
         <emu-alg>
-          1. Let _entries_ be ImportEntriesForModule of |ImportedDefaultBinding| with argument _module_.
-          1. Append to _entries_ the elements of the ImportEntriesForModule of |NameSpaceImport| with argument _module_.
+          1. Let _entries_ be |ImportedDefaultBinding|.ImportEntriesForModule(_module_).
+          1. Append to _entries_ the elements of |NameSpaceImport|.ImportEntriesForModule(_module_).
           1. Return _entries_.
         </emu-alg>
         <emu-grammar>ImportClause : ImportedDefaultBinding `,` NamedImports</emu-grammar>
         <emu-alg>
-          1. Let _entries_ be ImportEntriesForModule of |ImportedDefaultBinding| with argument _module_.
-          1. Append to _entries_ the elements of the ImportEntriesForModule of |NamedImports| with argument _module_.
+          1. Let _entries_ be |ImportedDefaultBinding|.ImportEntriesForModule(_module_).
+          1. Append to _entries_ the elements of |NamedImports|.ImportEntriesForModule(_module_).
           1. Return _entries_.
         </emu-alg>
         <emu-grammar>ImportedDefaultBinding : ImportedBinding</emu-grammar>
@@ -23318,8 +23318,8 @@
         </emu-alg>
         <emu-grammar>ImportsList : ImportsList `,` ImportSpecifier</emu-grammar>
         <emu-alg>
-          1. Let _specs_ be the ImportEntriesForModule of |ImportsList| with argument _module_.
-          1. Append to _specs_ the elements of the ImportEntriesForModule of |ImportSpecifier| with argument _module_.
+          1. Let _specs_ be |ImportsList|.ImportEntriesForModule(_module_).
+          1. Append to _specs_ the elements of |ImportSpecifier|.ImportEntriesForModule(_module_).
           1. Return _specs_.
         </emu-alg>
         <emu-grammar>ImportSpecifier : ImportedBinding</emu-grammar>
@@ -23556,11 +23556,11 @@
         <emu-grammar>ExportDeclaration : `export` ExportClause FromClause `;`</emu-grammar>
         <emu-alg>
           1. Let _module_ be the sole element of |FromClause|.ModuleRequests().
-          1. Return ExportEntriesForModule of |ExportClause| with argument _module_.
+          1. Return |ExportClause|.ExportEntriesForModule(_module_).
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` ExportClause `;`</emu-grammar>
         <emu-alg>
-          1. Return ExportEntriesForModule of |ExportClause| with argument *null*.
+          1. Return |ExportClause|.ExportEntriesForModule(*null*).
         </emu-alg>
         <emu-grammar>ExportDeclaration : `export` VariableStatement</emu-grammar>
         <emu-alg>
@@ -23610,8 +23610,8 @@
         </emu-alg>
         <emu-grammar>ExportsList : ExportsList `,` ExportSpecifier</emu-grammar>
         <emu-alg>
-          1. Let _specs_ be the ExportEntriesForModule of |ExportsList| with argument _module_.
-          1. Append to _specs_ the elements of the ExportEntriesForModule of |ExportSpecifier| with argument _module_.
+          1. Let _specs_ be |ExportsList|.ExportEntriesForModule(_module_).
+          1. Append to _specs_ the elements of |ExportSpecifier|.ExportEntriesForModule(_module_).
           1. Return _specs_.
         </emu-alg>
         <emu-grammar>ExportSpecifier : IdentifierName</emu-grammar>
@@ -24090,7 +24090,7 @@
                 1. Perform ? _lexEnvRec_.CreateMutableBinding(_dn_, *false*).
           1. For each Parse Node _f_ in _functionsToInitialize_, do
             1. Let _fn_ be the sole element of _f_.BoundNames().
-            1. Let _fo_ be the result of performing InstantiateFunctionObject for _f_ with argument _lexEnv_.
+            1. Let _fo_ be _f_.InstantiateFunctionObject(_lexEnv_).
             1. If _varEnvRec_ is a global Environment Record, then
               1. Perform ? _varEnvRec_.CreateGlobalFunctionBinding(_fn_, _fo_, *true*).
             1. Else,
@@ -41782,12 +41782,12 @@ THH:mm:ss.sss
       <p>The static semantics of ContainsDuplicateLabels in <emu-xref href="#sec-for-in-and-for-of-statements-static-semantics-containsduplicatelabels"></emu-xref> are augmented with the following:</p>
       <emu-grammar>IterationStatement : `for` `(` `var` BindingIdentifier Initializer `in` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return ContainsDuplicateLabels of |Statement| with argument _labelSet_.
+        1. Return |Statement|.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
       <p>The static semantics of ContainsUndefinedBreakTarget in <emu-xref href="#sec-for-in-and-for-of-statements-static-semantics-containsundefinedbreaktarget"></emu-xref> are augmented with the following:</p>
       <emu-grammar>IterationStatement : `for` `(` `var` BindingIdentifier Initializer `in` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedBreakTarget of |Statement| with argument _labelSet_.
+        1. Return |Statement|.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
       <p>The static semantics of ContainsUndefinedContinueTarget in <emu-xref href="#sec-for-in-and-for-of-statements-static-semantics-containsundefinedcontinuetarget"></emu-xref> are augmented with the following:</p>
       <emu-grammar>IterationStatement : `for` `(` `var` BindingIdentifier Initializer `in` Expression `)` Statement</emu-grammar>
