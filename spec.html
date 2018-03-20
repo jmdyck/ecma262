@@ -16374,8 +16374,10 @@
       <emu-see-also-para op="VarDeclaredNames"></emu-see-also-para>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement `else` Statement</emu-grammar>
       <emu-alg>
-        1. Let _names_ be VarDeclaredNames of the first |Statement|.
-        1. Append to _names_ the elements of the VarDeclaredNames of the second |Statement|.
+        1. Let _stmt1_ be the first |Statement|.
+        1. Let _names_ be _stmt1_.VarDeclaredNames().
+        1. Let _stmt2_ be the second |Statement|.
+        1. Append to _names_ the elements of _stmt2_.VarDeclaredNames().
         1. Return _names_.
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
@@ -16390,8 +16392,10 @@
       <emu-see-also-para op="VarScopedDeclarations"></emu-see-also-para>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement `else` Statement</emu-grammar>
       <emu-alg>
-        1. Let _declarations_ be VarScopedDeclarations of the first |Statement|.
-        1. Append to _declarations_ the elements of the VarScopedDeclarations of the second |Statement|.
+        1. Let _stmt1_ be the first |Statement|.
+        1. Let _declarations_ be _stmt1_.VarScopedDeclarations().
+        1. Let _stmt2_ be the second |Statement|.
+        1. Append to _declarations_ the elements of _stmt2_.VarScopedDeclarations().
         1. Return _declarations_.
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
@@ -17755,11 +17759,14 @@
       </emu-alg>
       <emu-grammar>CaseBlock : `{` CaseClauses? DefaultClause CaseClauses? `}`</emu-grammar>
       <emu-alg>
-        1. If the first |CaseClauses| is present, let _names_ be the LexicallyDeclaredNames of the first |CaseClauses|.
+        1. If the first |CaseClauses| is present, then
+          1. Let _clauses1_ be the first |CaseClauses|.
+          1. Let _names_ be _clauses1_.LexicallyDeclaredNames().
         1. Else, let _names_ be a new empty List.
-        1. Append to _names_ the elements of the LexicallyDeclaredNames of the |DefaultClause|.
+        1. Append to _names_ the elements of |DefaultClause|.LexicallyDeclaredNames().
         1. If the second |CaseClauses| is not present, return _names_.
-        1. Return the result of appending to _names_ the elements of the LexicallyDeclaredNames of the second |CaseClauses|.
+        1. Let _clauses2_ be the second |CaseClauses|.
+        1. Return the result of appending to _names_ the elements of _clauses2_.LexicallyDeclaredNames().
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
@@ -17789,11 +17796,14 @@
       </emu-alg>
       <emu-grammar>CaseBlock : `{` CaseClauses? DefaultClause CaseClauses? `}`</emu-grammar>
       <emu-alg>
-        1. If the first |CaseClauses| is present, let _declarations_ be the LexicallyScopedDeclarations of the first |CaseClauses|.
+        1. If the first |CaseClauses| is present, then
+          1. Let _clauses1_ be the first |CaseClauses|.
+          1. Let _declarations_ be _clauses1_.LexicallyScopedDeclarations().
         1. Else, let _declarations_ be a new empty List.
-        1. Append to _declarations_ the elements of the LexicallyScopedDeclarations of the |DefaultClause|.
+        1. Append to _declarations_ the elements of |DefaultClause|.LexicallyScopedDeclarations().
         1. If the second |CaseClauses| is not present, return _declarations_.
-        1. Return the result of appending to _declarations_ the elements of the LexicallyScopedDeclarations of the second |CaseClauses|.
+        1. Let _clauses2_ be the second |CaseClauses|.
+        1. Return the result of appending to _declarations_ the elements of _clauses2_.LexicallyScopedDeclarations().
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
@@ -17827,11 +17837,14 @@
       </emu-alg>
       <emu-grammar>CaseBlock : `{` CaseClauses? DefaultClause CaseClauses? `}`</emu-grammar>
       <emu-alg>
-        1. If the first |CaseClauses| is present, let _names_ be the VarDeclaredNames of the first |CaseClauses|.
+        1. If the first |CaseClauses| is present, then
+          1. Let _clauses1_ be the first |CaseClauses|.
+          1. Let _names_ be _clauses1_.VarDeclaredNames().
         1. Else, let _names_ be a new empty List.
-        1. Append to _names_ the elements of the VarDeclaredNames of the |DefaultClause|.
+        1. Append to _names_ the elements of |DefaultClause|.VarDeclaredNames().
         1. If the second |CaseClauses| is not present, return _names_.
-        1. Return the result of appending to _names_ the elements of the VarDeclaredNames of the second |CaseClauses|.
+        1. Let _clauses2_ be the second |CaseClauses|.
+        1. Return the result of appending to _names_ the elements of _clauses2_.VarDeclaredNames().
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
@@ -17865,11 +17878,14 @@
       </emu-alg>
       <emu-grammar>CaseBlock : `{` CaseClauses? DefaultClause CaseClauses? `}`</emu-grammar>
       <emu-alg>
-        1. If the first |CaseClauses| is present, let _declarations_ be the VarScopedDeclarations of the first |CaseClauses|.
+        1. If the first |CaseClauses| is present, then
+          1. Let _clauses1_ be the first |CaseClauses|.
+          1. Let _declarations_ be _clauses1_.VarScopedDeclarations().
         1. Else, let _declarations_ be a new empty List.
-        1. Append to _declarations_ the elements of the VarScopedDeclarations of the |DefaultClause|.
+        1. Append to _declarations_ the elements of |DefaultClause|.VarScopedDeclarations().
         1. If the second |CaseClauses| is not present, return _declarations_.
-        1. Return the result of appending to _declarations_ the elements of the VarScopedDeclarations of the second |CaseClauses|.
+        1. Let _clauses2_ be the second |CaseClauses|.
+        1. Return the result of appending to _declarations_ the elements of _clauses2_.VarScopedDeclarations().
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
@@ -23522,7 +23538,8 @@
         </emu-alg>
         <emu-grammar>ExportSpecifier : IdentifierName `as` IdentifierName</emu-grammar>
         <emu-alg>
-          1. Return a List containing the StringValue of the second |IdentifierName|.
+          1. Let _idname2_ be the second |IdentifierName|.
+          1. Return a List containing _idname2_.StringValue().
         </emu-alg>
       </emu-clause>
 
@@ -23610,8 +23627,10 @@
         </emu-alg>
         <emu-grammar>ExportSpecifier : IdentifierName `as` IdentifierName</emu-grammar>
         <emu-alg>
-          1. Let _sourceName_ be the StringValue of the first |IdentifierName|.
-          1. Let _exportName_ be the StringValue of the second |IdentifierName|.
+          1. Let _idname1_ be the first |IdentifierName|.
+          1. Let _sourceName_ be _idname1_.StringValue().
+          1. Let _idname2_ be the second |IdentifierName|.
+          1. Let _exportName_ be _idname2_.StringValue().
           1. If _module_ is *null*, then
             1. Let _localName_ be _sourceName_.
             1. Let _importName_ be *null*.
@@ -31650,7 +31669,8 @@ THH:mm:ss.sss
                 1. Let _capturedValue_ be the String value consisting of the code units of _captureI_.
               1. Perform ! CreateDataProperty(_A_, ! ToString(_i_), _capturedValue_).
               1. If the _i_th capture of _R_ was defined with a |GroupName|, then
-                1. Let _s_ be the StringValue of the corresponding |RegExpIdentifierName|.
+                1. Let _idname_ be the corresponding |RegExpIdentifierName|.
+                1. Let _s_ be _idname_.StringValue().
                 1. Perform ! CreateDataProperty(_groups_, _s_, _capturedValue_).
             1. Return _A_.
           </emu-alg>
