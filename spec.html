@@ -16324,9 +16324,11 @@
       <emu-see-also-para op="ContainsDuplicateLabels"></emu-see-also-para>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement `else` Statement</emu-grammar>
       <emu-alg>
-        1. Let _hasDuplicate_ be ContainsDuplicateLabels of the first |Statement| with argument _labelSet_.
+        1. Let _stmt1_ be the first |Statement|.
+        1. Let _hasDuplicate_ be _stmt1_.ContainsDuplicateLabels(_labelSet_).
         1. If _hasDuplicate_ is *true*, return *true*.
-        1. Return ContainsDuplicateLabels of the second |Statement| with argument _labelSet_.
+        1. Let _stmt2_ be the second |Statement|.
+        1. Return _stmt2_.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
@@ -16341,9 +16343,11 @@
       <emu-see-also-para op="ContainsUndefinedBreakTarget"></emu-see-also-para>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement `else` Statement</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of the first |Statement| with argument _labelSet_.
+        1. Let _stmt1_ be the first |Statement|.
+        1. Let _hasUndefinedLabels_ be _stmt1_.ContainsUndefinedBreakTarget(_labelSet_).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedBreakTarget of the second |Statement| with argument _labelSet_.
+        1. Let _stmt2_ be the second |Statement|.
+        1. Return _stmt2_.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
@@ -17642,12 +17646,14 @@
       <emu-grammar>CaseBlock : `{` CaseClauses? DefaultClause CaseClauses? `}`</emu-grammar>
       <emu-alg>
         1. If the first |CaseClauses| is present, then
-          1. Let _hasDuplicates_ be ContainsDuplicateLabels of the first |CaseClauses| with argument _labelSet_.
+          1. Let _clauses1_ be the first |CaseClauses|.
+          1. Let _hasDuplicates_ be _clauses1_.ContainsDuplicateLabels(_labelSet_).
           1. If _hasDuplicates_ is *true*, return *true*.
         1. Let _hasDuplicates_ be |DefaultClause|.ContainsDuplicateLabels(_labelSet_).
         1. If _hasDuplicates_ is *true*, return *true*.
         1. If the second |CaseClauses| is not present, return *false*.
-        1. Return ContainsDuplicateLabels of the second |CaseClauses| with argument _labelSet_.
+        1. Let _clauses2_ be the second |CaseClauses|.
+        1. Return _clauses2_.ContainsDuplicateLabels(_labelSet_).
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
@@ -17683,12 +17689,14 @@
       <emu-grammar>CaseBlock : `{` CaseClauses? DefaultClause CaseClauses? `}`</emu-grammar>
       <emu-alg>
         1. If the first |CaseClauses| is present, then
-          1. Let _hasUndefinedLabels_ be ContainsUndefinedBreakTarget of the first |CaseClauses| with argument _labelSet_.
+          1. Let _clauses1_ be the first |CaseClauses|.
+          1. Let _hasUndefinedLabels_ be _clauses1_.ContainsUndefinedBreakTarget(_labelSet_).
           1. If _hasUndefinedLabels_ is *true*, return *true*.
         1. Let _hasUndefinedLabels_ be |DefaultClause|.ContainsUndefinedBreakTarget(_labelSet_).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
         1. If the second |CaseClauses| is not present, return *false*.
-        1. Return ContainsUndefinedBreakTarget of the second |CaseClauses| with argument _labelSet_.
+        1. Let _clauses2_ be the second |CaseClauses|.
+        1. Return _clauses2_.ContainsUndefinedBreakTarget(_labelSet_).
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
@@ -21145,9 +21153,11 @@
         </emu-alg>
         <emu-grammar>IfStatement : `if` `(` Expression `)` Statement `else` Statement</emu-grammar>
         <emu-alg>
-          1. Let _has_ be HasCallInTailPosition of the first |Statement| with argument _call_.
+          1. Let _stmt1_ be the first |Statement|.
+          1. Let _has_ be _stmt1_.HasCallInTailPosition(_call_).
           1. If _has_ is *true*, return *true*.
-          1. Return HasCallInTailPosition of the second |Statement| with argument _call_.
+          1. Let _stmt2_ be the second |Statement|.
+          1. Return _stmt2_.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>
           IfStatement : `if` `(` Expression `)` Statement
@@ -21185,11 +21195,15 @@
         <emu-grammar>CaseBlock : `{` CaseClauses? DefaultClause CaseClauses? `}`</emu-grammar>
         <emu-alg>
           1. Let _has_ be *false*.
-          1. If the first |CaseClauses| is present, let _has_ be HasCallInTailPosition of the first |CaseClauses| with argument _call_.
+          1. If the first |CaseClauses| is present, then
+            1. Let _clauses1_ be the first |CaseClauses|.
+            1. Let _has_ be _clauses1_.HasCallInTailPosition(_call_).
           1. If _has_ is *true*, return *true*.
           1. Let _has_ be |DefaultClause|.HasCallInTailPosition(_call_).
           1. If _has_ is *true*, return *true*.
-          1. If the second |CaseClauses| is present, let _has_ be HasCallInTailPosition of the second |CaseClauses| with argument _call_.
+          1. If the second |CaseClauses| is present, then
+            1. Let _clauses2_ be the second |CaseClauses|.
+            1. Let _has_ be _clauses2_.HasCallInTailPosition(_call_).
           1. Return _has_.
         </emu-alg>
         <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
@@ -21331,9 +21345,11 @@
         </emu-alg>
         <emu-grammar>ConditionalExpression : LogicalORExpression `?` AssignmentExpression `:` AssignmentExpression</emu-grammar>
         <emu-alg>
-          1. Let _has_ be HasCallInTailPosition of the first |AssignmentExpression| with argument _call_.
+          1. Let _asmt1_ be the first |AssignmentExpression|.
+          1. Let _has_ be _asmt1_.HasCallInTailPosition(_call_).
           1. If _has_ is *true*, return *true*.
-          1. Return HasCallInTailPosition of the second |AssignmentExpression| with argument _call_.
+          1. Let _asmt2_ be the second |AssignmentExpression|.
+          1. Return _asmt2_.HasCallInTailPosition(_call_).
         </emu-alg>
         <emu-grammar>LogicalANDExpression : LogicalANDExpression `&amp;&amp;` BitwiseORExpression</emu-grammar>
         <emu-alg>
