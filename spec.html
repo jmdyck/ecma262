@@ -7826,9 +7826,9 @@
           1. Let _parameterBindings_ be _parameterNames_.
         1. Let _iteratorRecord_ be CreateListIteratorRecord(_argumentsList_).
         1. If _hasDuplicates_ is *true*, then
-          1. Perform ? IteratorBindingInitialization for _formals_ with _iteratorRecord_ and *undefined* as arguments.
+          1. Perform ? _formals_.IteratorBindingInitialization(_iteratorRecord_, *undefined*).
         1. Else,
-          1. Perform ? IteratorBindingInitialization for _formals_ with _iteratorRecord_ and _env_ as arguments.
+          1. Perform ? _formals_.IteratorBindingInitialization(_iteratorRecord_, _env_).
         1. If _hasParameterExpressions_ is *false*, then
           1. NOTE: Only a single lexical environment is needed for the parameters and top-level vars.
           1. Let _instantiatedVarNames_ be a copy of the List _parameterBindings_.
@@ -11803,11 +11803,11 @@
         <emu-grammar>ElementList : Elision? SpreadElement</emu-grammar>
         <emu-alg>
           1. Let _padding_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
-          1. Return the result of performing ArrayAccumulation for |SpreadElement| with arguments _array_ and _nextIndex_+_padding_.
+          1. Return |SpreadElement|.ArrayAccumulation(_array_, _nextIndex_+_padding_).
         </emu-alg>
         <emu-grammar>ElementList : ElementList `,` Elision? AssignmentExpression</emu-grammar>
         <emu-alg>
-          1. Let _postIndex_ be the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and _nextIndex_.
+          1. Let _postIndex_ be |ElementList|.ArrayAccumulation(_array_, _nextIndex_).
           1. ReturnIfAbrupt(_postIndex_).
           1. Let _padding_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
           1. Let _initResult_ be |AssignmentExpression|.Evaluate().
@@ -11818,10 +11818,10 @@
         </emu-alg>
         <emu-grammar>ElementList : ElementList `,` Elision? SpreadElement</emu-grammar>
         <emu-alg>
-          1. Let _postIndex_ be the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and _nextIndex_.
+          1. Let _postIndex_ be |ElementList|.ArrayAccumulation(_array_, _nextIndex_).
           1. ReturnIfAbrupt(_postIndex_).
           1. Let _padding_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
-          1. Return the result of performing ArrayAccumulation for |SpreadElement| with arguments _array_ and _postIndex_+_padding_.
+          1. Return |SpreadElement|.ArrayAccumulation(_array_, _postIndex_+_padding_).
         </emu-alg>
         <emu-grammar>SpreadElement : `...` AssignmentExpression</emu-grammar>
         <emu-alg>
@@ -11855,7 +11855,7 @@
         <emu-grammar>ArrayLiteral : `[` ElementList `]`</emu-grammar>
         <emu-alg>
           1. Let _array_ be ! ArrayCreate(0).
-          1. Let _len_ be the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and 0.
+          1. Let _len_ be |ElementList|.ArrayAccumulation(_array_, 0).
           1. ReturnIfAbrupt(_len_).
           1. Perform Set(_array_, `"length"`, ToUint32(_len_), *false*).
           1. NOTE: The above Set cannot fail because of the nature of the object returned by ArrayCreate.
@@ -11864,7 +11864,7 @@
         <emu-grammar>ArrayLiteral : `[` ElementList `,` Elision? `]`</emu-grammar>
         <emu-alg>
           1. Let _array_ be ! ArrayCreate(0).
-          1. Let _len_ be the result of performing ArrayAccumulation for |ElementList| with arguments _array_ and 0.
+          1. Let _len_ be |ElementList|.ArrayAccumulation(_array_, 0).
           1. ReturnIfAbrupt(_len_).
           1. Let _padding_ be |Elision|.ElisionWidth(); if |Elision| is not present, use the numeric value zero.
           1. Perform Set(_array_, `"length"`, ToUint32(_padding_+_len_), *false*).
@@ -12058,7 +12058,7 @@
         </emu-grammar>
         <emu-alg>
           1. Let _obj_ be ObjectCreate(%ObjectPrototype%).
-          1. Perform ? PropertyDefinitionEvaluation of |PropertyDefinitionList| with arguments _obj_ and *true*.
+          1. Perform ? |PropertyDefinitionList|.PropertyDefinitionEvaluation(_obj_, *true*).
           1. Return _obj_.
         </emu-alg>
         <emu-grammar>LiteralPropertyName : IdentifierName</emu-grammar>
@@ -12089,8 +12089,8 @@
         <emu-see-also-para op="PropertyDefinitionEvaluation"></emu-see-also-para>
         <emu-grammar>PropertyDefinitionList : PropertyDefinitionList `,` PropertyDefinition</emu-grammar>
         <emu-alg>
-          1. Perform ? PropertyDefinitionEvaluation of |PropertyDefinitionList| with arguments _object_ and _enumerable_.
-          1. Return the result of performing PropertyDefinitionEvaluation of |PropertyDefinition| with arguments _object_ and _enumerable_.
+          1. Perform ? |PropertyDefinitionList|.PropertyDefinitionEvaluation(_object_, _enumerable_).
+          1. Return |PropertyDefinition|.PropertyDefinitionEvaluation(_object_, _enumerable_).
         </emu-alg>
         <emu-grammar>PropertyDefinition : `...` AssignmentExpression</emu-grammar>
         <emu-alg>
@@ -14692,13 +14692,13 @@
         <emu-grammar>ObjectAssignmentPattern : `{` AssignmentRestProperty `}`</emu-grammar>
         <emu-alg>
           1. Let _excludedNames_ be a new empty List.
-          1. Return the result of performing RestDestructuringAssignmentEvaluation of |AssignmentRestProperty| with _value_ and _excludedNames_ as the arguments.
+          1. Return |AssignmentRestProperty|.RestDestructuringAssignmentEvaluation(_value_, _excludedNames_).
         </emu-alg>
 
         <emu-grammar>ObjectAssignmentPattern : `{` AssignmentPropertyList `,` AssignmentRestProperty `}`</emu-grammar>
         <emu-alg>
           1. Let _excludedNames_ be ? |AssignmentPropertyList|.PropertyDestructuringAssignmentEvaluation(_value_).
-          1. Return the result of performing RestDestructuringAssignmentEvaluation of |AssignmentRestProperty| with _value_ and _excludedNames_ as the arguments.
+          1. Return |AssignmentRestProperty|.RestDestructuringAssignmentEvaluation(_value_, _excludedNames_).
         </emu-alg>
       </emu-clause>
 
@@ -14736,7 +14736,7 @@
         <emu-alg>
           1. Let _name_ be |PropertyName|.Evaluate().
           1. ReturnIfAbrupt(_name_).
-          1. Perform ? KeyedDestructuringAssignmentEvaluation of |AssignmentElement| with _value_ and _name_ as the arguments.
+          1. Perform ? |AssignmentElement|.KeyedDestructuringAssignmentEvaluation(_value_, _name_).
           1. Return a new List containing _name_.
         </emu-alg>
       </emu-clause>
@@ -15028,7 +15028,7 @@
       <emu-grammar>BreakableStatement : IterationStatement</emu-grammar>
       <emu-alg>
         1. Let _newIterationSet_ be a copy of _iterationSet_ with all the elements of _labelSet_ appended.
-        1. Return ContainsUndefinedContinueTarget of |IterationStatement| with arguments _newIterationSet_ and &laquo; &raquo;.
+        1. Return |IterationStatement|.ContainsUndefinedContinueTarget(_newIterationSet_, &laquo; &raquo;).
       </emu-alg>
     </emu-clause>
 
@@ -15245,9 +15245,9 @@
       </emu-alg>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of |StatementList| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _hasUndefinedLabels_ be |StatementList|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedContinueTarget of |StatementListItem| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |StatementListItem|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
       <emu-grammar>StatementListItem : Declaration</emu-grammar>
       <emu-alg>
@@ -15645,7 +15645,7 @@
           1. Let _rhs_ be |Initializer|.Evaluate().
           1. Let _value_ be ? GetValue(_rhs_).
           1. Let _env_ be the running execution context's LexicalEnvironment.
-          1. Return the result of performing BindingInitialization for |BindingPattern| using _value_ and _env_ as the arguments.
+          1. Return |BindingPattern|.BindingInitialization(_value_, _env_).
         </emu-alg>
       </emu-clause>
     </emu-clause>
@@ -15752,7 +15752,7 @@
         <emu-alg>
           1. Let _rhs_ be |Initializer|.Evaluate().
           1. Let _rval_ be ? GetValue(_rhs_).
-          1. Return the result of performing BindingInitialization for |BindingPattern| passing _rval_ and *undefined* as arguments.
+          1. Return |BindingPattern|.BindingInitialization(_rval_, *undefined*).
         </emu-alg>
       </emu-clause>
     </emu-clause>
@@ -15987,12 +15987,12 @@
         <emu-grammar>BindingPattern : ObjectBindingPattern</emu-grammar>
         <emu-alg>
           1. Perform ? RequireObjectCoercible(_value_).
-          1. Return the result of performing BindingInitialization for |ObjectBindingPattern| using _value_ and _environment_ as arguments.
+          1. Return |ObjectBindingPattern|.BindingInitialization(_value_, _environment_).
         </emu-alg>
         <emu-grammar>BindingPattern : ArrayBindingPattern</emu-grammar>
         <emu-alg>
           1. Let _iteratorRecord_ be ? GetIterator(_value_).
-          1. Let _result_ be IteratorBindingInitialization for |ArrayBindingPattern| using _iteratorRecord_ and _environment_ as arguments.
+          1. Let _result_ be |ArrayBindingPattern|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
           1. If _iteratorRecord_.[[Done]] is *false*, return ? IteratorClose(_iteratorRecord_, _result_).
           1. Return _result_.
         </emu-alg>
@@ -16006,7 +16006,7 @@
             `{` BindingPropertyList `,` `}`
         </emu-grammar>
         <emu-alg>
-          1. Perform ? PropertyBindingInitialization for |BindingPropertyList| using _value_ and _environment_ as the arguments.
+          1. Perform ? |BindingPropertyList|.PropertyBindingInitialization(_value_, _environment_).
           1. Return NormalCompletion(~empty~).
         </emu-alg>
 
@@ -16018,7 +16018,7 @@
 
         <emu-grammar>ObjectBindingPattern : `{` BindingPropertyList `,` BindingRestProperty `}`</emu-grammar>
         <emu-alg>
-          1. Let _excludedNames_ be the result of performing ? PropertyBindingInitialization of |BindingPropertyList| using _value_ and _environment_ as arguments.
+          1. Let _excludedNames_ be ? |BindingPropertyList|.PropertyBindingInitialization(_value_, _environment_).
           1. Return the result of performing RestBindingInitialization of |BindingRestProperty| with _value_, _environment_, and _excludedNames_ as the arguments.
         </emu-alg>
       </emu-clause>
@@ -16031,8 +16031,8 @@
 
         <emu-grammar>BindingPropertyList : BindingPropertyList `,` BindingProperty</emu-grammar>
         <emu-alg>
-          1. Let _boundNames_ be the result of performing ? PropertyBindingInitialization for |BindingPropertyList| using _value_ and _environment_ as arguments.
-          1. Let _nextNames_ be the result of performing ? PropertyBindingInitialization for |BindingProperty| using _value_ and _environment_ as arguments.
+          1. Let _boundNames_ be ? |BindingPropertyList|.PropertyBindingInitialization(_value_, _environment_).
+          1. Let _nextNames_ be ? |BindingProperty|.PropertyBindingInitialization(_value_, _environment_).
           1. Append each item in _nextNames_ to the end of _boundNames_.
           1. Return _boundNames_.
         </emu-alg>
@@ -16087,49 +16087,49 @@
         <emu-alg>
           1. If |Elision| is present, then
             1. Perform ? |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
-          1. Return the result of performing IteratorBindingInitialization for |BindingRestElement| with _iteratorRecord_ and _environment_ as arguments.
+          1. Return |BindingRestElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` BindingElementList `]`</emu-grammar>
         <emu-alg>
-          1. Return the result of performing IteratorBindingInitialization for |BindingElementList| with _iteratorRecord_ and _environment_ as arguments.
+          1. Return |BindingElementList|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` BindingElementList `,` `]`</emu-grammar>
         <emu-alg>
-          1. Return the result of performing IteratorBindingInitialization for |BindingElementList| with _iteratorRecord_ and _environment_ as arguments.
+          1. Return |BindingElementList|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` BindingElementList `,` Elision `]`</emu-grammar>
         <emu-alg>
-          1. Perform ? IteratorBindingInitialization for |BindingElementList| with _iteratorRecord_ and _environment_ as arguments.
+          1. Perform ? |BindingElementList|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
           1. Return |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
         </emu-alg>
         <emu-grammar>ArrayBindingPattern : `[` BindingElementList `,` Elision? BindingRestElement `]`</emu-grammar>
         <emu-alg>
-          1. Perform ? IteratorBindingInitialization for |BindingElementList| with _iteratorRecord_ and _environment_ as arguments.
+          1. Perform ? |BindingElementList|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
           1. If |Elision| is present, then
             1. Perform ? |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
-          1. Return the result of performing IteratorBindingInitialization for |BindingRestElement| with _iteratorRecord_ and _environment_ as arguments.
+          1. Return |BindingRestElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         </emu-alg>
         <emu-grammar>BindingElementList : BindingElisionElement</emu-grammar>
         <emu-alg>
-          1. Return the result of performing IteratorBindingInitialization for |BindingElisionElement| with _iteratorRecord_ and _environment_ as arguments.
+          1. Return |BindingElisionElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         </emu-alg>
         <emu-grammar>BindingElementList : BindingElementList `,` BindingElisionElement</emu-grammar>
         <emu-alg>
-          1. Perform ? IteratorBindingInitialization for |BindingElementList| with _iteratorRecord_ and _environment_ as arguments.
-          1. Return the result of performing IteratorBindingInitialization for |BindingElisionElement| using _iteratorRecord_ and _environment_ as arguments.
+          1. Perform ? |BindingElementList|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
+          1. Return |BindingElisionElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         </emu-alg>
         <emu-grammar>BindingElisionElement : BindingElement</emu-grammar>
         <emu-alg>
-          1. Return the result of performing IteratorBindingInitialization of |BindingElement| with _iteratorRecord_ and _environment_ as the arguments.
+          1. Return |BindingElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         </emu-alg>
         <emu-grammar>BindingElisionElement : Elision BindingElement</emu-grammar>
         <emu-alg>
           1. Perform ? |Elision|.IteratorDestructuringAssignmentEvaluation(_iteratorRecord_).
-          1. Return the result of performing IteratorBindingInitialization of |BindingElement| with _iteratorRecord_ and _environment_ as the arguments.
+          1. Return |BindingElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         </emu-alg>
         <emu-grammar>BindingElement : SingleNameBinding</emu-grammar>
         <emu-alg>
-          1. Return the result of performing IteratorBindingInitialization for |SingleNameBinding| with _iteratorRecord_ and _environment_ as the arguments.
+          1. Return |SingleNameBinding|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         </emu-alg>
         <emu-grammar>SingleNameBinding : BindingIdentifier Initializer?</emu-grammar>
         <emu-alg>
@@ -16169,7 +16169,7 @@
           1. If |Initializer| is present and _v_ is *undefined*, then
             1. Let _defaultValue_ be |Initializer|.Evaluate().
             1. Set _v_ to ? GetValue(_defaultValue_).
-          1. Return the result of performing BindingInitialization of |BindingPattern| with _v_ and _environment_ as the arguments.
+          1. Return |BindingPattern|.BindingInitialization(_v_, _environment_).
         </emu-alg>
         <emu-grammar>BindingRestElement : `...` BindingIdentifier</emu-grammar>
         <emu-alg>
@@ -16203,7 +16203,7 @@
               1. ReturnIfAbrupt(_next_).
               1. If _next_ is *false*, set _iteratorRecord_.[[Done]] to *true*.
             1. If _iteratorRecord_.[[Done]] is *true*, then
-              1. Return the result of performing BindingInitialization of |BindingPattern| with _A_ and _environment_ as the arguments.
+              1. Return |BindingPattern|.BindingInitialization(_A_, _environment_).
             1. Let _nextValue_ be IteratorValue(_next_).
             1. If _nextValue_ is an abrupt completion, set _iteratorRecord_.[[Done]] to *true*.
             1. ReturnIfAbrupt(_nextValue_).
@@ -16226,7 +16226,7 @@
           1. If |Initializer| is present and _v_ is *undefined*, then
             1. Let _defaultValue_ be |Initializer|.Evaluate().
             1. Set _v_ to ? GetValue(_defaultValue_).
-          1. Return the result of performing BindingInitialization for |BindingPattern| passing _v_ and _environment_ as arguments.
+          1. Return |BindingPattern|.BindingInitialization(_v_, _environment_).
         </emu-alg>
         <emu-grammar>SingleNameBinding : BindingIdentifier Initializer?</emu-grammar>
         <emu-alg>
@@ -16368,7 +16368,7 @@
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedContinueTarget of |Statement| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |Statement|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
     </emu-clause>
 
@@ -16552,7 +16552,7 @@
         <emu-see-also-para op="ContainsUndefinedContinueTarget"></emu-see-also-para>
         <emu-grammar>IterationStatement : `do` Statement `while` `(` Expression `)` `;`</emu-grammar>
         <emu-alg>
-          1. Return ContainsUndefinedContinueTarget of |Statement| with arguments _iterationSet_ and &laquo; &raquo;.
+          1. Return |Statement|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         </emu-alg>
       </emu-clause>
 
@@ -16628,7 +16628,7 @@
         <emu-see-also-para op="ContainsUndefinedContinueTarget"></emu-see-also-para>
         <emu-grammar>IterationStatement : `while` `(` Expression `)` Statement</emu-grammar>
         <emu-alg>
-          1. Return ContainsUndefinedContinueTarget of |Statement| with arguments _iterationSet_ and &laquo; &raquo;.
+          1. Return |Statement|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         </emu-alg>
       </emu-clause>
 
@@ -16730,7 +16730,7 @@
             `for` `(` LexicalDeclaration Expression? `;` Expression? `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return ContainsUndefinedContinueTarget of |Statement| with arguments _iterationSet_ and &laquo; &raquo;.
+          1. Return |Statement|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         </emu-alg>
       </emu-clause>
 
@@ -16988,7 +16988,7 @@
             `for` `await` `(` ForDeclaration `of` AssignmentExpression `)` Statement
         </emu-grammar>
         <emu-alg>
-          1. Return ContainsUndefinedContinueTarget of |Statement| with arguments _iterationSet_ and &laquo; &raquo;.
+          1. Return |Statement|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         </emu-alg>
         <emu-note>
           <p>This section is extended by Annex <emu-xref href="#sec-initializers-in-forin-statement-heads"></emu-xref>.</p>
@@ -17128,7 +17128,7 @@
         </emu-note>
         <emu-grammar>ForDeclaration : LetOrConst ForBinding</emu-grammar>
         <emu-alg>
-          1. Return the result of performing BindingInitialization for |ForBinding| passing _value_ and _environment_ as the arguments.
+          1. Return |ForBinding|.BindingInitialization(_value_, _environment_).
         </emu-alg>
       </emu-clause>
 
@@ -17280,11 +17280,11 @@
                 1. Let _status_ be _assignmentPattern_.DestructuringAssignmentEvaluation(_nextValue_).
               1. Else if _lhsKind_ is ~varBinding~, then
                 1. Assert: _lhs_ is a |ForBinding|.
-                1. Let _status_ be the result of performing BindingInitialization for _lhs_ passing _nextValue_ and *undefined* as the arguments.
+                1. Let _status_ be _lhs_.BindingInitialization(_nextValue_, *undefined*).
               1. Else,
                 1. Assert: _lhsKind_ is ~lexicalBinding~.
                 1. Assert: _lhs_ is a |ForDeclaration|.
-                1. Let _status_ be the result of performing BindingInitialization for _lhs_ passing _nextValue_ and _iterationEnv_ as arguments.
+                1. Let _status_ be _lhs_.BindingInitialization(_nextValue_, _iterationEnv_).
             1. If _status_ is an abrupt completion, then
               1. Set the running execution context's LexicalEnvironment to _oldEnv_.
               1. If _iteratorKind_ is ~async~, return ? AsyncIteratorClose(_iteratorRecord_, _status_).
@@ -17548,7 +17548,7 @@
       <emu-see-also-para op="ContainsUndefinedContinueTarget"></emu-see-also-para>
       <emu-grammar>WithStatement : `with` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedContinueTarget of |Statement| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |Statement|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
     </emu-clause>
 
@@ -17723,7 +17723,7 @@
       <emu-see-also-para op="ContainsUndefinedContinueTarget"></emu-see-also-para>
       <emu-grammar>SwitchStatement : `switch` `(` Expression `)` CaseBlock</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedContinueTarget of |CaseBlock| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |CaseBlock|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
       <emu-grammar>CaseBlock : `{` `}`</emu-grammar>
       <emu-alg>
@@ -17734,25 +17734,25 @@
         1. If the first |CaseClauses| is present, then
           1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of the first |CaseClauses| with arguments _iterationSet_ and &laquo; &raquo;.
           1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of |DefaultClause| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _hasUndefinedLabels_ be |DefaultClause|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
         1. If the second |CaseClauses| is not present, return *false*.
         1. Return ContainsUndefinedContinueTarget of the second |CaseClauses| with arguments _iterationSet_ and &laquo; &raquo;.
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of |CaseClauses| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _hasUndefinedLabels_ be |CaseClauses|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedContinueTarget of |CaseClause| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |CaseClause|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
       <emu-grammar>CaseClause : `case` Expression `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return ContainsUndefinedContinueTarget of |StatementList| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. If the |StatementList| is present, return |StatementList|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. Return *false*.
       </emu-alg>
       <emu-grammar>DefaultClause : `default` `:` StatementList?</emu-grammar>
       <emu-alg>
-        1. If the |StatementList| is present, return ContainsUndefinedContinueTarget of |StatementList| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. If the |StatementList| is present, return |StatementList|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. Return *false*.
       </emu-alg>
     </emu-clause>
@@ -18101,7 +18101,7 @@
       <emu-alg>
         1. Let _label_ be |LabelIdentifier|.StringValue().
         1. Let _newLabelSet_ be a copy of _labelSet_ with _label_ appended.
-        1. Return ContainsUndefinedContinueTarget of |LabelledItem| with arguments _iterationSet_ and _newLabelSet_.
+        1. Return |LabelledItem|.ContainsUndefinedContinueTarget(_iterationSet_, _newLabelSet_).
       </emu-alg>
       <emu-grammar>LabelledItem : FunctionDeclaration</emu-grammar>
       <emu-alg>
@@ -18416,27 +18416,27 @@
       <emu-see-also-para op="ContainsUndefinedContinueTarget"></emu-see-also-para>
       <emu-grammar>TryStatement : `try` Block Catch</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of |Block| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _hasUndefinedLabels_ be |Block|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedContinueTarget of |Catch| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |Catch|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Finally</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of |Block| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _hasUndefinedLabels_ be |Block|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedContinueTarget of |Finally| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |Finally|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
       <emu-grammar>TryStatement : `try` Block Catch Finally</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of |Block| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _hasUndefinedLabels_ be |Block|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of |Catch| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _hasUndefinedLabels_ be |Catch|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedContinueTarget of |Finally| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |Finally|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
       <emu-grammar>Catch : `catch` `(` CatchParameter `)` Block</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedContinueTarget of |Block| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |Block|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
     </emu-clause>
 
@@ -18510,7 +18510,7 @@
         1. For each element _argName_ of |CatchParameter|.BoundNames(), do
           1. Perform ! _catchEnvRec_.CreateMutableBinding(_argName_, *false*).
         1. Set the running execution context's LexicalEnvironment to _catchEnv_.
-        1. Let _status_ be the result of performing BindingInitialization for |CatchParameter| passing _thrownValue_ and _catchEnv_ as arguments.
+        1. Let _status_ be |CatchParameter|.BindingInitialization(_thrownValue_, _catchEnv_).
         1. If _status_ is an abrupt completion, then
           1. Set the running execution context's LexicalEnvironment to _oldEnv_.
           1. Return Completion(_status_).
@@ -18979,17 +18979,17 @@
       </emu-alg>
       <emu-grammar>FormalParameters : FormalParameterList `,` FunctionRestParameter</emu-grammar>
       <emu-alg>
-        1. Perform ? IteratorBindingInitialization for |FormalParameterList| using _iteratorRecord_ and _environment_ as the arguments.
-        1. Return the result of performing IteratorBindingInitialization for |FunctionRestParameter| using _iteratorRecord_ and _environment_ as the arguments.
+        1. Perform ? |FormalParameterList|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
+        1. Return |FunctionRestParameter|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
       </emu-alg>
       <emu-grammar>FormalParameterList : FormalParameterList `,` FormalParameter</emu-grammar>
       <emu-alg>
-        1. Perform ? IteratorBindingInitialization for |FormalParameterList| using _iteratorRecord_ and _environment_ as the arguments.
-        1. Return the result of performing IteratorBindingInitialization for |FormalParameter| using _iteratorRecord_ and _environment_ as the arguments.
+        1. Perform ? |FormalParameterList|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
+        1. Return |FormalParameter|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
       </emu-alg>
       <emu-grammar>FormalParameter : BindingElement</emu-grammar>
       <emu-alg>
-        1. If |BindingElement|.ContainsExpression() is *false*, return the result of performing IteratorBindingInitialization for |BindingElement| using _iteratorRecord_ and _environment_ as the arguments.
+        1. If |BindingElement|.ContainsExpression() is *false*, return |BindingElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         1. Let _currentContext_ be the running execution context.
         1. Let _originalEnv_ be the VariableEnvironment of _currentContext_.
         1. Assert: The VariableEnvironment and LexicalEnvironment of _currentContext_ are the same.
@@ -18997,7 +18997,7 @@
         1. Let _paramVarEnv_ be NewDeclarativeEnvironment(_originalEnv_).
         1. Set the VariableEnvironment of _currentContext_ to _paramVarEnv_.
         1. Set the LexicalEnvironment of _currentContext_ to _paramVarEnv_.
-        1. Let _result_ be the result of performing IteratorBindingInitialization for |BindingElement| using _iteratorRecord_ and _environment_ as the arguments.
+        1. Let _result_ be |BindingElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         1. Set the VariableEnvironment of _currentContext_ to _originalEnv_.
         1. Set the LexicalEnvironment of _currentContext_ to _originalEnv_.
         1. Return _result_.
@@ -19007,7 +19007,7 @@
       </emu-note>
       <emu-grammar>FunctionRestParameter : BindingRestElement</emu-grammar>
       <emu-alg>
-        1. If |BindingRestElement|.ContainsExpression() is *false*, return the result of performing IteratorBindingInitialization for |BindingRestElement| using _iteratorRecord_ and _environment_ as the arguments.
+        1. If |BindingRestElement|.ContainsExpression() is *false*, return |BindingRestElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         1. Let _currentContext_ be the running execution context.
         1. Let _originalEnv_ be the VariableEnvironment of _currentContext_.
         1. Assert: The VariableEnvironment and LexicalEnvironment of _currentContext_ are the same.
@@ -19015,7 +19015,7 @@
         1. Let _paramVarEnv_ be NewDeclarativeEnvironment(_originalEnv_).
         1. Set the VariableEnvironment of _currentContext_ to _paramVarEnv_.
         1. Set the LexicalEnvironment of _currentContext_ to _paramVarEnv_.
-        1. Let _result_ be the result of performing IteratorBindingInitialization for |BindingRestElement| using _iteratorRecord_ and _environment_ as the arguments.
+        1. Let _result_ be |BindingRestElement|.IteratorBindingInitialization(_iteratorRecord_, _environment_).
         1. Set the VariableEnvironment of _currentContext_ to _originalEnv_.
         1. Set the LexicalEnvironment of _currentContext_ to _originalEnv_.
         1. Return _result_.
@@ -19322,7 +19322,7 @@
           1. If _v_ is an abrupt completion, set _iteratorRecord_.[[Done]] to *true*.
           1. ReturnIfAbrupt(_v_).
         1. If _iteratorRecord_.[[Done]] is *true*, let _v_ be *undefined*.
-        1. Return the result of performing BindingInitialization for |BindingIdentifier| using _v_ and _environment_ as the arguments.
+        1. Return |BindingIdentifier|.BindingInitialization(_v_, _environment_).
       </emu-alg>
     </emu-clause>
 
@@ -20459,7 +20459,7 @@
               <pre><code class="javascript">constructor( ){ }</code></pre>
               using the syntactic grammar with the goal symbol |MethodDefinition[~Yield, ~Await]|.
         1. Set the running execution context's LexicalEnvironment to _classScope_.
-        1. Let _constructorInfo_ be the result of performing DefineMethod for _constructor_ with arguments _proto_ and _constructorParent_ as the optional _functionPrototype_ argument.
+        1. Let _constructorInfo_ be _constructor_.DefineMethod(_proto_, _constructorParent_).
         1. Assert: _constructorInfo_ is not an abrupt completion.
         1. Let _F_ be _constructorInfo_.[[Closure]].
         1. If |ClassHeritage_opt| is present, set _F_.[[ConstructorKind]] to `"derived"`.
@@ -20470,9 +20470,9 @@
         1. Else, let _methods_ be |ClassBody|.NonConstructorMethodDefinitions().
         1. For each |ClassElement| _m_ in order from _methods_, do
           1. If _m_.IsStatic() is *false*, then
-            1. Let _status_ be the result of performing PropertyDefinitionEvaluation for _m_ with arguments _proto_ and *false*.
+            1. Let _status_ be _m_.PropertyDefinitionEvaluation(_proto_, *false*).
           1. Else,
-            1. Let _status_ be the result of performing PropertyDefinitionEvaluation for _m_ with arguments _F_ and *false*.
+            1. Let _status_ be _m_.PropertyDefinitionEvaluation(_F_, *false*).
           1. If _status_ is an abrupt completion, then
             1. Set the running execution context's LexicalEnvironment to _lex_.
             1. Return Completion(_status_).
@@ -21023,7 +21023,7 @@
           1. If _v_ is an abrupt completion, set _iteratorRecord_.[[Done]] to *true*.
           1. ReturnIfAbrupt(_v_).
         1. If _iteratorRecord_.[[Done]] is *true*, let _v_ be *undefined*.
-        1. Return the result of performing BindingInitialization for |BindingIdentifier| using _v_ and _environment_ as the arguments.
+        1. Return |BindingIdentifier|.BindingInitialization(_v_, _environment_).
       </emu-alg>
     </emu-clause>
 
@@ -21046,7 +21046,7 @@
         AsyncConciseBody : `{` AsyncFunctionBody `}`
       </emu-grammar>
       <emu-alg>
-        1. Return the result of EvaluateBody of |AsyncFunctionBody| passing _functionObject_ and _argumentsList_ as the arguments.
+        1. Return |AsyncFunctionBody|.EvaluateBody(_functionObject_, _argumentsList_).
       </emu-alg>
     </emu-clause>
 
@@ -21829,9 +21829,9 @@
         <emu-see-also-para op="ContainsUndefinedContinueTarget"></emu-see-also-para>
         <emu-grammar>ModuleItemList : ModuleItemList ModuleItem</emu-grammar>
         <emu-alg>
-          1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of |ModuleItemList| with arguments _iterationSet_ and &laquo; &raquo;.
+          1. Let _hasUndefinedLabels_ be |ModuleItemList|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
           1. If _hasUndefinedLabels_ is *true*, return *true*.
-          1. Return ContainsUndefinedContinueTarget of |ModuleItem| with arguments _iterationSet_ and &laquo; &raquo;.
+          1. Return |ModuleItem|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         </emu-alg>
         <emu-grammar>
           ModuleItem :
@@ -41808,7 +41808,7 @@ THH:mm:ss.sss
       <p>The static semantics of ContainsUndefinedContinueTarget in <emu-xref href="#sec-for-in-and-for-of-statements-static-semantics-containsundefinedcontinuetarget"></emu-xref> are augmented with the following:</p>
       <emu-grammar>IterationStatement : `for` `(` `var` BindingIdentifier Initializer `in` Expression `)` Statement</emu-grammar>
       <emu-alg>
-        1. Return ContainsUndefinedContinueTarget of |Statement| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Return |Statement|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
       <p>The static semantics of IsDestructuring in <emu-xref href="#sec-for-in-and-for-of-statements-static-semantics-isdestructuring"></emu-xref> are augmented with the following:</p>
       <emu-grammar>
