@@ -7564,7 +7564,8 @@
         <h1>OrdinaryCallEvaluateBody ( _F_, _argumentsList_ )</h1>
         <p>When the abstract operation OrdinaryCallEvaluateBody is called with function object _F_ and List _argumentsList_, the following steps are taken:</p>
         <emu-alg>
-          1. Return the result of EvaluateBody of the parsed code that is _F_.[[ECMAScriptCode]] passing _F_ and _argumentsList_ as the arguments.
+          1. Let _code_ be the parsed code that is _F_.[[ECMAScriptCode]].
+          1. Return _code_.EvaluateBody(_F_, _argumentsList_).
         </emu-alg>
       </emu-clause>
     </emu-clause>
@@ -16362,9 +16363,11 @@
       <emu-see-also-para op="ContainsUndefinedContinueTarget"></emu-see-also-para>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement `else` Statement</emu-grammar>
       <emu-alg>
-        1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of the first |Statement| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _stmt1_ be the first |Statement|.
+        1. Let _hasUndefinedLabels_ be _stmt1_.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
-        1. Return ContainsUndefinedContinueTarget of the second |Statement| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _stmt2_ be the second |Statement|.
+        1. Return _stmt2_.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
       <emu-grammar>IfStatement : `if` `(` Expression `)` Statement</emu-grammar>
       <emu-alg>
@@ -17732,12 +17735,14 @@
       <emu-grammar>CaseBlock : `{` CaseClauses? DefaultClause CaseClauses? `}`</emu-grammar>
       <emu-alg>
         1. If the first |CaseClauses| is present, then
-          1. Let _hasUndefinedLabels_ be ContainsUndefinedContinueTarget of the first |CaseClauses| with arguments _iterationSet_ and &laquo; &raquo;.
+          1. Let _clauses1_ be the first |CaseClauses|.
+          1. Let _hasUndefinedLabels_ be _clauses1_.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
           1. If _hasUndefinedLabels_ is *true*, return *true*.
         1. Let _hasUndefinedLabels_ be |DefaultClause|.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
         1. If _hasUndefinedLabels_ is *true*, return *true*.
         1. If the second |CaseClauses| is not present, return *false*.
-        1. Return ContainsUndefinedContinueTarget of the second |CaseClauses| with arguments _iterationSet_ and &laquo; &raquo;.
+        1. Let _clauses2_ be the second |CaseClauses|.
+        1. Return _clauses2_.ContainsUndefinedContinueTarget(_iterationSet_, &laquo; &raquo;).
       </emu-alg>
       <emu-grammar>CaseClauses : CaseClauses CaseClause</emu-grammar>
       <emu-alg>
