@@ -16014,13 +16014,13 @@
         <emu-grammar>ObjectBindingPattern : `{` BindingRestProperty `}`</emu-grammar>
         <emu-alg>
           1. Let _excludedNames_ be a new empty List.
-          1. Return the result of performing RestBindingInitialization of |BindingRestProperty| with _value_, _environment_, and _excludedNames_ as the arguments.
+          1. Return |BindingRestProperty|.RestBindingInitialization(_value_, _environment_, _excludedNames_).
         </emu-alg>
 
         <emu-grammar>ObjectBindingPattern : `{` BindingPropertyList `,` BindingRestProperty `}`</emu-grammar>
         <emu-alg>
           1. Let _excludedNames_ be ? |BindingPropertyList|.PropertyBindingInitialization(_value_, _environment_).
-          1. Return the result of performing RestBindingInitialization of |BindingRestProperty| with _value_, _environment_, and _excludedNames_ as the arguments.
+          1. Return |BindingRestProperty|.RestBindingInitialization(_value_, _environment_, _excludedNames_).
         </emu-alg>
       </emu-clause>
 
@@ -16041,7 +16041,7 @@
         <emu-grammar>BindingProperty : SingleNameBinding</emu-grammar>
         <emu-alg>
           1. Let _name_ be the string that is the only element of |SingleNameBinding|.BoundNames().
-          1. Perform ? KeyedBindingInitialization for |SingleNameBinding| using _value_, _environment_, and _name_ as the arguments.
+          1. Perform ? |SingleNameBinding|.KeyedBindingInitialization(_value_, _environment_, _name_).
           1. Return a new List containing _name_.
         </emu-alg>
 
@@ -16049,7 +16049,7 @@
         <emu-alg>
           1. Let _P_ be |PropertyName|.Evaluate().
           1. ReturnIfAbrupt(_P_).
-          1. Perform ? KeyedBindingInitialization of |BindingElement| with _value_, _environment_, and _P_ as the arguments.
+          1. Perform ? |BindingElement|.KeyedBindingInitialization(_value_, _environment_, _P_).
           1. Return a new List containing _P_.
         </emu-alg>
       </emu-clause>
