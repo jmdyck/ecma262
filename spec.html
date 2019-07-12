@@ -2103,7 +2103,8 @@
         </li>
       </ul>
       <p>Properties are identified using key values. A property key value is either an ECMAScript String value or a Symbol value. All String and Symbol values, including the empty String, are valid as property keys. A <dfn id="property-name">property name</dfn> is a property key that is a String value.</p>
-      <p>An <dfn id="integer-index">integer index</dfn> is a String-valued property key that is a canonical numeric String (see <emu-xref href="#sec-canonicalnumericindexstring"></emu-xref>) and whose numeric value is either *+0*<sub>𝔽</sub> or a positive integral Number &le; 𝔽(2<sup>53</sup> - 1). An <dfn id="array-index">array index</dfn> is an integer index whose numeric value _i_ is in the range <emu-eqn>*+0*<sub>𝔽</sub> &le; _i_ &lt; 𝔽(2<sup>32</sup> - 1)</emu-eqn>.</p>
+      <p>A <dfn id="uint53-string" oldids="integer-index">Uint53-string</dfn> is a String-valued property key that is a canonical numeric String (see <emu-xref href="#sec-canonicalnumericindexstring"></emu-xref>) and whose numeric value is either *+0*<sub>𝔽</sub> or a positive integral Number &le; 𝔽(2<sup>53</sup> - 1). An <dfn id="array-index">array index</dfn> is a Uint53-string whose numeric value _i_ is in the range <emu-eqn>*+0*<sub>𝔽</sub> &le; _i_ &lt; 𝔽(2<sup>32</sup> - 1)</emu-eqn>.</p>
+      <p>A <dfn>Uint53-indexed</dfn> property is one whose property key is a Uint53-string.</p>
       <p>Property keys are used to access properties and their values. There are two kinds of access for properties: <em>get</em> and <em>set</em>, corresponding to value retrieval and assignment, respectively. The properties accessible via get and set access includes both <em>own properties</em> that are a direct part of an object and <em>inherited properties</em> which are provided by another associated object via a property inheritance relationship. Inherited properties may be either own or inherited properties of the associated object. Each own property of an object must each have a key value that is distinct from the key values of the other own properties of that object.</p>
       <p>All objects are logically collections of properties, but there are multiple forms of objects that differ in their semantics for accessing and manipulating their properties. Please see <emu-xref href="#sec-object-internal-methods-and-internal-slots"></emu-xref> for definitions of the multiple forms of objects.</p>
 
@@ -5005,7 +5006,7 @@
 
     <emu-clause id="sec-toindex" aoid="ToIndex">
       <h1>ToIndex ( _value_ )</h1>
-      <p>The abstract operation ToIndex takes argument _value_. It returns _value_ argument converted to a non-negative integer if it is a valid integer index value. It performs the following steps when called:</p>
+      <p>The abstract operation ToIndex takes argument _value_. It returns _value_ argument converted to a non-negative integer if it is a valid Uint53-string value. It performs the following steps when called:</p>
       <emu-alg>
         1. If _value_ is *undefined*, then
           1. Return 0.
@@ -11881,7 +11882,7 @@
 
     <emu-clause id="sec-string-exotic-objects">
       <h1>String Exotic Objects</h1>
-      <p>A String object is an exotic object that encapsulates a String value and exposes virtual integer-indexed data properties corresponding to the individual code unit elements of the String value. String exotic objects always have a data property named *"length"* whose value is the number of code unit elements in the encapsulated String value. Both the code unit data properties and the *"length"* property are non-writable and non-configurable.</p>
+      <p>A String object is an exotic object that encapsulates a String value and exposes virtual Uint53-indexed data properties corresponding to the individual code unit elements of the String value. String exotic objects always have a data property named *"length"* whose value is the number of code unit elements in the encapsulated String value. Both the code unit data properties and the *"length"* property are non-writable and non-configurable.</p>
 
       <p>An object is a <dfn id="string-exotic-object">String exotic object</dfn> (or simply, a String object) if its [[GetOwnProperty]], [[DefineOwnProperty]], and [[OwnPropertyKeys]] internal methods use the following implementations, and its other essential internal methods use the definitions found in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>. These methods are installed in StringCreate.</p>
 
@@ -12185,7 +12186,7 @@
 
     <emu-clause id="sec-integer-indexed-exotic-objects">
       <h1>Integer-Indexed Exotic Objects</h1>
-      <p>An Integer-Indexed exotic object is an exotic object that performs special handling of integer index property keys.</p>
+      <p>An Integer-Indexed exotic object is an exotic object that performs special handling of Uint53-string property keys.</p>
       <p><emu-xref href="#integer-indexed-exotic-object">Integer-Indexed exotic objects</emu-xref> have the same internal slots as ordinary objects and additionally [[ViewedArrayBuffer]], [[ArrayLength]], [[ByteOffset]], [[ContentType]], and [[TypedArrayName]] internal slots.</p>
       <p>An object is an <dfn id="integer-indexed-exotic-object">Integer-Indexed exotic object</dfn> if its [[GetOwnProperty]], [[HasProperty]], [[DefineOwnProperty]], [[Get]], [[Set]], [[Delete]], and [[OwnPropertyKeys]] internal methods use the definitions in this section, and its other essential internal methods use the definitions found in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>. These methods are installed by IntegerIndexedObjectCreate.</p>
 
@@ -12288,7 +12289,7 @@
           1. If IsDetachedBuffer(_O_.[[ViewedArrayBuffer]]) is *false*, then
             1. For each integer _i_ starting with 0 such that _i_ &lt; _O_.[[ArrayLength]], in ascending order, do
               1. Add ! ToString(𝔽(_i_)) as the last element of _keys_.
-          1. For each own property key _P_ of _O_ such that Type(_P_) is String and _P_ is not an integer index, in ascending chronological order of property creation, do
+          1. For each own property key _P_ of _O_ such that Type(_P_) is String and _P_ is not a Uint53-string, in ascending chronological order of property creation, do
             1. Add _P_ as the last element of _keys_.
           1. For each own property key _P_ of _O_ such that Type(_P_) is Symbol, in ascending chronological order of property creation, do
             1. Add _P_ as the last element of _keys_.
@@ -30195,7 +30196,7 @@ THH:mm:ss.sss
     <emu-clause id="sec-properties-of-string-instances">
       <h1>Properties of String Instances</h1>
       <p>String instances are String exotic objects and have the internal methods specified for such objects. String instances inherit properties from the String prototype object. String instances also have a [[StringData]] internal slot.</p>
-      <p>String instances have a *"length"* property, and a set of enumerable properties with integer-indexed names.</p>
+      <p>String instances have a *"length"* property, and a set of enumerable properties with Uint53-string names.</p>
 
       <emu-clause id="sec-properties-of-string-instances-length">
         <h1>length</h1>
@@ -33361,7 +33362,7 @@ THH:mm:ss.sss
             1. Set _j_ to _j_ + 1.
           1. Return _obj_.
         </emu-alg>
-        <p>The <em>sort order</em> is the ordering, after completion of this function, of the <emu-xref href="#integer-index">integer-indexed</emu-xref> property values of _obj_ whose integer indexes are less than _len_. The result of the `sort` function is then determined as follows:</p>
+        <p>The <em>sort order</em> is the ordering, after completion of this function, of the Uint53-indexed property values of _obj_ whose integer indexes are less than _len_. The result of the `sort` function is then determined as follows:</p>
         <p>The sort order is implementation-defined if any of the following conditions is true:</p>
         <ul>
           <li>
@@ -34721,7 +34722,7 @@ THH:mm:ss.sss
 
       <emu-clause id="sec-%typedarray%.prototype.sort">
         <h1>%TypedArray%.prototype.sort ( _comparefn_ )</h1>
-        <p>%TypedArray%`.prototype.sort` is a distinct function that, except as described below, implements the same requirements as those of `Array.prototype.sort` as defined in <emu-xref href="#sec-array.prototype.sort"></emu-xref>. The implementation of the %TypedArray%`.prototype.sort` specification may be optimized with the knowledge that the *this* value is an object that has a fixed length and whose <emu-xref href="#integer-index">integer-indexed</emu-xref> properties are not sparse.</p>
+        <p>%TypedArray%`.prototype.sort` is a distinct function that, except as described below, implements the same requirements as those of `Array.prototype.sort` as defined in <emu-xref href="#sec-array.prototype.sort"></emu-xref>. The implementation of the %TypedArray%`.prototype.sort` specification may be optimized with the knowledge that the *this* value is an object that has a fixed length and whose Uint53-indexed properties are not sparse.</p>
         <p>This function is not generic. The *this* value must be an object with a [[TypedArrayName]] internal slot.</p>
         <p>Upon entry, the following steps are performed to initialize evaluation of the `sort` function. These steps are used instead of steps <emu-xref href="#step-array-sort-comparefn"></emu-xref>–<emu-xref href="#step-array-sort-len"></emu-xref> in <emu-xref href="#sec-array.prototype.sort"></emu-xref>:</p>
         <emu-alg>
@@ -34784,7 +34785,7 @@ THH:mm:ss.sss
 
       <emu-clause id="sec-%typedarray%.prototype.tolocalestring">
         <h1>%TypedArray%.prototype.toLocaleString ( [ _reserved1_ [ , _reserved2_ ] ] )</h1>
-        <p>%TypedArray%`.prototype.toLocaleString` is a distinct function that implements the same algorithm as `Array.prototype.toLocaleString` as defined in <emu-xref href="#sec-array.prototype.tolocalestring"></emu-xref> except that the *this* value's [[ArrayLength]] internal slot is accessed in place of performing a [[Get]] of *"length"*. The implementation of the algorithm may be optimized with the knowledge that the *this* value is an object that has a fixed length and whose <emu-xref href="#integer-index">integer-indexed</emu-xref> properties are not sparse. However, such optimization must not introduce any observable changes in the specified behaviour of the algorithm.</p>
+        <p>%TypedArray%`.prototype.toLocaleString` is a distinct function that implements the same algorithm as `Array.prototype.toLocaleString` as defined in <emu-xref href="#sec-array.prototype.tolocalestring"></emu-xref> except that the *this* value's [[ArrayLength]] internal slot is accessed in place of performing a [[Get]] of *"length"*. The implementation of the algorithm may be optimized with the knowledge that the *this* value is an object that has a fixed length and whose Uint53-indexed properties are not sparse. However, such optimization must not introduce any observable changes in the specified behaviour of the algorithm.</p>
         <p>This function is not generic. ValidateTypedArray is applied to the *this* value prior to evaluating the algorithm. If its result is an abrupt completion that exception is thrown instead of evaluating the algorithm.</p>
         <emu-note>
           <p>If the ECMAScript implementation includes the ECMA-402 Internationalization API this function is based upon the algorithm for `Array.prototype.toLocaleString` that is in the ECMA-402 specification.</p>
