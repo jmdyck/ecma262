@@ -30220,7 +30220,7 @@ THH:mm:ss.sss
     <emu-clause id="sec-syntax-for-patterns" oldids="sec-patterns">
       <h1>Syntax for Patterns</h1>
       <p>The `RegExp` constructor applies the following grammar to the input pattern String. An error occurs if the grammar cannot interpret the String as an expansion of |Pattern|.</p>
-      <h2>Syntax</h2>
+      <h2>Patterns</h2>
       <emu-grammar type="definition">
         Pattern[U, N] ::
           Disjunction[?U, ?N]
@@ -30268,33 +30268,15 @@ THH:mm:ss.sss
           `(` GroupSpecifier[?U] Disjunction[?U, ?N] `)`
           `(` `?` `:` Disjunction[?U, ?N] `)`
 
-        SyntaxCharacter :: one of
-          `^` `$` `\` `.` `*` `+` `?` `(` `)` `[` `]` `{` `}` `|`
-
         PatternCharacter ::
           SourceCharacter but not SyntaxCharacter
 
-        AtomEscape[U, N] ::
-          DecimalEscape
-          CharacterClassEscape[?U]
-          CharacterEscape[?U]
-          [+N] `k` GroupName[?U]
+        SyntaxCharacter :: one of
+          `^` `$` `\` `.` `*` `+` `?` `(` `)` `[` `]` `{` `}` `|`
+      </emu-grammar>
 
-        CharacterEscape[U] ::
-          ControlEscape
-          `c` ControlLetter
-          `0` [lookahead &lt;! DecimalDigit]
-          HexEscapeSequence
-          RegExpUnicodeEscapeSequence[?U]
-          IdentityEscape[?U]
-
-        ControlEscape :: one of
-          `f` `n` `r` `t` `v`
-
-        ControlLetter :: one of
-          `a` `b` `c` `d` `e` `f` `g` `h` `i` `j` `k` `l` `m` `n` `o` `p` `q` `r` `s` `t` `u` `v` `w` `x` `y` `z`
-          `A` `B` `C` `D` `E` `F` `G` `H` `I` `J` `K` `L` `M` `N` `O` `P` `Q` `R` `S` `T` `U` `V` `W` `X` `Y` `Z`
-
+      <h2>Group Specifiers</h2>
+      <emu-grammar type="definition">
         GroupSpecifier[U] ::
           [empty]
           `?` GroupName[?U]
@@ -30321,35 +30303,55 @@ THH:mm:ss.sss
           &lt;ZWNJ&gt;
           &lt;ZWJ&gt;
 
-        RegExpUnicodeEscapeSequence[U] ::
-          [+U] `u` HexLeadSurrogate `\u` HexTrailSurrogate
-          [+U] `u` HexLeadSurrogate
-          [+U] `u` HexTrailSurrogate
-          [+U] `u` HexNonSurrogate
-          [~U] `u` Hex4Digits
-          [+U] `u{` CodePoint `}`
-
         UnicodeLeadSurrogate ::
           &gt; any Unicode code point in the inclusive range 0xD800 to 0xDBFF
 
         UnicodeTrailSurrogate ::
           &gt; any Unicode code point in the inclusive range 0xDC00 to 0xDFFF
       </emu-grammar>
-      <p>Each `\\u` |HexTrailSurrogate| for which the choice of associated `u` |HexLeadSurrogate| is ambiguous shall be associated with the nearest possible `u` |HexLeadSurrogate| that would otherwise have no corresponding `\\u` |HexTrailSurrogate|.</p>
+
+      <h2>Character Classes</h2>
       <emu-grammar type="definition">
-        HexLeadSurrogate ::
-          Hex4Digits [> but only if the MV of |Hex4Digits| is in the inclusive range 0xD800 to 0xDBFF]
+        CharacterClass[U] ::
+          `[` [lookahead != `^`] ClassRanges[?U] `]`
+          `[` `^` ClassRanges[?U] `]`
 
-        HexTrailSurrogate ::
-          Hex4Digits [> but only if the MV of |Hex4Digits| is in the inclusive range 0xDC00 to 0xDFFF]
+        ClassRanges[U] ::
+          [empty]
+          NonemptyClassRanges[?U]
 
-        HexNonSurrogate ::
-          Hex4Digits [> but only if the MV of |Hex4Digits| is not in the inclusive range 0xD800 to 0xDFFF]
+        NonemptyClassRanges[U] ::
+          ClassAtom[?U]
+          ClassAtom[?U] NonemptyClassRangesNoDash[?U]
+          ClassAtom[?U] `-` ClassAtom[?U] ClassRanges[?U]
 
-        IdentityEscape[U] ::
-          [+U] SyntaxCharacter
-          [+U] `/`
-          [~U] SourceCharacter but not UnicodeIDContinue
+        NonemptyClassRangesNoDash[U] ::
+          ClassAtom[?U]
+          ClassAtomNoDash[?U] NonemptyClassRangesNoDash[?U]
+          ClassAtomNoDash[?U] `-` ClassAtom[?U] ClassRanges[?U]
+
+        ClassAtom[U] ::
+          `-`
+          ClassAtomNoDash[?U]
+
+        ClassAtomNoDash[U] ::
+          SourceCharacter but not one of `\` or `]` or `-`
+          `\` ClassEscape[?U]
+      </emu-grammar>
+
+      <h2>Escapes</h2>
+      <emu-grammar type="definition">
+        ClassEscape[U] ::
+          `b`
+          [+U] `-`
+          CharacterClassEscape[?U]
+          CharacterEscape[?U]
+
+        AtomEscape[U, N] ::
+          DecimalEscape
+          CharacterClassEscape[?U]
+          CharacterEscape[?U]
+          [+N] `k` GroupName[?U]
 
         DecimalEscape ::
           NonZeroDigit DecimalDigits[~Sep]? [lookahead &lt;! DecimalDigit]
@@ -30391,37 +30393,44 @@ THH:mm:ss.sss
           ControlLetter
           `_`
 
-        CharacterClass[U] ::
-          `[` [lookahead != `^`] ClassRanges[?U] `]`
-          `[` `^` ClassRanges[?U] `]`
+        CharacterEscape[U] ::
+          ControlEscape
+          `c` ControlLetter
+          `0` [lookahead &lt;! DecimalDigit]
+          HexEscapeSequence
+          RegExpUnicodeEscapeSequence[?U]
+          IdentityEscape[?U]
 
-        ClassRanges[U] ::
-          [empty]
-          NonemptyClassRanges[?U]
+        ControlEscape :: one of
+          `f` `n` `r` `t` `v`
 
-        NonemptyClassRanges[U] ::
-          ClassAtom[?U]
-          ClassAtom[?U] NonemptyClassRangesNoDash[?U]
-          ClassAtom[?U] `-` ClassAtom[?U] ClassRanges[?U]
+        ControlLetter :: one of
+          `a` `b` `c` `d` `e` `f` `g` `h` `i` `j` `k` `l` `m` `n` `o` `p` `q` `r` `s` `t` `u` `v` `w` `x` `y` `z`
+          `A` `B` `C` `D` `E` `F` `G` `H` `I` `J` `K` `L` `M` `N` `O` `P` `Q` `R` `S` `T` `U` `V` `W` `X` `Y` `Z`
 
-        NonemptyClassRangesNoDash[U] ::
-          ClassAtom[?U]
-          ClassAtomNoDash[?U] NonemptyClassRangesNoDash[?U]
-          ClassAtomNoDash[?U] `-` ClassAtom[?U] ClassRanges[?U]
+        RegExpUnicodeEscapeSequence[U] ::
+          [+U] `u` HexLeadSurrogate `\u` HexTrailSurrogate
+          [+U] `u` HexLeadSurrogate
+          [+U] `u` HexTrailSurrogate
+          [+U] `u` HexNonSurrogate
+          [~U] `u` Hex4Digits
+          [+U] `u{` CodePoint `}`
+      </emu-grammar>
+      <p>Each `\\u` |HexTrailSurrogate| for which the choice of associated `u` |HexLeadSurrogate| is ambiguous shall be associated with the nearest possible `u` |HexLeadSurrogate| that would otherwise have no corresponding `\\u` |HexTrailSurrogate|.</p>
+      <emu-grammar type="definition">
+        HexLeadSurrogate ::
+          Hex4Digits [> but only if the MV of |Hex4Digits| is in the inclusive range 0xD800 to 0xDBFF]
 
-        ClassAtom[U] ::
-          `-`
-          ClassAtomNoDash[?U]
+        HexTrailSurrogate ::
+          Hex4Digits [> but only if the MV of |Hex4Digits| is in the inclusive range 0xDC00 to 0xDFFF]
 
-        ClassAtomNoDash[U] ::
-          SourceCharacter but not one of `\` or `]` or `-`
-          `\` ClassEscape[?U]
+        HexNonSurrogate ::
+          Hex4Digits [> but only if the MV of |Hex4Digits| is not in the inclusive range 0xD800 to 0xDFFF]
 
-        ClassEscape[U] ::
-          `b`
-          [+U] `-`
-          CharacterClassEscape[?U]
-          CharacterEscape[?U]
+        IdentityEscape[U] ::
+          [+U] SyntaxCharacter
+          [+U] `/`
+          [~U] SourceCharacter but not UnicodeIDContinue
       </emu-grammar>
     </emu-clause>
 
@@ -30452,16 +30461,16 @@ THH:mm:ss.sss
             It is a Syntax Error if the MV of the first |DecimalDigits| is larger than the MV of the second |DecimalDigits|.
           </li>
         </ul>
-        <emu-grammar>AtomEscape :: `k` GroupName</emu-grammar>
+        <emu-grammar>RegExpIdentifierStart[U] :: `\` RegExpUnicodeEscapeSequence[+U]</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if the enclosing |Pattern| does not contain a |GroupSpecifier| with an enclosed |RegExpIdentifierName| whose CapturingGroupName equals the CapturingGroupName of the |RegExpIdentifierName| of this production's |GroupName|.
+            It is a Syntax Error if the CharacterValue of |RegExpUnicodeEscapeSequence| is not the code point value of *"$"*, *"_"*, or some code point matched by the |UnicodeIDStart| lexical grammar production.
           </li>
         </ul>
-        <emu-grammar>AtomEscape :: DecimalEscape</emu-grammar>
+        <emu-grammar>RegExpIdentifierPart[U] :: `\` RegExpUnicodeEscapeSequence[+U]</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if the CapturingGroupNumber of |DecimalEscape| is larger than _NcapturingParens_ (<emu-xref href="#sec-notation"></emu-xref>).
+            It is a Syntax Error if the CharacterValue of |RegExpUnicodeEscapeSequence| is not the code point value of *"$"*, *"_"*, &lt;ZWNJ&gt;, &lt;ZWJ&gt;, or some code point matched by the |UnicodeIDContinue| lexical grammar production.
           </li>
         </ul>
         <emu-grammar>NonemptyClassRanges :: ClassAtom `-` ClassAtom ClassRanges</emu-grammar>
@@ -30482,22 +30491,22 @@ THH:mm:ss.sss
             It is a Syntax Error if IsCharacterClass of |ClassAtomNoDash| is *false* and IsCharacterClass of |ClassAtom| is *false* and the CharacterValue of |ClassAtomNoDash| is larger than the CharacterValue of |ClassAtom|.
           </li>
         </ul>
-        <emu-grammar>RegExpIdentifierStart :: `\` RegExpUnicodeEscapeSequence</emu-grammar>
+        <emu-grammar>AtomEscape :: DecimalEscape</emu-grammar>
         <ul>
           <li>
-            It is a Syntax Error if the CharacterValue of |RegExpUnicodeEscapeSequence| is not the code point value of *"$"*, *"_"*, or some code point matched by the |UnicodeIDStart| lexical grammar production.
+            It is a Syntax Error if the CapturingGroupNumber of |DecimalEscape| is larger than _NcapturingParens_ (<emu-xref href="#sec-notation"></emu-xref>).
+          </li>
+        </ul>
+        <emu-grammar>AtomEscape :: `k` GroupName</emu-grammar>
+        <ul>
+          <li>
+            It is a Syntax Error if the enclosing |Pattern| does not contain a |GroupSpecifier| with an enclosed |RegExpIdentifierName| whose CapturingGroupName equals the CapturingGroupName of the |RegExpIdentifierName| of this production's |GroupName|.
           </li>
         </ul>
         <emu-grammar>RegExpIdentifierStart :: UnicodeLeadSurrogate UnicodeTrailSurrogate</emu-grammar>
         <ul>
           <li>
             It is a Syntax Error if the result of performing UTF16SurrogatePairToCodePoint on the two code points matched by |UnicodeLeadSurrogate| and |UnicodeTrailSurrogate| respectively is not matched by the |UnicodeIDStart| lexical grammar production.
-          </li>
-        </ul>
-        <emu-grammar>RegExpIdentifierPart :: `\` RegExpUnicodeEscapeSequence</emu-grammar>
-        <ul>
-          <li>
-            It is a Syntax Error if the CharacterValue of |RegExpUnicodeEscapeSequence| is not the code point value of *"$"*, *"_"*, &lt;ZWNJ&gt;, &lt;ZWJ&gt;, or some code point matched by the |UnicodeIDContinue| lexical grammar production.
           </li>
         </ul>
         <emu-grammar>RegExpIdentifierPart :: UnicodeLeadSurrogate UnicodeTrailSurrogate</emu-grammar>
@@ -30749,7 +30758,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Return the MV of |HexDigits|.
         </emu-alg>
-        <emu-grammar>CharacterEscape :: IdentityEscape</emu-grammar>
+        <emu-grammar>CharacterEscape ::! IdentityEscape</emu-grammar>
         <emu-alg>
           1. Let _ch_ be the code point matched by |IdentityEscape|.
           1. Return the code point value of _ch_.
@@ -31348,144 +31357,6 @@ THH:mm:ss.sss
         </emu-clause>
       </emu-clause>
 
-      <emu-clause id="sec-atomescape">
-        <h1>AtomEscape</h1>
-        <p>With parameter _direction_.</p>
-        <p>The production <emu-grammar>AtomEscape :: DecimalEscape</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Evaluate |DecimalEscape| to obtain an integer _n_.
-          1. Assert: _n_ &le; _NcapturingParens_.
-          1. Return ! BackreferenceMatcher(_n_, _direction_).
-        </emu-alg>
-        <p>The production <emu-grammar>AtomEscape :: CharacterEscape</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Evaluate |CharacterEscape| to obtain a character _ch_.
-          1. Let _A_ be a one-element CharSet containing the character _ch_.
-          1. Return ! CharacterSetMatcher(_A_, *false*, _direction_).
-        </emu-alg>
-        <p>The production <emu-grammar>AtomEscape :: CharacterClassEscape</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Evaluate |CharacterClassEscape| to obtain a CharSet _A_.
-          1. Return ! CharacterSetMatcher(_A_, *false*, _direction_).
-        </emu-alg>
-        <emu-note>
-          <p>An escape sequence of the form `\\` followed by a non-zero decimal number _n_ matches the result of the _n_<sup>th</sup> set of capturing parentheses (<emu-xref href="#sec-notation"></emu-xref>). It is an error if the regular expression has fewer than _n_ capturing parentheses. If the regular expression has _n_ or more capturing parentheses but the _n_<sup>th</sup> one is *undefined* because it has not captured anything, then the backreference always succeeds.</p>
-        </emu-note>
-        <p>The production <emu-grammar>AtomEscape :: `k` GroupName</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Search the enclosing |Pattern| for an instance of a |GroupSpecifier| containing a |RegExpIdentifierName| which has a CapturingGroupName equal to the CapturingGroupName of the |RegExpIdentifierName| contained in |GroupName|.
-          1. Assert: A unique such |GroupSpecifier| is found.
-          1. Let _parenIndex_ be the number of left-capturing parentheses in the entire regular expression that occur to the left of the located |GroupSpecifier|. This is the total number of <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> Parse Nodes prior to or enclosing the located |GroupSpecifier|, including its immediately enclosing |Atom|.
-          1. Return ! BackreferenceMatcher(_parenIndex_, _direction_).
-        </emu-alg>
-
-        <emu-clause id="sec-backreference-matcher" aoid="BackreferenceMatcher">
-          <h1>BackreferenceMatcher ( _n_, _direction_ )</h1>
-          <p>The abstract operation BackreferenceMatcher takes arguments _n_ (a positive integer) and _direction_ (1 or -1). It performs the following steps when called:</p>
-          <emu-alg>
-            1. Assert: _n_ &ge; 1.
-            1. Return a new Matcher with parameters (_x_, _c_) that captures _n_ and _direction_ and performs the following steps when called:
-              1. Assert: _x_ is a State.
-              1. Assert: _c_ is a Continuation.
-              1. Let _cap_ be _x_'s _captures_ List.
-              1. Let _s_ be _cap_[_n_].
-              1. If _s_ is *undefined*, return _c_(_x_).
-              1. Let _e_ be _x_'s _endIndex_.
-              1. Let _len_ be the number of elements in _s_.
-              1. Let _f_ be _e_ + _direction_ &times; _len_.
-              1. If _f_ &lt; 0 or _f_ &gt; _InputLength_, return ~failure~.
-              1. Let _g_ be min(_e_, _f_).
-              1. If there exists an integer _i_ between 0 (inclusive) and _len_ (exclusive) such that Canonicalize(_s_[_i_]) is not the same character value as Canonicalize(_Input_[_g_ + _i_]), return ~failure~.
-              1. Let _y_ be the State (_f_, _cap_).
-              1. Return _c_(_y_).
-          </emu-alg>
-        </emu-clause>
-      </emu-clause>
-
-      <emu-clause id="sec-characterescape">
-        <h1>CharacterEscape</h1>
-        <p>The |CharacterEscape| productions evaluate as follows:</p>
-        <emu-grammar>
-          CharacterEscape ::
-            ControlEscape
-            `c` ControlLetter
-            `0` [lookahead &lt;! DecimalDigit]
-            HexEscapeSequence
-            RegExpUnicodeEscapeSequence
-            IdentityEscape
-        </emu-grammar>
-        <emu-alg>
-          1. Let _cv_ be the CharacterValue of this |CharacterEscape|.
-          1. Return the character whose character value is _cv_.
-        </emu-alg>
-      </emu-clause>
-
-      <emu-clause id="sec-decimalescape">
-        <h1>DecimalEscape</h1>
-        <p>The |DecimalEscape| productions evaluate as follows:</p>
-        <emu-grammar>DecimalEscape :: NonZeroDigit DecimalDigits?</emu-grammar>
-        <emu-alg>
-          1. Return the CapturingGroupNumber of this |DecimalEscape|.
-        </emu-alg>
-        <emu-note>
-          <p>If `\\` is followed by a decimal number _n_ whose first digit is not `0`, then the escape sequence is considered to be a backreference. It is an error if _n_ is greater than the total number of left-capturing parentheses in the entire regular expression.</p>
-        </emu-note>
-      </emu-clause>
-
-      <emu-clause id="sec-characterclassescape">
-        <h1>CharacterClassEscape</h1>
-        <p>The production <emu-grammar>CharacterClassEscape :: `d`</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Return the ten-element CharSet containing the characters `0` through `9` inclusive.
-        </emu-alg>
-        <p>The production <emu-grammar>CharacterClassEscape :: `D`</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Return the CharSet containing all characters not in the CharSet returned by <emu-grammar>CharacterClassEscape :: `d`</emu-grammar> .
-        </emu-alg>
-        <p>The production <emu-grammar>CharacterClassEscape :: `s`</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Return the CharSet containing all characters corresponding to a code point on the right-hand side of the |WhiteSpace| or |LineTerminator| productions.
-        </emu-alg>
-        <p>The production <emu-grammar>CharacterClassEscape :: `S`</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Return the CharSet containing all characters not in the CharSet returned by <emu-grammar>CharacterClassEscape :: `s`</emu-grammar> .
-        </emu-alg>
-        <p>The production <emu-grammar>CharacterClassEscape :: `w`</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Return _WordCharacters_.
-        </emu-alg>
-        <p>The production <emu-grammar>CharacterClassEscape :: `W`</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Return the CharSet containing all characters not in the CharSet returned by <emu-grammar>CharacterClassEscape :: `w`</emu-grammar> .
-        </emu-alg>
-        <p>The production <emu-grammar>CharacterClassEscape :: `p{` UnicodePropertyValueExpression `}`</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Return the CharSet containing all Unicode code points included in the CharSet returned by |UnicodePropertyValueExpression|.
-        </emu-alg>
-        <p>The production <emu-grammar>CharacterClassEscape :: `P{` UnicodePropertyValueExpression `}`</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Return the CharSet containing all Unicode code points not included in the CharSet returned by |UnicodePropertyValueExpression|.
-        </emu-alg>
-        <p>The production <emu-grammar>UnicodePropertyValueExpression :: UnicodePropertyName `=` UnicodePropertyValue</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Let _ps_ be SourceText of |UnicodePropertyName|.
-          1. Let _p_ be ! UnicodeMatchProperty(_ps_).
-          1. Assert: _p_ is a Unicode property name or property alias listed in the &ldquo;Property name and aliases&rdquo; column of <emu-xref href="#table-nonbinary-unicode-properties"></emu-xref>.
-          1. Let _vs_ be SourceText of |UnicodePropertyValue|.
-          1. Let _v_ be ! UnicodeMatchPropertyValue(_p_, _vs_).
-          1. Return the CharSet containing all Unicode code points whose character database definition includes the property _p_ with value _v_.
-        </emu-alg>
-        <p>The production <emu-grammar>UnicodePropertyValueExpression :: LoneUnicodePropertyNameOrValue</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Let _s_ be SourceText of |LoneUnicodePropertyNameOrValue|.
-          1. If ! UnicodeMatchPropertyValue(`General_Category`, _s_) is identical to a List of Unicode code points that is the name of a Unicode general category or general category alias listed in the &ldquo;Property value and aliases&rdquo; column of <emu-xref href="#table-unicode-general-category-values"></emu-xref>, then
-            1. Return the CharSet containing all Unicode code points whose character database definition includes the property &ldquo;General_Category&rdquo; with value _s_.
-          1. Let _p_ be ! UnicodeMatchProperty(_s_).
-          1. Assert: _p_ is a binary Unicode property or binary property alias listed in the &ldquo;Property name and aliases&rdquo; column of <emu-xref href="#table-binary-unicode-properties"></emu-xref>.
-          1. Return the CharSet containing all Unicode code points whose character database definition includes the property _p_ with value &ldquo;True&rdquo;.
-        </emu-alg>
-      </emu-clause>
-
       <emu-clause id="sec-characterclass">
         <h1>CharacterClass</h1>
         <p>The production <emu-grammar>CharacterClass :: `[` ClassRanges `]`</emu-grammar> evaluates as follows:</p>
@@ -31627,6 +31498,144 @@ THH:mm:ss.sss
         <emu-note>
           <p>A |ClassAtom| can use any of the escape sequences that are allowed in the rest of the regular expression except for `\\b`, `\\B`, and backreferences. Inside a |CharacterClass|, `\\b` means the backspace character, while `\\B` and backreferences raise errors. Using a backreference inside a |ClassAtom| causes an error.</p>
         </emu-note>
+      </emu-clause>
+
+      <emu-clause id="sec-atomescape">
+        <h1>AtomEscape</h1>
+        <p>With parameter _direction_.</p>
+        <p>The production <emu-grammar>AtomEscape :: DecimalEscape</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Evaluate |DecimalEscape| to obtain an integer _n_.
+          1. Assert: _n_ &le; _NcapturingParens_.
+          1. Return ! BackreferenceMatcher(_n_, _direction_).
+        </emu-alg>
+        <p>The production <emu-grammar>AtomEscape :: CharacterClassEscape</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Evaluate |CharacterClassEscape| to obtain a CharSet _A_.
+          1. Return ! CharacterSetMatcher(_A_, *false*, _direction_).
+        </emu-alg>
+        <emu-note>
+          <p>An escape sequence of the form `\\` followed by a non-zero decimal number _n_ matches the result of the _n_<sup>th</sup> set of capturing parentheses (<emu-xref href="#sec-notation"></emu-xref>). It is an error if the regular expression has fewer than _n_ capturing parentheses. If the regular expression has _n_ or more capturing parentheses but the _n_<sup>th</sup> one is *undefined* because it has not captured anything, then the backreference always succeeds.</p>
+        </emu-note>
+        <p>The production <emu-grammar>AtomEscape :: CharacterEscape</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Evaluate |CharacterEscape| to obtain a character _ch_.
+          1. Let _A_ be a one-element CharSet containing the character _ch_.
+          1. Return ! CharacterSetMatcher(_A_, *false*, _direction_).
+        </emu-alg>
+        <p>The production <emu-grammar>AtomEscape :: `k` GroupName</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Search the enclosing |Pattern| for an instance of a |GroupSpecifier| containing a |RegExpIdentifierName| which has a CapturingGroupName equal to the CapturingGroupName of the |RegExpIdentifierName| contained in |GroupName|.
+          1. Assert: A unique such |GroupSpecifier| is found.
+          1. Let _parenIndex_ be the number of left-capturing parentheses in the entire regular expression that occur to the left of the located |GroupSpecifier|. This is the total number of <emu-grammar>Atom :: `(` GroupSpecifier Disjunction `)`</emu-grammar> Parse Nodes prior to or enclosing the located |GroupSpecifier|, including its immediately enclosing |Atom|.
+          1. Return ! BackreferenceMatcher(_parenIndex_, _direction_).
+        </emu-alg>
+
+        <emu-clause id="sec-backreference-matcher" aoid="BackreferenceMatcher">
+          <h1>BackreferenceMatcher ( _n_, _direction_ )</h1>
+          <p>The abstract operation BackreferenceMatcher takes arguments _n_ (a positive integer) and _direction_ (1 or -1). It performs the following steps when called:</p>
+          <emu-alg>
+            1. Assert: _n_ &ge; 1.
+            1. Return a new Matcher with parameters (_x_, _c_) that captures _n_ and _direction_ and performs the following steps when called:
+              1. Assert: _x_ is a State.
+              1. Assert: _c_ is a Continuation.
+              1. Let _cap_ be _x_'s _captures_ List.
+              1. Let _s_ be _cap_[_n_].
+              1. If _s_ is *undefined*, return _c_(_x_).
+              1. Let _e_ be _x_'s _endIndex_.
+              1. Let _len_ be the number of elements in _s_.
+              1. Let _f_ be _e_ + _direction_ &times; _len_.
+              1. If _f_ &lt; 0 or _f_ &gt; _InputLength_, return ~failure~.
+              1. Let _g_ be min(_e_, _f_).
+              1. If there exists an integer _i_ between 0 (inclusive) and _len_ (exclusive) such that Canonicalize(_s_[_i_]) is not the same character value as Canonicalize(_Input_[_g_ + _i_]), return ~failure~.
+              1. Let _y_ be the State (_f_, _cap_).
+              1. Return _c_(_y_).
+          </emu-alg>
+        </emu-clause>
+      </emu-clause>
+
+      <emu-clause id="sec-decimalescape">
+        <h1>DecimalEscape</h1>
+        <p>The |DecimalEscape| productions evaluate as follows:</p>
+        <emu-grammar>DecimalEscape :: NonZeroDigit DecimalDigits?</emu-grammar>
+        <emu-alg>
+          1. Return the CapturingGroupNumber of this |DecimalEscape|.
+        </emu-alg>
+        <emu-note>
+          <p>If `\\` is followed by a decimal number _n_ whose first digit is not `0`, then the escape sequence is considered to be a backreference. It is an error if _n_ is greater than the total number of left-capturing parentheses in the entire regular expression.</p>
+        </emu-note>
+      </emu-clause>
+
+      <emu-clause id="sec-characterclassescape">
+        <h1>CharacterClassEscape</h1>
+        <p>The production <emu-grammar>CharacterClassEscape :: `d`</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Return the ten-element CharSet containing the characters `0` through `9` inclusive.
+        </emu-alg>
+        <p>The production <emu-grammar>CharacterClassEscape :: `D`</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Return the CharSet containing all characters not in the CharSet returned by <emu-grammar>CharacterClassEscape :: `d`</emu-grammar> .
+        </emu-alg>
+        <p>The production <emu-grammar>CharacterClassEscape :: `s`</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Return the CharSet containing all characters corresponding to a code point on the right-hand side of the |WhiteSpace| or |LineTerminator| productions.
+        </emu-alg>
+        <p>The production <emu-grammar>CharacterClassEscape :: `S`</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Return the CharSet containing all characters not in the CharSet returned by <emu-grammar>CharacterClassEscape :: `s`</emu-grammar> .
+        </emu-alg>
+        <p>The production <emu-grammar>CharacterClassEscape :: `w`</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Return _WordCharacters_.
+        </emu-alg>
+        <p>The production <emu-grammar>CharacterClassEscape :: `W`</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Return the CharSet containing all characters not in the CharSet returned by <emu-grammar>CharacterClassEscape :: `w`</emu-grammar> .
+        </emu-alg>
+        <p>The production <emu-grammar>CharacterClassEscape :: `p{` UnicodePropertyValueExpression `}`</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Return the CharSet containing all Unicode code points included in the CharSet returned by |UnicodePropertyValueExpression|.
+        </emu-alg>
+        <p>The production <emu-grammar>CharacterClassEscape :: `P{` UnicodePropertyValueExpression `}`</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Return the CharSet containing all Unicode code points not included in the CharSet returned by |UnicodePropertyValueExpression|.
+        </emu-alg>
+        <p>The production <emu-grammar>UnicodePropertyValueExpression :: UnicodePropertyName `=` UnicodePropertyValue</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Let _ps_ be SourceText of |UnicodePropertyName|.
+          1. Let _p_ be ! UnicodeMatchProperty(_ps_).
+          1. Assert: _p_ is a Unicode property name or property alias listed in the &ldquo;Property name and aliases&rdquo; column of <emu-xref href="#table-nonbinary-unicode-properties"></emu-xref>.
+          1. Let _vs_ be SourceText of |UnicodePropertyValue|.
+          1. Let _v_ be ! UnicodeMatchPropertyValue(_p_, _vs_).
+          1. Return the CharSet containing all Unicode code points whose character database definition includes the property _p_ with value _v_.
+        </emu-alg>
+        <p>The production <emu-grammar>UnicodePropertyValueExpression :: LoneUnicodePropertyNameOrValue</emu-grammar> evaluates as follows:</p>
+        <emu-alg>
+          1. Let _s_ be SourceText of |LoneUnicodePropertyNameOrValue|.
+          1. If ! UnicodeMatchPropertyValue(`General_Category`, _s_) is identical to a List of Unicode code points that is the name of a Unicode general category or general category alias listed in the &ldquo;Property value and aliases&rdquo; column of <emu-xref href="#table-unicode-general-category-values"></emu-xref>, then
+            1. Return the CharSet containing all Unicode code points whose character database definition includes the property &ldquo;General_Category&rdquo; with value _s_.
+          1. Let _p_ be ! UnicodeMatchProperty(_s_).
+          1. Assert: _p_ is a binary Unicode property or binary property alias listed in the &ldquo;Property name and aliases&rdquo; column of <emu-xref href="#table-binary-unicode-properties"></emu-xref>.
+          1. Return the CharSet containing all Unicode code points whose character database definition includes the property _p_ with value &ldquo;True&rdquo;.
+        </emu-alg>
+      </emu-clause>
+
+      <emu-clause id="sec-characterescape">
+        <h1>CharacterEscape</h1>
+        <p>The |CharacterEscape| productions evaluate as follows:</p>
+        <emu-grammar>
+          CharacterEscape ::
+            ControlEscape
+            `c` ControlLetter
+            `0` [lookahead &lt;! DecimalDigit]
+            HexEscapeSequence
+            RegExpUnicodeEscapeSequence
+            IdentityEscape
+        </emu-grammar>
+        <emu-alg>
+          1. Let _cv_ be the CharacterValue of this |CharacterEscape|.
+          1. Return the character whose character value is _cv_.
+        </emu-alg>
       </emu-clause>
     </emu-clause>
 
@@ -41626,26 +41635,23 @@ THH:mm:ss.sss
     <emu-prodref name="Quantifier"></emu-prodref>
     <emu-prodref name="QuantifierPrefix"></emu-prodref>
     <emu-prodref name="Atom"></emu-prodref>
-    <emu-prodref name="SyntaxCharacter"></emu-prodref>
     <emu-prodref name="PatternCharacter"></emu-prodref>
-    <emu-prodref name="AtomEscape"></emu-prodref>
-    <emu-prodref name="CharacterEscape"></emu-prodref>
-    <emu-prodref name="ControlEscape"></emu-prodref>
-    <emu-prodref name="ControlLetter"></emu-prodref>
+    <emu-prodref name="SyntaxCharacter"></emu-prodref>
     <emu-prodref name="GroupSpecifier"></emu-prodref>
     <emu-prodref name="GroupName"></emu-prodref>
     <emu-prodref name="RegExpIdentifierName"></emu-prodref>
     <emu-prodref name="RegExpIdentifierStart"></emu-prodref>
     <emu-prodref name="RegExpIdentifierPart"></emu-prodref>
-    <emu-prodref name="RegExpUnicodeEscapeSequence"></emu-prodref>
     <emu-prodref name="UnicodeLeadSurrogate"></emu-prodref>
     <emu-prodref name="UnicodeTrailSurrogate"></emu-prodref>
-    <p>Each `\\u` |HexTrailSurrogate| for which the choice of associated `u` |HexLeadSurrogate| is ambiguous shall be associated with the nearest possible `u` |HexLeadSurrogate| that would otherwise have no corresponding `\\u` |HexTrailSurrogate|.</p>
-    <p>&nbsp;</p>
-    <emu-prodref name="HexLeadSurrogate"></emu-prodref>
-    <emu-prodref name="HexTrailSurrogate"></emu-prodref>
-    <emu-prodref name="HexNonSurrogate"></emu-prodref>
-    <emu-prodref name="IdentityEscape"></emu-prodref>
+    <emu-prodref name="CharacterClass"></emu-prodref>
+    <emu-prodref name="ClassRanges"></emu-prodref>
+    <emu-prodref name="NonemptyClassRanges"></emu-prodref>
+    <emu-prodref name="NonemptyClassRangesNoDash"></emu-prodref>
+    <emu-prodref name="ClassAtom"></emu-prodref>
+    <emu-prodref name="ClassAtomNoDash"></emu-prodref>
+    <emu-prodref name="ClassEscape"></emu-prodref>
+    <emu-prodref name="AtomEscape"></emu-prodref>
     <emu-prodref name="DecimalEscape"></emu-prodref>
     <emu-prodref name="CharacterClassEscape"></emu-prodref>
     <emu-prodref name="UnicodePropertyValueExpression"></emu-prodref>
@@ -41656,13 +41662,14 @@ THH:mm:ss.sss
     <emu-prodref name="UnicodePropertyValueCharacters"></emu-prodref>
     <emu-prodref name="UnicodePropertyValueCharacter"></emu-prodref>
     <emu-prodref name="UnicodePropertyNameCharacter"></emu-prodref>
-    <emu-prodref name="CharacterClass"></emu-prodref>
-    <emu-prodref name="ClassRanges"></emu-prodref>
-    <emu-prodref name="NonemptyClassRanges"></emu-prodref>
-    <emu-prodref name="NonemptyClassRangesNoDash"></emu-prodref>
-    <emu-prodref name="ClassAtom"></emu-prodref>
-    <emu-prodref name="ClassAtomNoDash"></emu-prodref>
-    <emu-prodref name="ClassEscape"></emu-prodref>
+    <emu-prodref name="CharacterEscape"></emu-prodref>
+    <emu-prodref name="ControlEscape"></emu-prodref>
+    <emu-prodref name="ControlLetter"></emu-prodref>
+    <emu-prodref name="RegExpUnicodeEscapeSequence"></emu-prodref>
+    <emu-prodref name="HexLeadSurrogate"></emu-prodref>
+    <emu-prodref name="HexTrailSurrogate"></emu-prodref>
+    <emu-prodref name="HexNonSurrogate"></emu-prodref>
+    <emu-prodref name="IdentityEscape"></emu-prodref>
   </emu-annex>
 </emu-annex>
 
