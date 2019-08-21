@@ -30273,19 +30273,16 @@ THH:mm:ss.sss
           `(` GroupSpecifier[?U] Disjunction[?U, ?N] `)`
           `(` `?` `:` Disjunction[?U, ?N] `)`
           [~U] InvalidBracedQuantifier
-          [+U] PatternCharacter
-          [~U] ExtendedPatternCharacter
+          PatternCharacter[?U]
 
         InvalidBracedQuantifier ::
           `{` DecimalDigits[~Sep] `}`
           `{` DecimalDigits[~Sep] `,` `}`
           `{` DecimalDigits[~Sep] `,` DecimalDigits[~Sep] `}`
 
-        ExtendedPatternCharacter ::
-          SourceCharacter but not one of `^` `$` `\` `.` `*` `+` `?` `(` `)` `[` `|`
-
-        PatternCharacter ::
-          SourceCharacter but not SyntaxCharacter
+        PatternCharacter[U] ::
+          [+U] SourceCharacter but not SyntaxCharacter
+          [~U] SourceCharacter but not one of `^` `$` `\` `.` `*` `+` `?` `(` `)` `[` `|`
 
         SyntaxCharacter :: one of
           `^` `$` `\` `.` `*` `+` `?` `(` `)` `[` `]` `{` `}` `|`
@@ -31306,12 +31303,6 @@ THH:mm:ss.sss
         <p>The production <emu-grammar>Atom ::! `(` `?` `:` Disjunction `)`</emu-grammar> evaluates as follows:</p>
         <emu-alg>
           1. Return the Matcher that is the result of evaluating |Disjunction| with argument _direction_.
-        </emu-alg>
-        <p>The production <emu-grammar>Atom ::! ExtendedPatternCharacter</emu-grammar> evaluates as follows:</p>
-        <emu-alg>
-          1. Let _ch_ be the character represented by |ExtendedPatternCharacter|.
-          1. Let _A_ be a one-element CharSet containing the character _ch_.
-          1. Return ! CharacterSetMatcher(_A_, *false*, _direction_).
         </emu-alg>
         <p>The production <emu-grammar>Atom ::! PatternCharacter</emu-grammar> evaluates as follows:</p>
         <emu-alg>
@@ -41724,7 +41715,6 @@ THH:mm:ss.sss
     <emu-prodref name="QuantifierPrefix"></emu-prodref>
     <emu-prodref name="Atom"></emu-prodref>
     <emu-prodref name="InvalidBracedQuantifier"></emu-prodref>
-    <emu-prodref name="ExtendedPatternCharacter"></emu-prodref>
     <emu-prodref name="PatternCharacter"></emu-prodref>
     <emu-prodref name="SyntaxCharacter"></emu-prodref>
     <emu-prodref name="GroupSpecifier"></emu-prodref>
