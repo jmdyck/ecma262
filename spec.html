@@ -30270,8 +30270,7 @@ THH:mm:ss.sss
           `\` AtomEscape[?U, ?N]
           [~U] `\` [lookahead == `c`]
           CharacterClass[?U]
-          [+U] `(` GroupSpecifier[?U] Disjunction[?U, ?N] `)`
-          [~U] `(` Disjunction[?U, ?N] `)`
+          `(` GroupSpecifier[?U] Disjunction[?U, ?N] `)`
           `(` `?` `:` Disjunction[?U, ?N] `)`
           [~U] InvalidBracedQuantifier
           [+U] PatternCharacter
@@ -30296,7 +30295,7 @@ THH:mm:ss.sss
       <emu-grammar type="definition">
         GroupSpecifier[U] ::
           [empty]
-          `?` GroupName[?U]
+          [+U] `?` GroupName[?U]
 
         GroupName[U] ::
           `&lt;` RegExpIdentifierName[?U] `&gt;`
@@ -31021,8 +31020,6 @@ THH:mm:ss.sss
             1. Assert: _c_ is a Continuation.
             1. Return ! RepeatMatcher(_m_, _min_, _max_, _greedy_, _x_, _c_, _parenIndex_, _parenCount_).
         </emu-alg>
-        <p>----</p>
-        <p>In the above algorithm, references to <emu-grammar>Atom ::! `(` GroupSpecifier Disjunction `)`</emu-grammar> are to be interpreted as meaning <emu-grammar>Atom ::! `(` GroupSpecifier Disjunction `)`</emu-grammar> or <emu-grammar>Atom ::! `(` Disjunction `)`</emu-grammar> .</p>
         <p>The production <emu-grammar>Term ::! QuantifiableAssertion Quantifier</emu-grammar> evaluates the same as the production <emu-grammar>Term ::! Atom Quantifier</emu-grammar> but with |QuantifiableAssertion| substituted for |Atom|.</p>
 
         <emu-clause id="sec-runtime-semantics-repeatmatcher-abstract-operation" aoid="RepeatMatcher">
