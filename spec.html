@@ -30269,7 +30269,7 @@ THH:mm:ss.sss
           `.`
           `\` AtomEscape[?U, ?N]
           [~U] `\` [lookahead == `c`]
-          CharacterClass[?U]
+          CharacterClass[?U, ?N]
           `(` GroupSpecifier[?U] Disjunction[?U, ?N] `)`
           `(` `?` `:` Disjunction[?U, ?N] `)`
           [~U] InvalidBracedQuantifier
@@ -30325,27 +30325,27 @@ THH:mm:ss.sss
 
       <h2>Character Classes</h2>
       <emu-grammar type="definition">
-        CharacterClass[U] ::
-          `[` [lookahead != `^`] ClassRanges[?U] `]`
-          `[` `^` ClassRanges[?U] `]`
+        CharacterClass[U, N] ::
+          `[` [lookahead != `^`] ClassRanges[?U, ?N] `]`
+          `[` `^` ClassRanges[?U, ?N] `]`
 
-        ClassRanges[U] ::
+        ClassRanges[U, N] ::
           [empty]
-          NonemptyClassRanges[?U]
+          NonemptyClassRanges[?U, ?N]
 
-        NonemptyClassRanges[U] ::
-          ClassAtom[?U]
-          ClassAtom[?U] NonemptyClassRangesNoDash[?U]
-          ClassAtom[?U] `-` ClassAtom[?U] ClassRanges[?U]
+        NonemptyClassRanges[U, N] ::
+          ClassAtom[?U, ?N]
+          ClassAtom[?U, ?N] NonemptyClassRangesNoDash[?U, ?N]
+          ClassAtom[?U, ?N] `-` ClassAtom[?U, ?N] ClassRanges[?U, ?N]
 
-        NonemptyClassRangesNoDash[U] ::
-          ClassAtom[?U]
-          ClassAtomNoDash[?U] NonemptyClassRangesNoDash[?U]
-          ClassAtomNoDash[?U] `-` ClassAtom[?U] ClassRanges[?U]
+        NonemptyClassRangesNoDash[U, N] ::
+          ClassAtom[?U, ?N]
+          ClassAtomNoDash[?U, ?N] NonemptyClassRangesNoDash[?U, ?N]
+          ClassAtomNoDash[?U, ?N] `-` ClassAtom[?U, ?N] ClassRanges[?U, ?N]
 
-        ClassAtom[U] ::
+        ClassAtom[U, N] ::
           `-`
-          ClassAtomNoDash[?U]
+          ClassAtomNoDash[?U, ?N]
 
         ClassAtomNoDash[U, N] ::!
           SourceCharacter but not one of `\` or `]` or `-`
