@@ -4027,11 +4027,9 @@
           1. Let _asyncContext_ be the running execution context.
           1. Let _promise_ be ? PromiseResolve(%Promise%, _value_).
           1. Let _stepsFulfilled_ be the algorithm steps defined in <emu-xref href="#await-fulfilled" title></emu-xref>.
-          1. Let _onFulfilled_ be ! CreateBuiltinFunction(_stepsFulfilled_, &laquo; [[AsyncContext]] &raquo;).
-          1. Set _onFulfilled_.[[AsyncContext]] to _asyncContext_.
+          1. Let _onFulfilled_ be ! CreateBuiltinFunction(_stepsFulfilled_, Record { [[AsyncContext]]: _asyncContext_ }).
           1. Let _stepsRejected_ be the algorithm steps defined in <emu-xref href="#await-rejected" title></emu-xref>.
-          1. Let _onRejected_ be ! CreateBuiltinFunction(_stepsRejected_, &laquo; [[AsyncContext]] &raquo;).
-          1. Set _onRejected_.[[AsyncContext]] to _asyncContext_.
+          1. Let _onRejected_ be ! CreateBuiltinFunction(_stepsRejected_, Record { [[AsyncContext]]: _asyncContext_ }).
           1. Perform ! PerformPromiseThen(_promise_, _onFulfilled_, _onRejected_).
           1. Remove _asyncContext_ from the execution context stack and restore the execution context that is at the top of the execution context stack as the running execution context.
           1. Set the code evaluation state of _asyncContext_ such that when evaluation is resumed with a Completion _completion_, the following steps of the algorithm that invoked Await will be performed, with _completion_ available.
@@ -5621,16 +5619,17 @@
     <h1>Operations on Objects</h1>
 
     <emu-clause id="sec-makebasicobject" aoid="MakeBasicObject">
-      <h1>MakeBasicObject ( _internalSlotsList_ )</h1>
+      <h1>MakeBasicObject ( _internalSlotsRecord_ )</h1>
       <p>The abstract operation MakeBasicObject is the source of all ECMAScript objects that are created algorithmically, including both ordinary objects and exotic objects. It factors out common steps used in creating all objects, and centralizes object creation.</p>
 
       <emu-alg>
-        1. Assert: _internalSlotsList_ is a List of internal slot names.
-        1. Let _obj_ be a newly created object with an internal slot for each name in _internalSlotsList_.
+        1. Assert: _internalSlotsRecord_ is a Record whose field names are internal slot names.
+        1. Let _obj_ be a newly created object.
+        1. For each (_name_, _value_) field in _internalSlotsRecord_, do
+          1. Add an internal slot to _obj_ with name _name_ and value _value_.
         1. Set _obj_'s essential internal methods to the default ordinary object definitions specified in <emu-xref href="#sec-ordinary-object-internal-methods-and-internal-slots"></emu-xref>.
-        1. Assert: If the caller will not be overriding both _obj_'s [[GetPrototypeOf]] and [[SetPrototypeOf]] essential internal methods, then _internalSlotsList_ contains [[Prototype]].
-        1. Assert: If the caller will not be overriding all of _obj_'s [[SetPrototypeOf]], [[IsExtensible]], and [[PreventExtensions]] essential internal methods, then _internalSlotsList_ contains [[Extensible]].
-        1. If _internalSlotsList_ contains [[Extensible]], then set _obj_.[[Extensible]] to *true*.
+        1. Assert: If the caller will not be overriding both _obj_'s [[GetPrototypeOf]] and [[SetPrototypeOf]] essential internal methods, then _internalSlotsRecord_ has a [[Prototype]] field.
+        1. Assert: If the caller will not be overriding all of _obj_'s [[SetPrototypeOf]], [[IsExtensible]], and [[PreventExtensions]] essential internal methods, then _internalSlotsRecord_ has a [[Extensible]] field.
         1. Return _obj_.
       </emu-alg>
 
@@ -6129,11 +6128,10 @@
       <h1>CreateListIteratorRecord ( _list_ )</h1>
       <p>The abstract operation CreateListIteratorRecord with argument _list_ creates an Iterator (<emu-xref href="#sec-iterator-interface"></emu-xref>) object record whose next method returns the successive elements of _list_. It performs the following steps:</p>
       <emu-alg>
-        1. Let _iterator_ be OrdinaryObjectCreate(%IteratorPrototype%, &laquo; [[IteratedList]], [[ListNextIndex]] &raquo;).
-        1. Set _iterator_.[[IteratedList]] to _list_.
-        1. Set _iterator_.[[ListNextIndex]] to 0.
+        1. _internalSlotsRecord_ be the Record { [[IteratedList]]: _list_, [[ListNextIndex]]: 0 }.
+        1. Let _iterator_ be OrdinaryObjectCreate(%IteratorPrototype%, _internalSlotsRecord_).
         1. Let _steps_ be the algorithm steps defined in <emu-xref href="#sec-listiteratornext-functions" title></emu-xref>.
-        1. Let _next_ be ! CreateBuiltinFunction(_steps_, &laquo; &raquo;).
+        1. Let _next_ be ! CreateBuiltinFunction(_steps_, Record { }).
         1. Return Record { [[Iterator]]: _iterator_, [[NextMethod]]: _next_, [[Done]]: *false* }.
       </emu-alg>
       <emu-note>
@@ -7351,7 +7349,7 @@
       <emu-alg>
         1. Let _intrinsics_ be a new Record.
         1. Set _realmRec_.[[Intrinsics]] to _intrinsics_.
-        1. Set fields of _intrinsics_ with the values listed in <emu-xref href="#table-7"></emu-xref>. The field names are the names listed in column one of the table. The value of each field is a new object value fully and recursively populated with property values as defined by the specification of each object in clauses 18-26. All object property values are newly created object values. All values that are built-in function objects are created by performing CreateBuiltinFunction(&lt;steps&gt;, &lt;slots&gt;, _realmRec_, &lt;prototype&gt;) where &lt;steps&gt; is the definition of that function provided by this specification, &lt;slots&gt; is a list of the names, if any, of the function's specified internal slots, and &lt;prototype&gt; is the specified value of the function's [[Prototype]] internal slot. The creation of the intrinsics and their properties must be ordered to avoid any dependencies upon objects that have not yet been created.
+        1. Set fields of _intrinsics_ with the values listed in <emu-xref href="#table-7"></emu-xref>. The field names are the names listed in column one of the table. The value of each field is a new object value fully and recursively populated with property values as defined by the specification of each object in clauses 18-26. All object property values are newly created object values. All values that are built-in function objects are created by performing CreateBuiltinFunction(&lt;steps&gt;, &lt;slots&gt;, _realmRec_, &lt;prototype&gt;) where &lt;steps&gt; is the definition of that function provided by this specification, &lt;slots&gt; is a Record of the names and values, if any, of the function's specified internal slots, and &lt;prototype&gt; is the specified value of the function's [[Prototype]] internal slot. The creation of the intrinsics and their properties must be ordered to avoid any dependencies upon objects that have not yet been created.
         1. Perform AddRestrictedFunctionProperties(_intrinsics_.[[%Function.prototype%]], _realmRec_).
         1. Return _intrinsics_.
       </emu-alg>
@@ -8257,13 +8255,14 @@
     </emu-clause>
 
     <emu-clause id="sec-ordinaryobjectcreate" aoid="OrdinaryObjectCreate" oldids="sec-objectcreate">
-      <h1>OrdinaryObjectCreate ( _proto_ [ , _additionalInternalSlotsList_ ] )</h1>
-      <p>The abstract operation OrdinaryObjectCreate with argument _proto_ (an object or *null*) is used to specify the runtime creation of new ordinary objects. The optional argument _additionalInternalSlotsList_ is a List of the names of additional internal slots that must be defined as part of the object, beyond [[Prototype]] and [[Extensible]]. If the list is not provided, a new empty List is used. This abstract operation performs the following steps:</p>
+      <h1>OrdinaryObjectCreate ( _proto_ [ , _additionalInternalSlotsRecord_ ] )</h1>
+      <p>The abstract operation OrdinaryObjectCreate with argument _proto_ (an object or *null*) is used to specify the runtime creation of new ordinary objects. The optional argument _additionalInternalSlotsRecord_ is a Record of the names and values of additional internal slots that must be defined as part of the object, beyond [[Prototype]] and [[Extensible]]. If the record is not provided, a empty Record is used (in effect). This abstract operation performs the following steps:</p>
       <emu-alg>
-        1. Let _internalSlotsList_ be &laquo; [[Prototype]], [[Extensible]] &raquo;.
-        1. If _additionalInternalSlotsList_ is present, append each of its elements to _internalSlotsList_.
-        1. Let _O_ be ! MakeBasicObject(_internalSlotsList_).
-        1. Set _O_.[[Prototype]] to _proto_.
+        1. Let _internalSlotsRecord_ be the Record { [[Prototype]]: _proto_, [[Extensible]]: *true* }.
+        1. If _additionalInternalSlotsRecord_ is present, then
+          1. Assert: _additionalInternalSlotsRecord_ does not have a [[Prototype]] field or an [[Extensible]] field.
+          1. Append each of _additionalInternalSlotsRecord_'s fields to _internalSlotsRecord_.
+        1. Let _O_ be ! MakeBasicObject(_internalSlotsRecord_).
         1. Return _O_.
       </emu-alg>
 
@@ -8273,12 +8272,12 @@
     </emu-clause>
 
     <emu-clause id="sec-ordinarycreatefromconstructor" aoid="OrdinaryCreateFromConstructor">
-      <h1>OrdinaryCreateFromConstructor ( _constructor_, _intrinsicDefaultProto_ [ , _internalSlotsList_ ] )</h1>
-      <p>The abstract operation OrdinaryCreateFromConstructor creates an ordinary object whose [[Prototype]] value is retrieved from a constructor's *"prototype"* property, if it exists. Otherwise the intrinsic named by _intrinsicDefaultProto_ is used for [[Prototype]]. The optional _internalSlotsList_ is a List of the names of additional internal slots that must be defined as part of the object. If the list is not provided, a new empty List is used. This abstract operation performs the following steps:</p>
+      <h1>OrdinaryCreateFromConstructor ( _constructor_, _intrinsicDefaultProto_ [ , _additionalInternalSlotsRecord_ ] )</h1>
+      <p>The abstract operation OrdinaryCreateFromConstructor creates an ordinary object whose [[Prototype]] value is retrieved from a constructor's *"prototype"* property, if it exists. Otherwise the intrinsic named by _intrinsicDefaultProto_ is used for [[Prototype]]. The optional _additionalInternalSlotsRecord_ is a Record of the names and values of additional internal slots that must be defined as part of the object. If the record is not provided, a new empty Record is used. This abstract operation performs the following steps:</p>
       <emu-alg>
         1. Assert: _intrinsicDefaultProto_ is a String value that is this specification's name of an intrinsic object. The corresponding object must be an intrinsic that is intended to be used as the [[Prototype]] value of an object.
         1. Let _proto_ be ? GetPrototypeFromConstructor(_constructor_, _intrinsicDefaultProto_).
-        1. Return OrdinaryObjectCreate(_proto_, _internalSlotsList_).
+        1. Return OrdinaryObjectCreate(_proto_, _additionalInternalSlotsRecord_).
       </emu-alg>
     </emu-clause>
 
@@ -8559,21 +8558,25 @@
       <p>The abstract operation OrdinaryFunctionCreate requires the arguments: an object _functionPrototype_, a parameter list Parse Node specified by _ParameterList_, a body Parse Node specified by _Body_, _thisMode_ which is either ~lexical-this~ or ~non-lexical-this~, and a Lexical Environment specified by _Scope_. OrdinaryFunctionCreate performs the following steps:</p>
       <emu-alg>
         1. Assert: Type(_functionPrototype_) is Object.
-        1. Let _internalSlotsList_ be the internal slots listed in <emu-xref href="#table-27"></emu-xref>.
-        1. Let _F_ be ! OrdinaryObjectCreate(_functionPrototype_, _internalSlotsList_).
-        1. Set _F_.[[Call]] to the definition specified in <emu-xref href="#sec-ecmascript-function-objects-call-thisargument-argumentslist"></emu-xref>.
-        1. Set _F_.[[FormalParameters]] to _ParameterList_.
-        1. Set _F_.[[ECMAScriptCode]] to _Body_.
         1. If the source text matching _Body_ is strict mode code, let _Strict_ be *true*; else let _Strict_ be *false*.
-        1. Set _F_.[[Strict]] to _Strict_.
-        1. If _thisMode_ is ~lexical-this~, set _F_.[[ThisMode]] to ~lexical~.
-        1. Else if _Strict_ is *true*, set _F_.[[ThisMode]] to ~strict~.
-        1. Else, set _F_.[[ThisMode]] to ~global~.
-        1. Set _F_.[[IsClassConstructor]] to *false*.
-        1. Set _F_.[[Environment]] to _Scope_.
-        1. Set _F_.[[ScriptOrModule]] to GetActiveScriptOrModule().
-        1. Set _F_.[[Realm]] to the current Realm Record.
-        1. Set _F_.[[HomeObject]] to *undefined*.
+        1. If _thisMode_ is ~lexical-this~, set _FuncThisMode_ to ~lexical~.
+        1. Else if _Strict_ is *true*, set _FuncThisMode_ to ~strict~.
+        1. Else, set _FuncThisMode_ to ~global~.
+        1. Let _internalSlotsRecord_ be the Record with the following fields:
+          * [[FormalParameters]]: _ParameterList_
+          * [[ECMAScriptCode]]: _Body_
+          * [[Strict]]: _Strict_
+          * [[ThisMode]]: _FuncThisMode_
+          * [[IsClassConstructor]]: *false*
+          * [[Environment]]: _Scope_
+          * [[ScriptOrModule]]: GetActiveScriptOrModule()
+          * [[Realm]]: the current Realm Record
+          * [[HomeObject]]: *undefined*
+          * [[ConstructorKind]]: *undefined*
+          * [[SourceText]]: *undefined*
+        1. Let _F_ be ! OrdinaryObjectCreate(_functionPrototype_, _internalSlotsRecord_).
+        1. Set _F_.[[Call]] to the definition specified in <emu-xref href="#sec-ecmascript-function-objects-call-thisargument-argumentslist"></emu-xref>.
+
         1. Let _len_ be the ExpectedArgumentCount of _ParameterList_.
         1. Perform ! SetFunctionLength(_F_, _len_).
         1. Return _F_.
@@ -8844,14 +8847,14 @@
     </emu-clause>
 
     <emu-clause id="sec-createbuiltinfunction" aoid="CreateBuiltinFunction">
-      <h1>CreateBuiltinFunction ( _steps_, _internalSlotsList_ [ , _realm_ [ , _prototype_ ] ] )</h1>
-      <p>The abstract operation CreateBuiltinFunction takes arguments _steps_, _internalSlotsList_, _realm_, and _prototype_. The argument _internalSlotsList_ is a List of the names of additional internal slots that must be defined as part of the object. CreateBuiltinFunction returns a built-in function object created by the following steps:</p>
+      <h1>CreateBuiltinFunction ( _steps_, _additionalInternalSlotsRecord_ [ , _realm_ [ , _prototype_ ] ] )</h1>
+      <p>The abstract operation CreateBuiltinFunction takes arguments _steps_, _additionalInternalSlotsRecord_, _realm_, and _prototype_. The argument _additionalInternalSlotsRecord_ is a Record of the names and values of additional internal slots that must be defined as part of the object. CreateBuiltinFunction returns a built-in function object created by the following steps:</p>
       <emu-alg>
         1. Assert: _steps_ is either a set of algorithm steps or other definition of a function's behaviour provided in this specification.
         1. If _realm_ is not present, set _realm_ to the current Realm Record.
         1. Assert: _realm_ is a Realm Record.
         1. If _prototype_ is not present, set _prototype_ to _realm_.[[Intrinsics]].[[%Function.prototype%]].
-        1. Let _func_ be a new built-in function object that when called performs the action described by _steps_. The new function object has internal slots whose names are the elements of _internalSlotsList_.
+        1. Let _func_ be a new built-in function object that when called performs the action described by _steps_. The new function object has internal slots whose names and values are given by the fields of _additionalInternalSlotsRecord_.
         1. Set _func_.[[Realm]] to _realm_.
         1. Set _func_.[[Prototype]] to _prototype_.
         1. Set _func_.[[Extensible]] to *true*.
@@ -8955,15 +8958,16 @@
         <emu-alg>
           1. Assert: Type(_targetFunction_) is Object.
           1. Let _proto_ be ? _targetFunction_.[[GetPrototypeOf]]().
-          1. Let _internalSlotsList_ be the internal slots listed in <emu-xref href="#table-28"></emu-xref>, plus [[Prototype]] and [[Extensible]].
-          1. Let _obj_ be ! MakeBasicObject(_internalSlotsList_).
-          1. Set _obj_.[[Prototype]] to _proto_.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[Prototype]]: _proto_
+            * [[Extensible]]: *true*
+            * [[BoundTargetFunction]]: _targetFunction_
+            * [[BoundThis]]: _boundThis_
+            * [[BoundArguments]]: _boundArgs_
+          1. Let _obj_ be ! MakeBasicObject(_internalSlotsRecord_).
           1. Set _obj_.[[Call]] as described in <emu-xref href="#sec-bound-function-exotic-objects-call-thisargument-argumentslist"></emu-xref>.
           1. If IsConstructor(_targetFunction_) is *true*, then
             1. Set _obj_.[[Construct]] as described in <emu-xref href="#sec-bound-function-exotic-objects-construct-argumentslist-newtarget"></emu-xref>.
-          1. Set _obj_.[[BoundTargetFunction]] to _targetFunction_.
-          1. Set _obj_.[[BoundThis]] to _boundThis_.
-          1. Set _obj_.[[BoundArguments]] to _boundArgs_.
           1. Return _obj_.
         </emu-alg>
       </emu-clause>
@@ -9011,8 +9015,8 @@
           1. If _length_ is *-0*, set _length_ to *+0*.
           1. If _length_ &gt; 2<sup>32</sup> - 1, throw a *RangeError* exception.
           1. If _proto_ is not present, set _proto_ to %Array.prototype%.
-          1. Let _A_ be ! MakeBasicObject(&laquo; [[Prototype]], [[Extensible]] &raquo;).
-          1. Set _A_.[[Prototype]] to _proto_.
+          1. Let _internalSlotsRecord_ be the Record { [[Prototype]]: _proto_, [[Extensible]]: *true* }.
+          1. Let _A_ be ! MakeBasicObject(_internalSlotsRecord_).
           1. Set _A_.[[DefineOwnProperty]] as specified in <emu-xref href="#sec-array-exotic-objects-defineownproperty-p-desc"></emu-xref>.
           1. Perform ! OrdinaryDefineOwnProperty(_A_, *"length"*, PropertyDescriptor { [[Value]]: _length_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
           1. Return _A_.
@@ -9143,9 +9147,11 @@
         <p>The abstract operation StringCreate with arguments _value_ and _prototype_ is used to specify the creation of new String exotic objects. It performs the following steps:</p>
         <emu-alg>
           1. Assert: Type(_value_) is String.
-          1. Let _S_ be ! MakeBasicObject(&laquo; [[Prototype]], [[Extensible]], [[StringData]] &raquo;).
-          1. Set _S_.[[Prototype]] to _prototype_.
-          1. Set _S_.[[StringData]] to _value_.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[Prototype]]: _prototype_
+            * [[Extensible]]: *true*
+            * [[StringData]]: _value_
+          1. Let _S_ be ! MakeBasicObject(_internalSlotsRecord_).
           1. Set _S_.[[GetOwnProperty]] as specified in <emu-xref href="#sec-string-exotic-objects-getownproperty-p"></emu-xref>.
           1. Set _S_.[[DefineOwnProperty]] as specified in <emu-xref href="#sec-string-exotic-objects-defineownproperty-p-desc"></emu-xref>.
           1. Set _S_.[[OwnPropertyKeys]] as specified in <emu-xref href="#sec-string-exotic-objects-ownpropertykeys"></emu-xref>.
@@ -9295,8 +9301,8 @@
         <p>The abstract operation CreateUnmappedArgumentsObject called with an argument _argumentsList_ performs the following steps:</p>
         <emu-alg>
           1. Let _len_ be the number of elements in _argumentsList_.
-          1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%, &laquo; [[ParameterMap]] &raquo;).
-          1. Set _obj_.[[ParameterMap]] to *undefined*.
+          1. Let _internalSlotsRecord_ be the Record { [[ParameterMap]]: *undefined* }.
+          1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%, _internalSlotsRecord_).
           1. Perform DefinePropertyOrThrow(_obj_, *"length"*, PropertyDescriptor { [[Value]]: _len_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *true* }).
           1. Let _index_ be 0.
           1. Repeat, while _index_ &lt; _len_,
@@ -9315,15 +9321,17 @@
         <emu-alg>
           1. Assert: _formals_ does not contain a rest parameter, any binding patterns, or any initializers. It may contain duplicate identifiers.
           1. Let _len_ be the number of elements in _argumentsList_.
-          1. Let _obj_ be ! MakeBasicObject(&laquo; [[Prototype]], [[Extensible]], [[ParameterMap]] &raquo;).
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[Prototype]]: %Object.prototype%
+            * [[Extensible]]: *true*
+            * [[ParameterMap]]: _map_
+          1. Let _obj_ be ! MakeBasicObject(_internalSlotsRecord_).
           1. Set _obj_.[[GetOwnProperty]] as specified in <emu-xref href="#sec-arguments-exotic-objects-getownproperty-p"></emu-xref>.
           1. Set _obj_.[[DefineOwnProperty]] as specified in <emu-xref href="#sec-arguments-exotic-objects-defineownproperty-p-desc"></emu-xref>.
           1. Set _obj_.[[Get]] as specified in <emu-xref href="#sec-arguments-exotic-objects-get-p-receiver"></emu-xref>.
           1. Set _obj_.[[Set]] as specified in <emu-xref href="#sec-arguments-exotic-objects-set-p-v-receiver"></emu-xref>.
           1. Set _obj_.[[Delete]] as specified in <emu-xref href="#sec-arguments-exotic-objects-delete-p"></emu-xref>.
-          1. Set _obj_.[[Prototype]] to %Object.prototype%.
           1. Let _map_ be OrdinaryObjectCreate(*null*).
-          1. Set _obj_.[[ParameterMap]] to _map_.
           1. Let _parameterNames_ be the BoundNames of _formals_.
           1. Let _numberOfParameters_ be the number of elements in _parameterNames_.
           1. Let _index_ be 0.
@@ -9353,9 +9361,7 @@
           <p>The abstract operation MakeArgGetter called with String _name_ and Environment Record _env_ creates a built-in function object that when executed returns the value bound for _name_ in _env_. It performs the following steps:</p>
           <emu-alg>
             1. Let _steps_ be the steps of an ArgGetter function as specified below.
-            1. Let _getter_ be ! CreateBuiltinFunction(_steps_, &laquo; [[Name]], [[Env]] &raquo;).
-            1. Set _getter_.[[Name]] to _name_.
-            1. Set _getter_.[[Env]] to _env_.
+            1. Let _getter_ be ! CreateBuiltinFunction(_steps_, Record { [[Name]]: _name_, [[Env]]: _env_ }).
             1. Return _getter_.
           </emu-alg>
           <p>An ArgGetter function is an anonymous built-in function with [[Name]] and [[Env]] internal slots. When an ArgGetter function that expects no arguments is called it performs the following steps:</p>
@@ -9375,9 +9381,7 @@
           <p>The abstract operation MakeArgSetter called with String _name_ and Environment Record _env_ creates a built-in function object that when executed sets the value bound for _name_ in _env_. It performs the following steps:</p>
           <emu-alg>
             1. Let _steps_ be the steps of an ArgSetter function as specified below.
-            1. Let _setter_ be ! CreateBuiltinFunction(_steps_, &laquo; [[Name]], [[Env]] &raquo;).
-            1. Set _setter_.[[Name]] to _name_.
-            1. Set _setter_.[[Env]] to _env_.
+            1. Let _setter_ be ! CreateBuiltinFunction(_steps_, Record { [[Name]]: _name_, [[Env]]: _env_ }).
             1. Return _setter_.
           </emu-alg>
           <p>An ArgSetter function is an anonymous built-in function with [[Name]] and [[Env]] internal slots. When an ArgSetter function is called with argument _value_ it performs the following steps:</p>
@@ -9502,15 +9506,23 @@
         <h1>IntegerIndexedObjectCreate ( _prototype_ )</h1>
         <p>The abstract operation IntegerIndexedObjectCreate is used to specify the creation of new <emu-xref href="#integer-indexed-exotic-object">Integer-Indexed exotic objects</emu-xref>. IntegerIndexedObjectCreate performs the following steps:</p>
         <emu-alg>
-          1. Let _internalSlotsList_ be &laquo; [[Prototype]], [[Extensible]], [[ViewedArrayBuffer]], [[TypedArrayName]], [[ContentType]], [[ByteLength]], [[ByteOffset]], [[ArrayLength]] &raquo;.
-          1. Let _A_ be ! MakeBasicObject(_internalSlotsList_).
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[Prototype]]: _prototype_
+            * [[Extensible]]: *true*
+            * [[ViewedArrayBuffer]]: *undefined*
+            * [[TypedArrayName]]: *undefined*
+            * [[ContentType]]: *undefined*
+            * [[ByteLength]]: *undefined*
+            * [[ByteOffset]]: *undefined*
+            * [[ArrayLength]]: *undefined*
+          1. NOTE: The internal slots that are initialized to *undefined* will be set to a useful value later.
+          1. Let _A_ be ! MakeBasicObject(_internalSlotsRecord_).
           1. Set _A_.[[GetOwnProperty]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-getownproperty-p"></emu-xref>.
           1. Set _A_.[[HasProperty]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-hasproperty-p"></emu-xref>.
           1. Set _A_.[[DefineOwnProperty]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-defineownproperty-p-desc"></emu-xref>.
           1. Set _A_.[[Get]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-get-p-receiver"></emu-xref>.
           1. Set _A_.[[Set]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-set-p-v-receiver"></emu-xref>.
           1. Set _A_.[[OwnPropertyKeys]] as specified in <emu-xref href="#sec-integer-indexed-exotic-objects-ownpropertykeys"></emu-xref>.
-          1. Set _A_.[[Prototype]] to _prototype_.
           1. Return _A_.
         </emu-alg>
       </emu-clause>
@@ -9753,13 +9765,14 @@
           1. Assert: _module_ is a Module Record.
           1. Assert: _module_.[[Namespace]] is *undefined*.
           1. Assert: _exports_ is a List of String values.
-          1. Let _internalSlotsList_ be the internal slots listed in <emu-xref href="#table-29"></emu-xref>.
-          1. Let _M_ be ! MakeBasicObject(_internalSlotsList_).
-          1. Set _M_'s essential internal methods to the definitions specified in <emu-xref href="#sec-module-namespace-exotic-objects"></emu-xref>.
-          1. Set _M_.[[Prototype]] to *null*.
-          1. Set _M_.[[Module]] to _module_.
           1. Let _sortedExports_ be a new List containing the same values as the list _exports_ where the values are ordered as if an Array of the same values had been sorted using `Array.prototype.sort` using *undefined* as _comparefn_.
-          1. Set _M_.[[Exports]] to _sortedExports_.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[Prototype]]: *null*
+            * [[Module]]: _module_
+            * [[Exports]]: _sortedExports_
+          1. Let _M_ be ! MakeBasicObject(_internalSlotsRecord_).
+          1. Set _M_'s essential internal methods to the definitions specified in <emu-xref href="#sec-module-namespace-exotic-objects"></emu-xref>.
+
           1. Create own properties of _M_ corresponding to the definitions in <emu-xref href="#sec-module-namespace-objects"></emu-xref>.
           1. Set _module_.[[Namespace]] to _M_.
           1. Return _M_.
@@ -10425,14 +10438,15 @@
         1. If _target_ is a Proxy exotic object and _target_.[[ProxyHandler]] is *null*, throw a *TypeError* exception.
         1. If Type(_handler_) is not Object, throw a *TypeError* exception.
         1. If _handler_ is a Proxy exotic object and _handler_.[[ProxyHandler]] is *null*, throw a *TypeError* exception.
-        1. Let _P_ be ! MakeBasicObject(&laquo; [[ProxyHandler]], [[ProxyTarget]] &raquo;).
+        1. Let _internalSlotsRecord_ be the Record with the following fields:
+          * [[ProxyTarget]]: _target_.
+          * [[ProxyHandler]]: _handler_.
+        1. Let _P_ be ! MakeBasicObject(_internalSlotsRecord_).
         1. Set _P_'s essential internal methods, except for [[Call]] and [[Construct]], to the definitions specified in <emu-xref href="#sec-proxy-object-internal-methods-and-internal-slots"></emu-xref>.
         1. If IsCallable(_target_) is *true*, then
           1. Set _P_.[[Call]] as specified in <emu-xref href="#sec-proxy-object-internal-methods-and-internal-slots-call-thisargument-argumentslist"></emu-xref>.
           1. If IsConstructor(_target_) is *true*, then
             1. Set _P_.[[Construct]] as specified in <emu-xref href="#sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget"></emu-xref>.
-        1. Set _P_.[[ProxyTarget]] to _target_.
-        1. Set _P_.[[ProxyHandler]] to _handler_.
         1. Return _P_.
       </emu-alg>
     </emu-clause>
@@ -18153,11 +18167,12 @@
           <p>The abstract operation CreateForInIterator with argument _object_ is used to create a For-In Iterator object which iterates over the own and inherited enumerable string properties of _object_ in a specific order. It performs the following steps:</p>
           <emu-alg>
             1. Assert: Type(_object_) is Object.
-            1. Let _iterator_ be OrdinaryObjectCreate(%ForInIteratorPrototype%, &laquo; [[Object]], [[ObjectWasVisited]], [[VisitedKeys]], [[RemainingKeys]] &raquo;).
-            1. Set _iterator_.[[Object]] to _object_.
-            1. Set _iterator_.[[ObjectWasVisited]] to *false*.
-            1. Set _iterator_.[[VisitedKeys]] to a new empty List.
-            1. Set _iterator_.[[RemainingKeys]] to a new empty List.
+            1. Let _internalSlotsRecord_ be the Record with the following fields:
+              * [[Object]]: _object_
+              * [[ObjectWasVisited]]: *false*
+              * [[VisitedKeys]]: a new empty List
+              * [[RemainingKeys]]: a new empty List
+            1. Let _iterator_ be OrdinaryObjectCreate(%ForInIteratorPrototype%, _internalSlotsRecord_).
             1. Return _iterator_.
           </emu-alg>
         </emu-clause>
@@ -20535,7 +20550,10 @@
       <emu-grammar>GeneratorBody : FunctionBody</emu-grammar>
       <emu-alg>
         1. Perform ? FunctionDeclarationInstantiation(_functionObject_, _argumentsList_).
-        1. Let _G_ be ? OrdinaryCreateFromConstructor(_functionObject_, *"%Generator.prototype%"*, &laquo; [[GeneratorState]], [[GeneratorContext]] &raquo;).
+        1. Let _internalSlotsRecord_ be the Record with the following fields:
+          * [[GeneratorState]]: *undefined*
+          * [[GeneratorContext]]: *undefined*
+        1. Let _G_ be ? OrdinaryCreateFromConstructor(_functionObject_, *"%Generator.prototype%"*, _internalSlotsRecord_).
         1. Perform GeneratorStart(_G_, |FunctionBody|).
         1. Return Completion { [[Type]]: ~return~, [[Value]]: _G_, [[Target]]: ~empty~ }.
       </emu-alg>
@@ -20861,7 +20879,11 @@
       </emu-grammar>
       <emu-alg>
         1. Perform ? FunctionDeclarationInstantiation(_functionObject_, _argumentsList_).
-        1. Let _generator_ be ? OrdinaryCreateFromConstructor(_functionObject_, *"%AsyncGenerator.prototype%"*, &laquo; [[AsyncGeneratorState]], [[AsyncGeneratorContext]], [[AsyncGeneratorQueue]] &raquo;).
+        1. Let _internalSlotsRecord_ be the Record with the following fields:
+          * [[AsyncGeneratorState]]: *undefined*
+          * [[AsyncGeneratorContext]]: *undefined*
+          * [[AsyncGeneratorQueue]]: *undefined*
+        1. Let _generator_ be ? OrdinaryCreateFromConstructor(_functionObject_, *"%AsyncGenerator.prototype%"*, _internalSlotsRecord_).
         1. Perform ! AsyncGeneratorStart(_generator_, |FunctionBody|).
         1. Return Completion { [[Type]]: ~return~, [[Value]]: _generator_, [[Target]]: ~empty~ }.
       </emu-alg>
@@ -25858,7 +25880,7 @@
           1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%).
           1. Assert: _obj_ is an extensible ordinary object with no own properties.
           1. Let _stepsDefine_ be the algorithm steps defined in <emu-xref href="#sec-create-data-property-on-object-functions" title></emu-xref>.
-          1. Let _adder_ be ! CreateBuiltinFunction(_stepsDefine_, &laquo; &raquo;).
+          1. Let _adder_ be ! CreateBuiltinFunction(_stepsDefine_, Record { }).
           1. Return ? AddEntriesFromIterable(_obj_, _iterable_, _adder_).
         </emu-alg>
         <emu-note>
@@ -26498,8 +26520,8 @@
         <emu-alg>
           1. Let _b_ be ! ToBoolean(_value_).
           1. If NewTarget is *undefined*, return _b_.
-          1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Boolean.prototype%"*, &laquo; [[BooleanData]] &raquo;).
-          1. Set _O_.[[BooleanData]] to _b_.
+          1. Let _internalSlotsRecord_ be the Record { [[BooleanData]]: _b_ }.
+          1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Boolean.prototype%"*, _internalSlotsRecord_).
           1. Return _O_.
         </emu-alg>
       </emu-clause>
@@ -26862,7 +26884,8 @@
         <p>When the `Error` function is called with argument _message_, the following steps are taken:</p>
         <emu-alg>
           1. If NewTarget is *undefined*, let _newTarget_ be the active function object; else let _newTarget_ be NewTarget.
-          1. Let _O_ be ? OrdinaryCreateFromConstructor(_newTarget_, *"%Error.prototype%"*, &laquo; [[ErrorData]] &raquo;).
+          1. Let _internalSlotsRecord_ be the Record { [[ErrorData]]: *undefined* }.
+          1. Let _O_ be ? OrdinaryCreateFromConstructor(_newTarget_, *"%Error.prototype%"*, _internalSlotsRecord_).
           1. If _message_ is not *undefined*, then
             1. Let _msg_ be ? ToString(_message_).
             1. Let _msgDesc_ be the PropertyDescriptor { [[Value]]: _msg_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.
@@ -26987,7 +27010,8 @@
           <p>When a _NativeError_ function is called with argument _message_, the following steps are taken:</p>
           <emu-alg>
             1. If NewTarget is *undefined*, let _newTarget_ be the active function object; else let _newTarget_ be NewTarget.
-            1. Let _O_ be ? OrdinaryCreateFromConstructor(_newTarget_, <code>"%<var>NativeError</var>.prototype%"</code>, &laquo; [[ErrorData]] &raquo;).
+            1. Let _internalSlotsRecord_ be the Record { [[ErrorData]]: *undefined* }.
+            1. Let _O_ be ? OrdinaryCreateFromConstructor(_newTarget_, <code>"%<var>NativeError</var>.prototype%"</code>, _internalSlotsRecord_).
             1. If _message_ is not *undefined*, then
               1. Let _msg_ be ? ToString(_message_).
               1. Let _msgDesc_ be the PropertyDescriptor { [[Value]]: _msg_, [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *true* }.
@@ -27075,8 +27099,8 @@
           1. Else,
             1. Let _n_ be *+0*.
           1. If NewTarget is *undefined*, return _n_.
-          1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Number.prototype%"*, &laquo; [[NumberData]] &raquo;).
-          1. Set _O_.[[NumberData]] to _n_.
+          1. Let _internalSlotsRecord_ be the Record { [[NumberData]]: _n_ }.
+          1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Number.prototype%"*, _internalSlotsRecord_).
           1. Return _O_.
         </emu-alg>
       </emu-clause>
@@ -28824,8 +28848,8 @@ THH:mm:ss.sss
               1. Let _yi_ be ! ToInteger(_y_).
               1. If 0 &le; _yi_ &le; 99, let _yr_ be 1900 + _yi_; otherwise, let _yr_ be _y_.
             1. Let _finalDate_ be MakeDate(MakeDay(_yr_, _m_, _dt_), MakeTime(_h_, _min_, _s_, _milli_)).
-            1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Date.prototype%"*, &laquo; [[DateValue]] &raquo;).
-            1. Set _O_.[[DateValue]] to TimeClip(UTC(_finalDate_)).
+            1. Let _internalSlotsRecord_ be the Record { [[DateValue]]: TimeClip(UTC(_finalDate_)) }.
+            1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Date.prototype%"*, _internalSlotsRecord_).
             1. Return _O_.
         </emu-alg>
       </emu-clause>
@@ -28850,8 +28874,8 @@ THH:mm:ss.sss
                 1. Let _tv_ be the result of parsing _v_ as a date, in exactly the same manner as for the `parse` method (<emu-xref href="#sec-date.parse"></emu-xref>).
               1. Else,
                 1. Let _tv_ be ? ToNumber(_v_).
-            1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Date.prototype%"*, &laquo; [[DateValue]] &raquo;).
-            1. Set _O_.[[DateValue]] to TimeClip(_tv_).
+            1. Let _internalSlotsRecord_ be the Record { [[DateValue]]: TimeClip(_tv_) }.
+            1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Date.prototype%"*, _internalSlotsRecord_).
             1. Return _O_.
         </emu-alg>
       </emu-clause>
@@ -28867,8 +28891,9 @@ THH:mm:ss.sss
             1. Let _now_ be the Number that is the time value (UTC) identifying the current time.
             1. Return ToDateString(_now_).
           1. Else,
-            1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Date.prototype%"*, &laquo; [[DateValue]] &raquo;).
-            1. Set _O_.[[DateValue]] to the time value (UTC) identifying the current time.
+            1. Let _internalSlotsRecord_ be the Record with the following fields:
+              * [[DateValue]]: the time value (UTC) identifying the current time
+            1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Date.prototype%"*, _internalSlotsRecord_).
             1. Return _O_.
         </emu-alg>
       </emu-clause>
@@ -30729,9 +30754,10 @@ THH:mm:ss.sss
         <p>Several methods of String objects return Iterator objects. The abstract operation CreateStringIterator with argument _string_ is used to create such iterator objects. It performs the following steps:</p>
         <emu-alg>
           1. Assert: Type(_string_) is String.
-          1. Let _iterator_ be OrdinaryObjectCreate(%StringIteratorPrototype%, &laquo; [[IteratedString]], [[StringNextIndex]] &raquo;).
-          1. Set _iterator_.[[IteratedString]] to _string_.
-          1. Set _iterator_.[[StringNextIndex]] to 0.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[IteratedString]]: _string_
+            * [[StringNextIndex]]: 0
+          1. Let _iterator_ be OrdinaryObjectCreate(%StringIteratorPrototype%, _internalSlotsRecord_).
           1. Return _iterator_.
         </emu-alg>
       </emu-clause>
@@ -32455,7 +32481,11 @@ THH:mm:ss.sss
           <h1>Runtime Semantics: RegExpAlloc ( _newTarget_ )</h1>
           <p>When the abstract operation RegExpAlloc with argument _newTarget_ is called, the following steps are taken:</p>
           <emu-alg>
-            1. Let _obj_ be ? OrdinaryCreateFromConstructor(_newTarget_, *"%RegExp.prototype%"*, &laquo; [[RegExpMatcher]], [[OriginalSource]], [[OriginalFlags]] &raquo;).
+            1. Let _internalSlotsRecord_ be the Record with the following fields:
+              * [[RegExpMatcher]]: *undefined*
+              * [[OriginalSource]]: *undefined*
+              * [[OriginalFlags]]: *undefined*
+            1. Let _obj_ be ? OrdinaryCreateFromConstructor(_newTarget_, *"%RegExp.prototype%"*, _internalSlotsRecord_).
             1. Perform ! DefinePropertyOrThrow(_obj_, *"lastIndex"*, PropertyDescriptor { [[Writable]]: *true*, [[Enumerable]]: *false*, [[Configurable]]: *false* }).
             1. Return _obj_.
           </emu-alg>
@@ -32798,12 +32828,13 @@ THH:mm:ss.sss
             1. Assert: Type(_S_) is String.
             1. Assert: Type(_global_) is Boolean.
             1. Assert: Type(_fullUnicode_) is Boolean.
-            1. Let _iterator_ be OrdinaryObjectCreate(%RegExpStringIteratorPrototype%, &laquo; [[IteratingRegExp]], [[IteratedString]], [[Global]], [[Unicode]], [[Done]] &raquo;).
-            1. Set _iterator_.[[IteratingRegExp]] to _R_.
-            1. Set _iterator_.[[IteratedString]] to _S_.
-            1. Set _iterator_.[[Global]] to _global_.
-            1. Set _iterator_.[[Unicode]] to _fullUnicode_.
-            1. Set _iterator_.[[Done]] to *false*.
+            1. Let _internalSlotsRecord_ be the Record with the following fields:
+              * [[IteratingRegExp]]: _R_
+              * [[IteratedString]]: _S_
+              * [[Global]]: _global_
+              * [[Unicode]]: _fullUnicode_
+              * [[Done]]: *false*
+            1. Let _iterator_ be OrdinaryObjectCreate(%RegExpStringIteratorPrototype%, _internalSlotsRecord_).
             1. Return _iterator_.
           </emu-alg>
         </emu-clause>
@@ -34523,10 +34554,11 @@ THH:mm:ss.sss
         <emu-alg>
           1. Assert: Type(_array_) is Object.
           1. Assert: _kind_ is ~key+value~, ~key~, or ~value~.
-          1. Let _iterator_ be OrdinaryObjectCreate(%ArrayIteratorPrototype%, &laquo; [[IteratedArrayLike]], [[ArrayLikeNextIndex]], [[ArrayLikeIterationKind]] &raquo;).
-          1. Set _iterator_.[[IteratedArrayLike]] to _array_.
-          1. Set _iterator_.[[ArrayLikeNextIndex]] to 0.
-          1. Set _iterator_.[[ArrayLikeIterationKind]] to _kind_.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[IteratedArrayLike]]: _array_
+            * [[ArrayLikeNextIndex]]: 0
+            * [[ArrayLikeIterationKind]]: _kind_
+          1. Let _iterator_ be OrdinaryObjectCreate(%ArrayIteratorPrototype%, _internalSlotsRecord_).
           1. Return _iterator_.
         </emu-alg>
       </emu-clause>
@@ -35811,8 +35843,8 @@ THH:mm:ss.sss
         <p>When the `Map` function is called with optional argument _iterable_, the following steps are taken:</p>
         <emu-alg>
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
-          1. Let _map_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Map.prototype%"*, &laquo; [[MapData]] &raquo;).
-          1. Set _map_.[[MapData]] to a new empty List.
+          1. Let _internalSlotsRecord_ be the Record { [[MapData]]: a new empty List }.
+          1. Let _map_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Map.prototype%"*, _internalSlotsRecord_).
           1. If _iterable_ is either *undefined* or *null*, return _map_.
           1. Let _adder_ be ? Get(_map_, *"set"*).
           1. Return ? AddEntriesFromIterable(_map_, _iterable_, _adder_).
@@ -36059,10 +36091,11 @@ THH:mm:ss.sss
         <p>Several methods of Map objects return Iterator objects. The abstract operation CreateMapIterator with arguments _map_ and _kind_ is used to create such iterator objects. It performs the following steps:</p>
         <emu-alg>
           1. Perform ? RequireInternalSlot(_map_, [[MapData]]).
-          1. Let _iterator_ be OrdinaryObjectCreate(%MapIteratorPrototype%, &laquo; [[IteratedMap]], [[MapNextIndex]], [[MapIterationKind]] &raquo;).
-          1. Set _iterator_.[[IteratedMap]] to _map_.
-          1. Set _iterator_.[[MapNextIndex]] to 0.
-          1. Set _iterator_.[[MapIterationKind]] to _kind_.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[IteratedMap]]: _map_
+            * [[MapNextIndex]]: 0
+            * [[MapIterationKind]]: _kind_
+          1. Let _iterator_ be OrdinaryObjectCreate(%MapIteratorPrototype%, _internalSlotsRecord_).
           1. Return _iterator_.
         </emu-alg>
       </emu-clause>
@@ -36180,8 +36213,8 @@ THH:mm:ss.sss
         <p>When the `Set` function is called with optional argument _iterable_, the following steps are taken:</p>
         <emu-alg>
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
-          1. Let _set_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Set.prototype%"*, &laquo; [[SetData]] &raquo;).
-          1. Set _set_.[[SetData]] to a new empty List.
+          1. Let _internalSlotsRecord_ be the Record { [[SetData]]: a new empty List }.
+          1. Let _set_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Set.prototype%"*, _internalSlotsRecord_).
           1. If _iterable_ is either *undefined* or *null*, return _set_.
           1. Let _adder_ be ? Get(_set_, *"add"*).
           1. If IsCallable(_adder_) is *false*, throw a *TypeError* exception.
@@ -36393,10 +36426,11 @@ THH:mm:ss.sss
         <p>Several methods of Set objects return Iterator objects. The abstract operation CreateSetIterator with arguments _set_ and _kind_ is used to create such iterator objects. It performs the following steps:</p>
         <emu-alg>
           1. Perform ? RequireInternalSlot(_set_, [[SetData]]).
-          1. Let _iterator_ be OrdinaryObjectCreate(%SetIteratorPrototype%, &laquo; [[IteratedSet]], [[SetNextIndex]], [[SetIterationKind]] &raquo;).
-          1. Set _iterator_.[[IteratedSet]] to _set_.
-          1. Set _iterator_.[[SetNextIndex]] to 0.
-          1. Set _iterator_.[[SetIterationKind]] to _kind_.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[IteratedSet]]: _set_
+            * [[SetNextIndex]]: 0
+            * [[SetIterationKind]]: _kind_
+          1. Let _iterator_ be OrdinaryObjectCreate(%SetIteratorPrototype%, _internalSlotsRecord_).
           1. Return _iterator_.
         </emu-alg>
       </emu-clause>
@@ -36518,8 +36552,8 @@ THH:mm:ss.sss
         <p>When the `WeakMap` function is called with optional argument _iterable_, the following steps are taken:</p>
         <emu-alg>
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
-          1. Let _map_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%WeakMap.prototype%"*, &laquo; [[WeakMapData]] &raquo;).
-          1. Set _map_.[[WeakMapData]] to a new empty List.
+          1. Let _internalSlotsRecord_ be the Record { [[WeakMapData]]: a new empty List }.
+          1. Let _map_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%WeakMap.prototype%"*, _internalSlotsRecord_).
           1. If _iterable_ is either *undefined* or *null*, return _map_.
           1. Let _adder_ be ? Get(_map_, *"set"*).
           1. Return ? AddEntriesFromIterable(_map_, _iterable_, _adder_).
@@ -36664,8 +36698,8 @@ THH:mm:ss.sss
         <p>When the `WeakSet` function is called with optional argument _iterable_, the following steps are taken:</p>
         <emu-alg>
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
-          1. Let _set_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%WeakSet.prototype%"*, &laquo; [[WeakSetData]] &raquo;).
-          1. Set _set_.[[WeakSetData]] to a new empty List.
+          1. Let _internalSlotsRecord_ be the Record { [[WeakSetData]]: a new empty List }.
+          1. Let _set_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%WeakSet.prototype%"*, _internalSlotsRecord_).
           1. If _iterable_ is either *undefined* or *null*, return _set_.
           1. Let _adder_ be ? Get(_set_, *"add"*).
           1. If IsCallable(_adder_) is *false*, throw a *TypeError* exception.
@@ -36786,11 +36820,13 @@ THH:mm:ss.sss
         <h1>AllocateArrayBuffer ( _constructor_, _byteLength_ )</h1>
         <p>The abstract operation AllocateArrayBuffer with arguments _constructor_ and _byteLength_ is used to create an ArrayBuffer object. It performs the following steps:</p>
         <emu-alg>
-          1. Let _obj_ be ? OrdinaryCreateFromConstructor(_constructor_, *"%ArrayBuffer.prototype%"*, &laquo; [[ArrayBufferData]], [[ArrayBufferByteLength]], [[ArrayBufferDetachKey]] &raquo;).
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[ArrayBufferData]]: _block_
+            * [[ArrayBufferByteLength]]: _byteLength_
+            * [[ArrayBufferDetachKey]]: *undefined*
+          1. Let _obj_ be ? OrdinaryCreateFromConstructor(_constructor_, *"%ArrayBuffer.prototype%"*, _internalSlotsRecord_).
           1. Assert: ! IsNonNegativeInteger(_byteLength_) is *true*.
           1. Let _block_ be ? CreateByteDataBlock(_byteLength_).
-          1. Set _obj_.[[ArrayBufferData]] to _block_.
-          1. Set _obj_.[[ArrayBufferByteLength]] to _byteLength_.
           1. Return _obj_.
         </emu-alg>
       </emu-clause>
@@ -37129,11 +37165,13 @@ THH:mm:ss.sss
         <h1>AllocateSharedArrayBuffer ( _constructor_, _byteLength_ )</h1>
         <p>The abstract operation AllocateSharedArrayBuffer with arguments _constructor_ and _byteLength_ is used to create a SharedArrayBuffer object. It performs the following steps:</p>
         <emu-alg>
-          1. Let _obj_ be ? OrdinaryCreateFromConstructor(_constructor_, *"%SharedArrayBuffer.prototype%"*, &laquo; [[ArrayBufferData]], [[ArrayBufferByteLength]] &raquo;).
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[ArrayBufferData]]: *undefined*
+            * [[ArrayBufferByteLength]]: _byteLength_
+          1. Let _obj_ be ? OrdinaryCreateFromConstructor(_constructor_, *"%SharedArrayBuffer.prototype%"*, _internalSlotsRecord_).
           1. Assert: ! IsNonNegativeInteger(_byteLength_) is *true*.
           1. Let _block_ be ? CreateSharedByteDataBlock(_byteLength_).
           1. Set _obj_.[[ArrayBufferData]] to _block_.
-          1. Set _obj_.[[ArrayBufferByteLength]] to _byteLength_.
           1. Return _obj_.
         </emu-alg>
       </emu-clause>
@@ -37345,11 +37383,13 @@ THH:mm:ss.sss
           1. Else,
             1. Let _viewByteLength_ be ? ToIndex(_byteLength_).
             1. If _offset_ + _viewByteLength_ &gt; _bufferByteLength_, throw a *RangeError* exception.
-          1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%DataView.prototype%"*, &laquo; [[DataView]], [[ViewedArrayBuffer]], [[ByteLength]], [[ByteOffset]] &raquo;).
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[DataView]]: *undefined*
+            * [[ViewedArrayBuffer]]: _buffer_
+            * [[ByteLength]]: _viewByteLength_
+            * [[ByteOffset]]: _offset_
+          1. Let _O_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%DataView.prototype%"*, _internalSlotsRecord_).
           1. If IsDetachedBuffer(_buffer_) is *true*, throw a *TypeError* exception.
-          1. Set _O_.[[ViewedArrayBuffer]] to _buffer_.
-          1. Set _O_.[[ByteLength]] to _viewByteLength_.
-          1. Set _O_.[[ByteOffset]] to _offset_.
           1. Return _O_.
         </emu-alg>
       </emu-clause>
@@ -38731,8 +38771,8 @@ THH:mm:ss.sss
         <h1>CreateAsyncFromSyncIterator ( _syncIteratorRecord_ )</h1>
         <p>The abstract operation CreateAsyncFromSyncIterator is used to create an async iterator Record from a synchronous iterator Record. It performs the following steps:</p>
         <emu-alg>
-          1. Let _asyncIterator_ be ! OrdinaryObjectCreate(%AsyncFromSyncIteratorPrototype%, &laquo; [[SyncIteratorRecord]] &raquo;).
-          1. Set _asyncIterator_.[[SyncIteratorRecord]] to _syncIteratorRecord_.
+          1. Let _internalSlotsRecord_ be the Record { [[SyncIteratorRecord]]: _syncIteratorRecord_ }.
+          1. Let _asyncIterator_ be ! OrdinaryObjectCreate(%AsyncFromSyncIteratorPrototype%, _internalSlotsRecord_).
           1. Let _nextMethod_ be ! Get(_asyncIterator_, *"next"*).
           1. Let _iteratorRecord_ be the Record { [[Iterator]]: _asyncIterator_, [[NextMethod]]: _nextMethod_, [[Done]]: *false* }.
           1. Return _iteratorRecord_.
@@ -38861,8 +38901,7 @@ THH:mm:ss.sss
           1. Let _valueWrapper_ be PromiseResolve(%Promise%, _value_).
           1. IfAbruptRejectPromise(_valueWrapper_, _promiseCapability_).
           1. Let _steps_ be the algorithm steps defined in <emu-xref href="#sec-async-from-sync-iterator-value-unwrap-functions" title></emu-xref>.
-          1. Let _onFulfilled_ be ! CreateBuiltinFunction(_steps_, &laquo; [[Done]] &raquo;).
-          1. Set _onFulfilled_.[[Done]] to _done_.
+          1. Let _onFulfilled_ be ! CreateBuiltinFunction(_steps_, Record { [[Done]]: _done_ }).
           1. Perform ! PerformPromiseThen(_valueWrapper_, _onFulfilled_, *undefined*, _promiseCapability_).
           1. Return _promiseCapability_.[[Promise]].
         </emu-alg>
@@ -39485,11 +39524,9 @@ THH:mm:ss.sss
                 1. Set _generator_.[[AsyncGeneratorState]] to ~awaiting-return~.
                 1. Let _promise_ be ? PromiseResolve(%Promise%, _completion_.[[Value]]).
                 1. Let _stepsFulfilled_ be the algorithm steps defined in <emu-xref href="#async-generator-resume-next-return-processor-fulfilled" title></emu-xref>.
-                1. Let _onFulfilled_ be ! CreateBuiltinFunction(_stepsFulfilled_, &laquo; [[Generator]] &raquo;).
-                1. Set _onFulfilled_.[[Generator]] to _generator_.
+                1. Let _onFulfilled_ be ! CreateBuiltinFunction(_stepsFulfilled_, Record { [[Generator]]: _generator_ }).
                 1. Let _stepsRejected_ be the algorithm steps defined in <emu-xref href="#async-generator-resume-next-return-processor-rejected" title></emu-xref>.
-                1. Let _onRejected_ be ! CreateBuiltinFunction(_stepsRejected_, &laquo; [[Generator]] &raquo;).
-                1. Set _onRejected_.[[Generator]] to _generator_.
+                1. Let _onRejected_ be ! CreateBuiltinFunction(_stepsRejected_, Record { [[Generator]]: _generator_ }).
                 1. Perform ! PerformPromiseThen(_promise_, _onFulfilled_, _onRejected_).
                 1. Return *undefined*.
               1. Else,
@@ -39740,13 +39777,15 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _alreadyResolved_ be the Record { [[Value]]: *false* }.
           1. Let _stepsResolve_ be the algorithm steps defined in <emu-xref href="#sec-promise-resolve-functions" title></emu-xref>.
-          1. Let _resolve_ be ! CreateBuiltinFunction(_stepsResolve_, &laquo; [[Promise]], [[AlreadyResolved]] &raquo;).
-          1. Set _resolve_.[[Promise]] to _promise_.
-          1. Set _resolve_.[[AlreadyResolved]] to _alreadyResolved_.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[Promise]]: _promise_
+            * [[AlreadyResolved]]: _alreadyResolved_
+          1. Let _resolve_ be ! CreateBuiltinFunction(_stepsResolve_, _internalSlotsRecord_).
           1. Let _stepsReject_ be the algorithm steps defined in <emu-xref href="#sec-promise-reject-functions" title></emu-xref>.
-          1. Let _reject_ be ! CreateBuiltinFunction(_stepsReject_, &laquo; [[Promise]], [[AlreadyResolved]] &raquo;).
-          1. Set _reject_.[[Promise]] to _promise_.
-          1. Set _reject_.[[AlreadyResolved]] to _alreadyResolved_.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[Promise]]: _promise_
+            * [[AlreadyResolved]]: _alreadyResolved_
+          1. Let _reject_ be ! CreateBuiltinFunction(_stepsReject_, _internalSlotsRecord_).
           1. Return the Record { [[Resolve]]: _resolve_, [[Reject]]: _reject_ }.
         </emu-alg>
 
@@ -39817,8 +39856,8 @@ THH:mm:ss.sss
           1. NOTE: _C_ is assumed to be a constructor function that supports the parameter conventions of the `Promise` constructor (see <emu-xref href="#sec-promise-executor"></emu-xref>).
           1. Let _promiseCapability_ be the PromiseCapability { [[Promise]]: *undefined*, [[Resolve]]: *undefined*, [[Reject]]: *undefined* }.
           1. Let _steps_ be the algorithm steps defined in <emu-xref href="#sec-getcapabilitiesexecutor-functions" title></emu-xref>.
-          1. Let _executor_ be ! CreateBuiltinFunction(_steps_, &laquo; [[Capability]] &raquo;).
-          1. Set _executor_.[[Capability]] to _promiseCapability_.
+          1. Let _internalSlotsRecord_ be the Record { [[Capability]]: _promiseCapability_ }.
+          1. Let _executor_ be ! CreateBuiltinFunction(_steps_, _internalSlotsRecord_).
           1. Let _promise_ be ? Construct(_C_, &laquo; _executor_ &raquo;).
           1. If IsCallable(_promiseCapability_.[[Resolve]]) is *false*, throw a *TypeError* exception.
           1. If IsCallable(_promiseCapability_.[[Reject]]) is *false*, throw a *TypeError* exception.
@@ -39968,11 +40007,13 @@ THH:mm:ss.sss
         <emu-alg>
           1. If NewTarget is *undefined*, throw a *TypeError* exception.
           1. If IsCallable(_executor_) is *false*, throw a *TypeError* exception.
-          1. Let _promise_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Promise.prototype%"*, &laquo; [[PromiseState]], [[PromiseResult]], [[PromiseFulfillReactions]], [[PromiseRejectReactions]], [[PromiseIsHandled]] &raquo;).
-          1. Set _promise_.[[PromiseState]] to ~pending~.
-          1. Set _promise_.[[PromiseFulfillReactions]] to a new empty List.
-          1. Set _promise_.[[PromiseRejectReactions]] to a new empty List.
-          1. Set _promise_.[[PromiseIsHandled]] to *false*.
+          1. Let _internalSlotsRecord_ be the Record with the following fields:
+            * [[PromiseState]]: ~pending~
+            * [[PromiseResult]]: *undefined*
+            * [[PromiseFulfillReactions]]: a new empty List
+            * [[PromiseRejectReactions]]: a new empty List
+            * [[PromiseIsHandled]]: *false*
+          1. Let _promise_ be ? OrdinaryCreateFromConstructor(NewTarget, *"%Promise.prototype%"*, _internalSlotsRecord_).
           1. Let _resolvingFunctions_ be CreateResolvingFunctions(_promise_).
           1. Let _completion_ be Call(_executor_, *undefined*, &laquo; _resolvingFunctions_.[[Resolve]], _resolvingFunctions_.[[Reject]] &raquo;).
           1. If _completion_ is an abrupt completion, then
@@ -40043,12 +40084,13 @@ THH:mm:ss.sss
               1. Append *undefined* to _values_.
               1. Let _nextPromise_ be ? Call(_promiseResolve_, _constructor_, &laquo; _nextValue_ &raquo;).
               1. Let _steps_ be the algorithm steps defined in <emu-xref href="#sec-promise.all-resolve-element-functions" title></emu-xref>.
-              1. Let _resolveElement_ be ! CreateBuiltinFunction(_steps_, &laquo; [[AlreadyCalled]], [[Index]], [[Values]], [[Capability]], [[RemainingElements]] &raquo;).
-              1. Set _resolveElement_.[[AlreadyCalled]] to the Record { [[Value]]: *false* }.
-              1. Set _resolveElement_.[[Index]] to _index_.
-              1. Set _resolveElement_.[[Values]] to _values_.
-              1. Set _resolveElement_.[[Capability]] to _resultCapability_.
-              1. Set _resolveElement_.[[RemainingElements]] to _remainingElementsCount_.
+              1. Let _internalSlotsRecord_ be the Record with the following fields:
+                * [[AlreadyCalled]]: the Record { [[Value]]: *false* }
+                * [[Index]]: _index_
+                * [[Values]]: _values_
+                * [[Capability]]: _resultCapability_
+                * [[RemainingElements]]: _remainingElementsCount_
+              1. Let _resolveElement_ be ! CreateBuiltinFunction(_steps_, _internalSlotsRecord_).
               1. Set _remainingElementsCount_.[[Value]] to _remainingElementsCount_.[[Value]] + 1.
               1. Perform ? Invoke(_nextPromise_, *"then"*, &laquo; _resolveElement_, _resultCapability_.[[Reject]] &raquo;).
               1. Set _index_ to _index_ + 1.
@@ -40125,20 +40167,22 @@ THH:mm:ss.sss
               1. Append *undefined* to _values_.
               1. Let _nextPromise_ be ? Call(_promiseResolve_, _constructor_, &laquo; _nextValue_ &raquo;).
               1. Let _steps_ be the algorithm steps defined in <emu-xref href="#sec-promise.allsettled-resolve-element-functions" title></emu-xref>.
-              1. Let _resolveElement_ be ! CreateBuiltinFunction(_steps_, &laquo; [[AlreadyCalled]], [[Index]], [[Values]], [[Capability]], [[RemainingElements]] &raquo;).
               1. Let _alreadyCalled_ be the Record { [[Value]]: *false* }.
-              1. Set _resolveElement_.[[AlreadyCalled]] to _alreadyCalled_.
-              1. Set _resolveElement_.[[Index]] to _index_.
-              1. Set _resolveElement_.[[Values]] to _values_.
-              1. Set _resolveElement_.[[Capability]] to _resultCapability_.
-              1. Set _resolveElement_.[[RemainingElements]] to _remainingElementsCount_.
+              1. Let _internalSlotsRecord_ be the Record with the following fields:
+                * [[AlreadyCalled]]: _alreadyCalled_
+                * [[Index]]: _index_
+                * [[Values]]: _values_
+                * [[Capability]]: _resultCapability_
+                * [[RemainingElements]]: _remainingElementsCount_
+              1. Let _resolveElement_ be ! CreateBuiltinFunction(_steps_, _internalSlotsRecord_).
               1. Let _rejectSteps_ be the algorithm steps defined in <emu-xref href="#sec-promise.allsettled-reject-element-functions" title></emu-xref>.
-              1. Let _rejectElement_ be ! CreateBuiltinFunction(_rejectSteps_, &laquo; [[AlreadyCalled]], [[Index]], [[Values]], [[Capability]], [[RemainingElements]] &raquo;).
-              1. Set _rejectElement_.[[AlreadyCalled]] to _alreadyCalled_.
-              1. Set _rejectElement_.[[Index]] to _index_.
-              1. Set _rejectElement_.[[Values]] to _values_.
-              1. Set _rejectElement_.[[Capability]] to _resultCapability_.
-              1. Set _rejectElement_.[[RemainingElements]] to _remainingElementsCount_.
+              1. Let _internalSlotsRecord_ be the Record with the following fields:
+                * [[AlreadyCalled]]: _alreadyCalled_
+                * [[Index]]: _index_
+                * [[Values]]: _values_
+                * [[Capability]]: _resultCapability_
+                * [[RemainingElements]]: _remainingElementsCount_
+              1. Let _rejectElement_ be ! CreateBuiltinFunction(_rejectSteps_, _internalSlotsRecord_).
               1. Set _remainingElementsCount_.[[Value]] to _remainingElementsCount_.[[Value]] + 1.
               1. Perform ? Invoke(_nextPromise_, *"then"*, &laquo; _resolveElement_, _rejectElement_ &raquo;).
               1. Set _index_ to _index_ + 1.
@@ -40342,13 +40386,15 @@ THH:mm:ss.sss
             1. Let _catchFinally_ be _onFinally_.
           1. Else,
             1. Let _stepsThenFinally_ be the algorithm steps defined in <emu-xref href="#sec-thenfinallyfunctions" title></emu-xref>.
-            1. Let _thenFinally_ be ! CreateBuiltinFunction(_stepsThenFinally_, &laquo; [[Constructor]], [[OnFinally]] &raquo;).
-            1. Set _thenFinally_.[[Constructor]] to _C_.
-            1. Set _thenFinally_.[[OnFinally]] to _onFinally_.
+            1. Let _internalSlotsRecord_ be the Record with the following fields:
+              * [[Constructor]]: _C_
+              * [[OnFinally]]: _onFinally_
+            1. Let _thenFinally_ be ! CreateBuiltinFunction(_stepsThenFinally_, _internalSlotsRecord_).
             1. Let _stepsCatchFinally_ be the algorithm steps defined in <emu-xref href="#sec-catchfinallyfunctions" title></emu-xref>.
-            1. Let _catchFinally_ be ! CreateBuiltinFunction(_stepsCatchFinally_, &laquo; [[Constructor]], [[OnFinally]] &raquo;).
-            1. Set _catchFinally_.[[Constructor]] to _C_.
-            1. Set _catchFinally_.[[OnFinally]] to _onFinally_.
+            1. Let _internalSlotsRecord_ be the Record with the following fields:
+              * [[Constructor]]: _C_
+              * [[OnFinally]]: _onFinally_
+            1. Let _catchFinally_ be ! CreateBuiltinFunction(_stepsCatchFinally_, _internalSlotsRecord_).
           1. Return ? Invoke(_promise_, *"then"*, &laquo; _thenFinally_, _catchFinally_ &raquo;).
         </emu-alg>
 
@@ -40824,8 +40870,8 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _p_ be ? ProxyCreate(_target_, _handler_).
           1. Let _steps_ be the algorithm steps defined in <emu-xref href="#sec-proxy-revocation-functions" title></emu-xref>.
-          1. Let _revoker_ be ! CreateBuiltinFunction(_steps_, &laquo; [[RevocableProxy]] &raquo;).
-          1. Set _revoker_.[[RevocableProxy]] to _p_.
+          1. Let _internalSlotsRecord_ be the Record { [[RevocableProxy]]: _p_ }.
+          1. Let _revoker_ be ! CreateBuiltinFunction(_steps_, _internalSlotsRecord_).
           1. Let _result_ be OrdinaryObjectCreate(%Object.prototype%).
           1. Perform ! CreateDataPropertyOrThrow(_result_, *"proxy"*, _p_).
           1. Perform ! CreateDataPropertyOrThrow(_result_, *"revoke"*, _revoker_).
