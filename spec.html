@@ -11598,7 +11598,60 @@
     <p>The behaviour specified for each built-in function via algorithm steps or other means is the specification of the function body behaviour for both [[Call]] and [[Construct]] invocations of the function. However, [[Construct]] invocation is not supported by all built-in functions. For each built-in function, when invoked with [[Call]], the [[Call]] _thisArgument_ provides the *this* value, the [[Call]] _argumentsList_ provides the named parameters, and the NewTarget value is *undefined*. When invoked with [[Construct]], the *this* value is uninitialized, the [[Construct]] _argumentsList_ provides the named parameters, and the [[Construct]] _newTarget_ parameter provides the NewTarget value. If the built-in function is implemented as an ECMAScript function object then this specified behaviour must be implemented by the ECMAScript code that is the body of the function. Built-in functions that are ECMAScript function objects must be strict functions. If a built-in constructor has any [[Call]] behaviour other than throwing a *TypeError* exception, an ECMAScript implementation of the function must be done in a manner that does not cause the function's [[IsClassConstructor]] internal slot to have the value *true*.</p>
     <p>Built-in function objects that are not identified as constructors do not implement the [[Construct]] internal method unless otherwise specified in the description of a particular function. When a built-in constructor is called as part of a `new` expression the _argumentsList_ parameter of the invoked [[Construct]] internal method provides the values for the built-in constructor's named parameters.</p>
     <p>Built-in functions that are not constructors do not have a *"prototype"* property unless otherwise specified in the description of a particular function.</p>
-    <p>Built-in functions have an [[InitialName]] internal slot.</p>
+
+    <p>In addition to [[Extensible]] and [[Prototype]], ECMAScript function objects also have the internal slots listed in <emu-xref href="#table-internal-slots-of-built-in-function-objects"></emu-xref>.</p>
+    <emu-table id="table-internal-slots-of-built-in-function-objects" caption="Internal Slots of Built-in Function Objects">
+      <table>
+        <tbody>
+          <tr>
+            <th>
+              Internal Slot
+            </th>
+            <th>
+              Type
+            </th>
+            <th>
+              Description
+            </th>
+          </tr>
+          <tr>
+            <td>
+              [[Realm]]
+            </td>
+            <td>
+              Realm Record
+            </td>
+            <td>
+              The realm in which the function was created and which provides any intrinsic objects that are accessed when evaluating the function.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              [[ScriptOrModule]]
+            </td>
+            <td>
+              Null
+            </td>
+            <td>
+              The script or module in which the function was created.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              [[InitialName]]
+            </td>
+            <td>
+              String
+            </td>
+            <td>
+              The initial name of the built-in function object. Used by <emu-xref href="#sec-function.prototype.tostring"></emu-xref>.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </emu-table>
+    <p>If a built-in function object is implemented as an ECMAScript function it must also have the internal slots listed in <emu-xref href="#table-internal-slots-of-ecmascript-function-objects"></emu-xref>.</p>
+
     <p>If a built-in function object is not implemented as an ECMAScript function it must provide [[Call]] and [[Construct]] internal methods that conform to the following definitions:</p>
 
     <emu-clause id="sec-built-in-function-objects-call-thisargument-argumentslist">
@@ -11632,16 +11685,15 @@
     </emu-clause>
 
     <emu-clause id="sec-createbuiltinfunction" aoid="CreateBuiltinFunction">
-      <h1>CreateBuiltinFunction ( _steps_, _length_, _name_, _additionalInternalSlotsList_ [ , _realm_ [ , _prototype_ [ , _prefix_ ] ] ] )</h1>
-      <p>The abstract operation CreateBuiltinFunction takes arguments _steps_, _length_, _name_, and _additionalInternalSlotsList_ (a List of names of internal slots) and optional arguments _realm_, _prototype_, and _prefix_. _additionalInternalSlotsList_ contains the names of additional internal slots that must be defined as part of the object. This operation creates a built-in function object. It performs the following steps when called:</p>
+      <h1>CreateBuiltinFunction ( _steps_, _length_, _name_ [ , _additionalInternalSlotsList_ [ , _realm_ [ , _prototype_ [ , _prefix_ ] ] ] ] )</h1>
+      <p>The abstract operation CreateBuiltinFunction takes arguments _steps_, _length_, _name_, and optional arguments _additionalInternalSlotsList_ (a List of names of internal slots), _realm_, _prototype_, and _prefix_. _additionalInternalSlotsList_ contains the names of additional internal slots that must be defined as part of the object. This operation creates a built-in function object. It performs the following steps when called:</p>
       <emu-alg>
         1. Assert: _steps_ is either a set of algorithm steps or other definition of a function's behaviour provided in this specification.
         1. If _realm_ is not present or _realm_ is ~empty~, set _realm_ to the current Realm Record.
         1. Assert: _realm_ is a Realm Record.
         1. If _prototype_ is not present, set _prototype_ to _realm_.[[Intrinsics]].[[%Function.prototype%]].
-        1. Let _internalSlotsList_ be the internal slots specified in <emu-xref href="#sec-built-in-function-objects"></emu-xref>.
-        1. Append [[InitialName]] to _internalSlotsList_.
-        1. Append each element of _additionalInternalSlotsList_ to _internalSlotsList_.
+        1. Let _internalSlotsList_ be &laquo; [[Prototype]], [[Extensible]] &raquo; and the internal slots specified in <emu-xref href="#table-internal-slots-of-built-in-function-objects"></emu-xref>.
+        1. If _additionalInternalSlotsList_ is present, append each of its elements to _internalSlotsList_.
         1. Let _func_ be a new built-in function object that when called performs the action described by _steps_. The new function object has internal slots whose names are the elements of _internalSlotsList_.
         1. Set _func_.[[Extensible]] to *true*.
         1. Set _func_.[[Prototype]] to _prototype_.
