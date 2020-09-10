@@ -11692,7 +11692,7 @@
         1. If _realm_ is not present or _realm_ is ~empty~, set _realm_ to the current Realm Record.
         1. Assert: _realm_ is a Realm Record.
         1. If _prototype_ is not present, set _prototype_ to _realm_.[[Intrinsics]].[[%Function.prototype%]].
-        1. Let _internalSlotsList_ be &laquo; [[Prototype]], [[Extensible]] &raquo; and the internal slots specified in <emu-xref href="#table-internal-slots-of-built-in-function-objects"></emu-xref>.
+        1. Let _internalSlotsList_ be &laquo; [[Prototype]], [[Extensible]] &raquo; and the internal slots specified in <emu-xref href="#table-internal-slots-of-built-in-function-objects"></emu-xref> or <emu-xref href="#table-internal-slots-of-ecmascript-function-objects"></emu-xref> and &laquo; [[InitialName]] &raquo;, as appropriate.
         1. If _additionalInternalSlotsList_ is present, append each of its elements to _internalSlotsList_.
         1. Let _func_ be a new built-in function object that when called performs the action described by _steps_. The new function object has internal slots whose names are the elements of _internalSlotsList_.
         1. Set _func_.[[Extensible]] to *true*.
