@@ -11599,7 +11599,7 @@
     <p>Built-in function objects that are not identified as constructors do not implement the [[Construct]] internal method unless otherwise specified in the description of a particular function. When a built-in constructor is called as part of a `new` expression the _argumentsList_ parameter of the invoked [[Construct]] internal method provides the values for the built-in constructor's named parameters.</p>
     <p>Built-in functions that are not constructors do not have a *"prototype"* property unless otherwise specified in the description of a particular function.</p>
 
-    <p>In addition to [[Extensible]] and [[Prototype]], ECMAScript function objects also have the internal slots listed in <emu-xref href="#table-internal-slots-of-built-in-function-objects"></emu-xref>.</p>
+    <p>In addition to [[Extensible]] and [[Prototype]], built-in function objects also have the internal slots listed in <emu-xref href="#table-internal-slots-of-built-in-function-objects"></emu-xref>.</p>
     <emu-table id="table-internal-slots-of-built-in-function-objects" caption="Internal Slots of Built-in Function Objects">
       <table>
         <tbody>
@@ -11692,7 +11692,7 @@
         1. If _realm_ is not present or _realm_ is ~empty~, set _realm_ to the current Realm Record.
         1. Assert: _realm_ is a Realm Record.
         1. If _prototype_ is not present, set _prototype_ to _realm_.[[Intrinsics]].[[%Function.prototype%]].
-        1. Let _internalSlotsList_ be &laquo; [[Prototype]], [[Extensible]] &raquo; and the internal slots specified in <emu-xref href="#table-internal-slots-of-built-in-function-objects"></emu-xref> or <emu-xref href="#table-internal-slots-of-ecmascript-function-objects"></emu-xref> and &laquo; [[InitialName]] &raquo;, as appropriate.
+        1. Let _internalSlotsList_ be a List containing [[Prototype]], [[Extensible]], and the internal slots specified in <emu-xref href="#table-internal-slots-of-ecmascript-function-objects"></emu-xref> and [[InitialName]], or the internal slots specified in <emu-xref href="#table-internal-slots-of-built-in-function-objects"></emu-xref>, as appropriate.
         1. If _additionalInternalSlotsList_ is present, append each of its elements to _internalSlotsList_.
         1. Let _func_ be a new built-in function object that when called performs the action described by _steps_. The new function object has internal slots whose names are the elements of _internalSlotsList_.
         1. Set _func_.[[Extensible]] to *true*.
