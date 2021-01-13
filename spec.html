@@ -1848,14 +1848,30 @@
           <p>The abstract operation NumberBitwiseOp takes arguments _op_ (a sequence of Unicode code points), _x_, and _y_. It performs the following steps when called:</p>
           <emu-alg>
             1. Assert: _op_ is `&amp;`, `^`, or `|`.
-            1. Let _lnum_ be ! ToInt32(_x_).
-            1. Let _rnum_ be ! ToInt32(_y_).
-            1. Let _lbits_ be the 32-bit two's complement bit string representing ℝ(_lnum_).
-            1. Let _rbits_ be the 32-bit two's complement bit string representing ℝ(_rnum_).
+            1. Let _lbits_ be ! NumberToInt32Bits(_x_).
+            1. Let _rbits_ be ! NumberToInt32Bits(_y_).
             1. If _op_ is `&amp;`, let _result_ be the result of applying the bitwise AND operation to _lbits_ and _rbits_.
             1. Else if _op_ is `^`, let _result_ be the result of applying the bitwise exclusive OR (XOR) operation to _lbits_ and _rbits_.
             1. Else, _op_ is `|`. Let _result_ be the result of applying the bitwise inclusive OR operation to _lbits_ and _rbits_.
-            1. Return the Number value for the integer represented by the 32-bit two's complement bit string _result_.
+            1. Return ! Int32BitsToNumber(_result_).
+          </emu-alg>
+        </emu-clause>
+
+        <emu-clause id="sec-numbertoint32bits" aoid="NumberToInt32Bits">
+          <h1>NumberToInt32Bits ( _number_ )</h1>
+          <p>The abstract operation NumberToInt32Bits takes argument _number_ (a Number). It performs the following steps when called:</p>
+          <emu-alg>
+            1. Let _n_ be ! ToInt32(_number_).
+            1. Return the 32-bit two's complement bit string representing ℝ(_n_).
+          </emu-alg>
+        </emu-clause>
+
+        <emu-clause id="sec-int32bitstonumber" aoid="Int32BitsToNumber">
+          <h1>Int32BitsToNumber ( _bits_ )</h1>
+          <p>The abstract operation Int32BitsToNumber takes argument _bits_ (a 32-bit bit string). It performs the following steps when called:</p>
+          <emu-alg>
+            1. Let _i_ be the result of interpreting _bits_ as a 32-bit two's complement signed integer.
+            1. Return 𝔽(_i_).
           </emu-alg>
         </emu-clause>
 
