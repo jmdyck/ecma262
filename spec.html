@@ -8744,22 +8744,108 @@
                 [[Bindings]]
               </td>
               <td>
-                List of bindings
+                List of DeclarativeBindingRecord
               </td>
               <td>
-                Satisfies the invariant that no two bindings in [[Bindings]] are bindings for the same name.
+                Satisfies the invariant that no two records in [[Bindings]] have the same [[BoundName]].
               </td>
             </tr>
             </tbody>
           </table>
         </emu-table>
+
+        <p>A <dfn>DeclarativeBindingRecord</dfn> has the following fields:</p>
+        <emu-table id="table-fields-of-declarative-binding-records" caption="DeclarativeBindingRecord Fields">
+          <table>
+            <tbody>
+            <tr>
+              <th>
+                Field Name
+              </th>
+              <th>
+                Value
+              </th>
+              <th>
+                Meaning
+              </th>
+            </tr>
+            <tr>
+              <td>
+                [[BoundName]]
+              </td>
+              <td>
+                a String
+              </td>
+              <td>
+                the name being bound.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[IsInitialized]]
+              </td>
+              <td>
+                a Boolean
+              </td>
+              <td>
+                indicates whether the binding is initialized.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[BoundValue]]
+              </td>
+              <td>
+                an ECMAScript language value
+              </td>
+              <td>
+                the value that the name is bound to.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[IsMutable]]
+              </td>
+              <td>
+                a Boolean
+              </td>
+              <td>
+                if *true*, indicates that the binding is mutable.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[IsDeletable]]
+              </td>
+              <td>
+                a Boolean
+              </td>
+              <td>
+                if *true*, indicates that the binding may be deleted by a subsequent DeleteBinding call.
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[IsStrict]]
+              </td>
+              <td>
+                a Boolean
+              </td>
+              <td>
+                if *true*, indicates that the binding is a strict binding.
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </emu-table>
+
         <p>The behaviour of the concrete specification methods for declarative Environment Records is defined by the following algorithms.</p>
 
         <emu-clause id="sec-declarative-environment-records-hasbinding-n">
           <h1>HasBinding ( _N_ )</h1>
           <p>The HasBinding concrete method of a declarative Environment Record _envRec_ takes argument _N_ (a String). It determines if the argument identifier is one of the identifiers bound by the record. It performs the following steps when called:</p>
           <emu-alg>
-            1. If _envRec_.[[Bindings]] contains a binding for the name that is the value of _N_, return *true*.
+            1. If _envRec_.[[Bindings]] contains a DeclarativeBindingRecord whose [[BoundName]] field is equal to the value of _N_, return *true*.
             1. Return *false*.
           </emu-alg>
         </emu-clause>
@@ -8769,7 +8855,7 @@
           <p>The CreateMutableBinding concrete method of a declarative Environment Record _envRec_ takes arguments _N_ (a String) and _D_ (a Boolean). It creates a new mutable binding for the name _N_ that is uninitialized. A binding must not already exist in this Environment Record for _N_. If _D_ has the value *true*, the new binding is marked as being subject to deletion. It performs the following steps when called:</p>
           <emu-alg>
             1. Assert: _envRec_.HasBinding(_N_) is *false*.
-            1. Let _binding_ be a mutable binding for _N_ and record that it is uninitialized. If _D_ is *true*, record that the newly created binding may be deleted by a subsequent DeleteBinding call.
+            1. Let _binding_ be DeclarativeBindingRecord { [[BoundName]]: _N_, [[IsInitialized]]: *false*, [[BoundValue]]: *undefined*, [[IsMutable]]: *true*, [[IsDeletable]]: _D_, [[IsStrict]]: *false* }.
             1. Append _binding_ to _envRec_.[[Bindings]].
             1. Return NormalCompletion(~empty~).
           </emu-alg>
@@ -8780,7 +8866,7 @@
           <p>The CreateImmutableBinding concrete method of a declarative Environment Record _envRec_ takes arguments _N_ (a String) and _S_ (a Boolean). It creates a new immutable binding for the name _N_ that is uninitialized. A binding must not already exist in this Environment Record for _N_. If _S_ has the value *true*, the new binding is marked as a strict binding. It performs the following steps when called:</p>
           <emu-alg>
             1. Assert: _envRec_.HasBinding(_N_) is *false*.
-            1. Let _binding_ be an immutable binding for _N_ and record that it is uninitialized. If _S_ is *true*, record that the newly created binding is a strict binding.
+            1. Let _binding_ be DeclarativeBindingRecord { [[BoundName]]: _N_, [[IsInitialized]]: *false*, [[BoundValue]]: *undefined*, [[IsMutable]]: *false*, [[IsDeletable]]: *false*, [[IsStrict]]: _S_ }.
             1. Append _binding_ to _envRec_.[[Bindings]].
             1. Return NormalCompletion(~empty~).
           </emu-alg>
@@ -8791,10 +8877,10 @@
           <p>The InitializeBinding concrete method of a declarative Environment Record _envRec_ takes arguments _N_ (a String) and _V_ (an ECMAScript language value). It is used to set the bound value of the current binding of the identifier whose name is the value of the argument _N_ to the value of argument _V_. An uninitialized binding for _N_ must already exist. It performs the following steps when called:</p>
           <emu-alg>
             1. Assert: _envRec_.HasBinding(_N_) is *true*.
-            1. Let _binding_ be the binding for _N_ in _envRec_.[[Bindings]].
-            1. Assert: _binding_ is uninitialized.
-            1. Set the bound value of _binding_ to _V_.
-            1. <emu-not-ref>Record</emu-not-ref> that _binding_ has been initialized.
+            1. Let _binding_ be the DeclarativeBindingRecord in _envRec_.[[Bindings]] whose [[BoundName]] field equals _N_.
+            1. Assert: _binding_.[[IsInitialized]] is *false*.
+            1. Set _binding_.[[BoundValue]] to _V_.
+            1. Set _binding_.[[IsInitialized]] to *true*.
             1. Return NormalCompletion(~empty~).
           </emu-alg>
         </emu-clause>
@@ -8808,10 +8894,10 @@
               1. Perform _envRec_.CreateMutableBinding(_N_, *true*).
               1. Perform _envRec_.InitializeBinding(_N_, _V_).
               1. Return NormalCompletion(~empty~).
-            1. Let _binding_ be the binding for _N_ in _envRec_.[[Bindings]].
-            1. If _binding_ is a strict binding, set _S_ to *true*.
-            1. If _binding_ has not yet been initialized, throw a *ReferenceError* exception.
-            1. Else if _binding_ is a mutable binding, change its bound value to _V_.
+            1. Let _binding_ be the DeclarativeBindingRecord in _envRec_.[[Bindings]] whose [[BoundName]] field equals _N_.
+            1. If _binding_.[[IsStrict]] is *true*, set _S_ to *true*.
+            1. If _binding_.[[IsInitialized]] is *false*, throw a *ReferenceError* exception.
+            1. Else if _binding_.[[IsMutable]] is *true*, change its bound value to _V_.
             1. Else,
               1. Assert: This is an attempt to change the value of an immutable binding.
               1. If _S_ is *true*, throw a *TypeError* exception.
@@ -8828,9 +8914,9 @@
           <p>The GetBindingValue concrete method of a declarative Environment Record _envRec_ takes arguments _N_ (a String) and _S_ (a Boolean). It returns the value of its bound identifier whose name is the value of the argument _N_. If the binding exists but is uninitialized a *ReferenceError* is thrown, regardless of the value of _S_. It performs the following steps when called:</p>
           <emu-alg>
             1. Assert: _envRec_.HasBinding(_N_) is *true*.
-            1. Let _binding_ be the binding for _N_ in _envRec_.[[Bindings]].
-            1. If _binding_ is an uninitialized binding, throw a *ReferenceError* exception.
-            1. Return the value currently bound in _binding_.
+            1. Let _binding_ be the DeclarativeBindingRecord in _envRec_.[[Bindings]] whose [[BoundName]] field equals _N_.
+            1. If _binding_.[[IsInitialized]] is *false*, throw a *ReferenceError* exception.
+            1. Return _binding_.[[BoundValue]].
           </emu-alg>
         </emu-clause>
 
@@ -8839,8 +8925,8 @@
           <p>The DeleteBinding concrete method of a declarative Environment Record _envRec_ takes argument _N_ (a String). It can only delete bindings that have been explicitly designated as being subject to deletion. It performs the following steps when called:</p>
           <emu-alg>
             1. Assert: _envRec_.HasBinding(_N_) is *true*.
-            1. Let _binding_ be the binding for _N_ in _envRec_.[[Bindings]].
-            1. If _binding_ cannot be deleted, return *false*.
+            1. Let _binding_ be the DeclarativeBindingRecord in _envRec_.[[Bindings]] whose [[BoundName]] field equals _N_.
+            1. If _binding_.[[IsDeletable]] is *false*, return *false*.
             1. Remove _binding_ from _envRec_.[[Bindings]].
             1. Return *true*.
           </emu-alg>
@@ -9598,6 +9684,46 @@
             </tbody>
           </table>
         </emu-table>
+        <p>The [[Bindings]] of a Module Environment Record can include ImportDeclarativeBindingRecords. These have all the fields of DeclarativeBindingRecords, plus the additional state fields listed in the following table.</p>
+        <emu-table id="table-additional-fields-of-importdeclarativebindingrecords" caption="Additional Fields of ImportDeclarativeBindingRecords">
+          <table>
+            <tbody>
+            <tr>
+              <th>
+                Field Name
+              </th>
+              <th>
+                Value
+              </th>
+              <th>
+                Meaning
+              </th>
+            </tr>
+            <tr>
+              <td>
+                [[TargetModuleRec]]
+              </td>
+              <td>
+                a Module Record
+              </td>
+              <td>
+                ?
+              </td>
+            </tr>
+            <tr>
+              <td>
+                [[TargetName]]
+              </td>
+              <td>
+                a String
+              </td>
+              <td>
+                the name of a binding that exists in [[TargetModuleRec]]'s module Environment Record.
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </emu-table>
         <p>The behaviour of the additional concrete specification methods for module Environment Records are defined by the following algorithms:</p>
 
         <emu-clause id="sec-module-environment-records-getbindingvalue-n-s">
@@ -9606,14 +9732,15 @@
           <emu-alg>
             1. Assert: _S_ is *true*.
             1. Assert: _envRec_.HasBinding(_N_) is *true*.
-            1. Let _binding_ be the binding for _N_ in _envRec_.[[Bindings]].
-            1. If _binding_ is an indirect binding, then
-              1. Let _M_ and _N2_ be the indirection values provided when this binding for _N_ was created.
+            1. Let _binding_ be the DeclarativeBindingRecord in _envRec_.[[Bindings]] whose [[BoundName]] field equals _N_.
+            1. If _binding_ is an ImportDeclarativeBindingRecord, then
+              1. Let _M_ be _binding_.[[TargetModuleRec]].
+              1. Let _N2_ be _binding_.[[TargetName]].
               1. Let _targetEnv_ be _M_.[[Environment]].
               1. If _targetEnv_ is *undefined*, throw a *ReferenceError* exception.
               1. Return ? _targetEnv_.GetBindingValue(_N2_, *true*).
-            1. If _binding_ is an uninitialized binding, throw a *ReferenceError* exception.
-            1. Return the value currently bound in _binding_.
+            1. If _binding_.[[IsInitialized]] is *false*, throw a *ReferenceError* exception.
+            1. Return _binding_.[[BoundValue]].
           </emu-alg>
           <emu-note>
             <p>_S_ will always be *true* because a |Module| is always strict mode code.</p>
@@ -9654,7 +9781,7 @@
             1. Assert: _envRec_.HasBinding(_N_) is *false*.
             1. Assert: _M_ is a Module Record.
             1. Assert: When _M_.[[Environment]] is instantiated it will have a direct binding for _N2_.
-            1. Let _binding_ be an immutable indirect binding for _N_ that references _M_ and _N2_ as its target binding and record that the binding is initialized.
+            1. Let _binding_ be ImportDeclarativeBindingRecord { [[BoundName]]: _N_, [[IsInitialized]]: *true*, [[BoundValue]]: *undefined*, [[IsMutable]]: *false*, [[IsDeletable]]: *false*, [[IsStrict]]: *false*, [[TargetModuleRec]]: _M_, [[TargetName]]: _N2_ }.
             1. Append _binding_ to _envRec_.[[Bindings]].
             1. Return NormalCompletion(~empty~).
           </emu-alg>
@@ -42908,8 +43035,8 @@ THH:mm:ss.sss
         </emu-alg>
         <p>During BlockDeclarationInstantiation the following steps are performed in place of step <emu-xref href="#step-blockdeclarationinstantiation-initializebinding"></emu-xref>:</p>
         <emu-alg replaces-step="step-blockdeclarationinstantiation-initializebinding">
-          1. Let _binding_ be the binding for _fn_ in _env_.[[Bindings]].
-          1. If _binding_ is an uninitialized binding, then
+          1. Let _binding_ be the DeclarativeBindingRecord in _env_.[[Bindings]] whose [[BoundName]] field equals _fn_.
+          1. If _binding_.[[IsInitialized]] is *false*, then
             1. Perform _env_.InitializeBinding(_fn_, _fo_).
           1. Else,
             1. Assert: _d_ is a |FunctionDeclaration|.
