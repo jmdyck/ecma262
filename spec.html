@@ -9646,7 +9646,7 @@
 
       <emu-clause id="sec-newdeclarativeenvironment" aoid="NewDeclarativeEnvironment">
         <h1>NewDeclarativeEnvironment ( _E_ )</h1>
-        <p>The abstract operation NewDeclarativeEnvironment takes argument _E_ (an Environment Record). It performs the following steps when called:</p>
+        <p>The abstract operation NewDeclarativeEnvironment takes argument _E_ (an Environment Record or *null*). It performs the following steps when called:</p>
         <emu-alg>
           1. Let _env_ be a new declarative Environment Record containing no bindings.
           1. Set _env_.[[OuterEnv]] to _E_.
@@ -9687,7 +9687,7 @@
         <p>The abstract operation NewGlobalEnvironment takes arguments _G_ and _thisValue_. It performs the following steps when called:</p>
         <emu-alg>
           1. Let _objRec_ be NewObjectEnvironment(_G_, *false*, *null*).
-          1. Let _dclRec_ be a new declarative Environment Record containing no bindings.
+          1. Let _dclRec_ be NewDeclarativeEnvironment(*null*).
           1. Let _env_ be a new global Environment Record.
           1. Set _env_.[[ObjectRecord]] to _objRec_.
           1. Set _env_.[[GlobalThisValue]] to _thisValue_.
