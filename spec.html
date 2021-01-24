@@ -8739,7 +8739,7 @@
           <h1>CreateMutableBinding ( _N_, _D_ )</h1>
           <p>The CreateMutableBinding concrete method of a declarative Environment Record _envRec_ takes arguments _N_ (a String) and _D_ (a Boolean). It creates a new mutable binding for the name _N_ that is uninitialized. A binding must not already exist in this Environment Record for _N_. If _D_ has the value *true*, the new binding is marked as being subject to deletion. It performs the following steps when called:</p>
           <emu-alg>
-            1. Assert: _envRec_ does not already have a binding for _N_.
+            1. Assert: _envRec_.HasBinding(_N_) is *false*.
             1. Create a mutable binding in _envRec_ for _N_ and record that it is uninitialized. If _D_ is *true*, record that the newly created binding may be deleted by a subsequent DeleteBinding call.
             1. Return NormalCompletion(~empty~).
           </emu-alg>
@@ -8749,7 +8749,7 @@
           <h1>CreateImmutableBinding ( _N_, _S_ )</h1>
           <p>The CreateImmutableBinding concrete method of a declarative Environment Record _envRec_ takes arguments _N_ (a String) and _S_ (a Boolean). It creates a new immutable binding for the name _N_ that is uninitialized. A binding must not already exist in this Environment Record for _N_. If _S_ has the value *true*, the new binding is marked as a strict binding. It performs the following steps when called:</p>
           <emu-alg>
-            1. Assert: _envRec_ does not already have a binding for _N_.
+            1. Assert: _envRec_.HasBinding(_N_) is *false*.
             1. Create an immutable binding in _envRec_ for _N_ and record that it is uninitialized. If _S_ is *true*, record that the newly created binding is a strict binding.
             1. Return NormalCompletion(~empty~).
           </emu-alg>
@@ -8759,7 +8759,8 @@
           <h1>InitializeBinding ( _N_, _V_ )</h1>
           <p>The InitializeBinding concrete method of a declarative Environment Record _envRec_ takes arguments _N_ (a String) and _V_ (an ECMAScript language value). It is used to set the bound value of the current binding of the identifier whose name is the value of the argument _N_ to the value of argument _V_. An uninitialized binding for _N_ must already exist. It performs the following steps when called:</p>
           <emu-alg>
-            1. Assert: _envRec_ must have an uninitialized binding for _N_.
+            1. Assert: _envRec_.HasBinding(_N_) is *true*.
+            1. Assert: the binding for _N_ in _envRec_ is uninitialized.
             1. Set the bound value for _N_ in _envRec_ to _V_.
             1. <emu-not-ref>Record</emu-not-ref> that the binding for _N_ in _envRec_ has been initialized.
             1. Return NormalCompletion(~empty~).
@@ -8770,7 +8771,7 @@
           <h1>SetMutableBinding ( _N_, _V_, _S_ )</h1>
           <p>The SetMutableBinding concrete method of a declarative Environment Record _envRec_ takes arguments _N_ (a String), _V_ (an ECMAScript language value), and _S_ (a Boolean). It attempts to change the bound value of the current binding of the identifier whose name is the value of the argument _N_ to the value of argument _V_. A binding for _N_ normally already exists, but in rare cases it may not. If the binding is an immutable binding, a *TypeError* is thrown if _S_ is *true*. It performs the following steps when called:</p>
           <emu-alg>
-            1. [id="step-setmutablebinding-missing-binding"] If _envRec_ does not have a binding for _N_, then
+            1. [id="step-setmutablebinding-missing-binding"] If _envRec_.HasBinding(_N_) is *false*, then
               1. If _S_ is *true*, throw a *ReferenceError* exception.
               1. Perform _envRec_.CreateMutableBinding(_N_, *true*).
               1. Perform _envRec_.InitializeBinding(_N_, _V_).
@@ -8793,7 +8794,7 @@
           <h1>GetBindingValue ( _N_, _S_ )</h1>
           <p>The GetBindingValue concrete method of a declarative Environment Record _envRec_ takes arguments _N_ (a String) and _S_ (a Boolean). It returns the value of its bound identifier whose name is the value of the argument _N_. If the binding exists but is uninitialized a *ReferenceError* is thrown, regardless of the value of _S_. It performs the following steps when called:</p>
           <emu-alg>
-            1. Assert: _envRec_ has a binding for _N_.
+            1. Assert: _envRec_.HasBinding(_N_) is *true*.
             1. If the binding for _N_ in _envRec_ is an uninitialized binding, throw a *ReferenceError* exception.
             1. Return the value currently bound to _N_ in _envRec_.
           </emu-alg>
@@ -8803,7 +8804,7 @@
           <h1>DeleteBinding ( _N_ )</h1>
           <p>The DeleteBinding concrete method of a declarative Environment Record _envRec_ takes argument _N_ (a String). It can only delete bindings that have been explicitly designated as being subject to deletion. It performs the following steps when called:</p>
           <emu-alg>
-            1. Assert: _envRec_ has a binding for the name that is the value of _N_.
+            1. Assert: _envRec_.HasBinding(_N_) is *true*.
             1. If the binding for _N_ in _envRec_ cannot be deleted, return *false*.
             1. Remove the binding for _N_ from _envRec_.
             1. Return *true*.
@@ -9569,7 +9570,7 @@
           <p>The GetBindingValue concrete method of a module Environment Record _envRec_ takes arguments _N_ (a String) and _S_ (a Boolean). It returns the value of its bound identifier whose name is the value of the argument _N_. However, if the binding is an indirect binding the value of the target binding is returned. If the binding exists but is uninitialized a *ReferenceError* is thrown. It performs the following steps when called:</p>
           <emu-alg>
             1. Assert: _S_ is *true*.
-            1. Assert: _envRec_ has a binding for _N_.
+            1. Assert: _envRec_.HasBinding(_N_) is *true*.
             1. If the binding for _N_ is an indirect binding, then
               1. Let _M_ and _N2_ be the indirection values provided when this binding for _N_ was created.
               1. Let _targetEnv_ be _M_.[[Environment]].
@@ -9614,7 +9615,7 @@
           <h1>CreateImportBinding ( _N_, _M_, _N2_ )</h1>
           <p>The CreateImportBinding concrete method of a module Environment Record _envRec_ takes arguments _N_ (a String), _M_ (a Module Record), and _N2_ (a String). It creates a new initialized immutable indirect binding for the name _N_. A binding must not already exist in this Environment Record for _N_. _N2_ is the name of a binding that exists in _M_'s module Environment Record. Accesses to the value of the new binding will indirectly access the bound value of the target binding. It performs the following steps when called:</p>
           <emu-alg>
-            1. Assert: _envRec_ does not already have a binding for _N_.
+            1. Assert: _envRec_.HasBinding(_N_) is *false*.
             1. Assert: _M_ is a Module Record.
             1. Assert: When _M_.[[Environment]] is instantiated it will have a direct binding for _N2_.
             1. Create an immutable indirect binding in _envRec_ for _N_ that references _M_ and _N2_ as its target binding and record that the binding is initialized.
