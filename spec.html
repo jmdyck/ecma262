@@ -32514,18 +32514,7 @@ THH:mm:ss.sss
           1. Return _obj_.
         </emu-alg>
         <p>The <em>sort order</em> is the ordering, after completion of this function, of the <emu-xref href="#integer-index">integer-indexed</emu-xref> property values of _obj_ whose integer indexes are less than _len_. The result of the `sort` function is then determined as follows:</p>
-        <p>The sort order is implementation-defined if any of the following conditions is true:</p>
-        <ul>
-          <li>
-            If _comparefn_ is not *undefined* and is not a consistent comparator for the elements of _items_ (see below).
-          </li>
-          <li>
-            If _comparefn_ is *undefined* and SortCompare does not act as a consistent comparator.
-          </li>
-          <li>
-            If _comparefn_ is *undefined* and all applications of ToString, to any specific value passed as an argument to SortCompare, do not produce the same result.
-          </li>
-        </ul>
+        <p>The sort order is implementation-defined if SortCompare is not a consistent comparator for the elements of _items_ (see below).</p>
         <p>Unless the sort order is specified above to be implementation-defined, _items_ must satisfy all of the following conditions after executing step <emu-xref href="#step-array-sort"></emu-xref> of the algorithm above:</p>
         <ul>
           <li>
@@ -32590,7 +32579,19 @@ THH:mm:ss.sss
             <p>Because non-existent property values always compare greater than *undefined* property values, and *undefined* always compares greater than any other value, *undefined* property values always sort to the end of the result, followed by non-existent property values.</p>
           </emu-note>
           <emu-note>
-            <p>Method calls performed by the ToString abstract operations in steps <emu-xref href="#step-sortcompare-tostring-x"></emu-xref> and <emu-xref href="#step-sortcompare-tostring-y"></emu-xref> have the potential to cause SortCompare to not behave as a consistent comparator.</p>
+            <p>SortCompare is not a consistent comparator if any of the following conditions is true:</p>
+            <ul>
+              <li>
+                _comparefn_ is not *undefined* and is not a consistent comparator.
+              </li>
+              <li>
+                _comparefn_ is *undefined* and any invocation of ToString (in step <emu-xref href="#step-sortcompare-tostring-x"></emu-xref> or <emu-xref href="#step-sortcompare-tostring-y"></emu-xref>) modifies _obj_ or any object on _obj_'s prototype chain.
+              </li>
+              <li>
+                _comparefn_ is *undefined* and for any specific value passed as an argument to SortCompare, all applications of ToString do not produce the same result.
+              </li>
+            </ul>
+            <p>The latter two cases can happen if ToString performs method calls.</p>
           </emu-note>
         </emu-clause>
       </emu-clause>
