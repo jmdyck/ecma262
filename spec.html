@@ -14245,21 +14245,21 @@
         <p>|TemplateSubstitutionTail| is used by the |InputElementTemplateTail| alternative lexical goal.</p>
       </emu-note>
 
-      <emu-clause id="sec-static-semantics-tv-and-trv">
-        <h1>Static Semantics: TV and TRV</h1>
-        <p>A template literal component is interpreted as a sequence of Unicode code points. The Template Value (TV) of a literal component is described in terms of String values (SV, <emu-xref href="#sec-literals-string-literals"></emu-xref>) contributed by the various parts of the template literal component. As part of this process, some Unicode code points within the template component are interpreted as having a mathematical value (MV, <emu-xref href="#sec-literals-numeric-literals"></emu-xref>). In determining a TV, escape sequences are replaced by the UTF-16 code unit(s) of the Unicode code point represented by the escape sequence. The Template Raw Value (TRV) is similar to a Template Value with the difference that in TRVs escape sequences are interpreted literally.</p>
+      <emu-clause id="sec-static-semantics-tv" type="sdo" aoid="TV" oldids="sec-static-semantics-tv-and-trv">
+        <h1>Static Semantics: TV</h1>
+        <p>A template literal component is interpreted as a sequence of Unicode code points. The Template Value (TV) of a literal component is described in terms of String values (SV, <emu-xref href="#sec-literals-string-literals"></emu-xref>) contributed by the various parts of the template literal component. As part of this process, some Unicode code points within the template component are interpreted as having a mathematical value (MV, <emu-xref href="#sec-literals-numeric-literals"></emu-xref>). In determining a TV, escape sequences are replaced by the UTF-16 code unit(s) of the Unicode code point represented by the escape sequence.</p>
         <ul>
           <li>
-            The TV and TRV of <emu-grammar>NoSubstitutionTemplate :: ``` ```</emu-grammar> is the empty String.
+            The TV of <emu-grammar>NoSubstitutionTemplate :: ``` ```</emu-grammar> is the empty String.
           </li>
           <li>
-            The TV and TRV of <emu-grammar>TemplateHead :: ``` `${`</emu-grammar> is the empty String.
+            The TV of <emu-grammar>TemplateHead :: ``` `${`</emu-grammar> is the empty String.
           </li>
           <li>
-            The TV and TRV of <emu-grammar>TemplateMiddle :: `}` `${`</emu-grammar> is the empty String.
+            The TV of <emu-grammar>TemplateMiddle :: `}` `${`</emu-grammar> is the empty String.
           </li>
           <li>
-            The TV and TRV of <emu-grammar>TemplateTail :: `}` ```</emu-grammar> is the empty String.
+            The TV of <emu-grammar>TemplateTail :: `}` ```</emu-grammar> is the empty String.
           </li>
           <li>
             The TV of <emu-grammar>TemplateCharacters :: TemplateCharacter TemplateCharacters</emu-grammar> is *undefined* if either the TV of |TemplateCharacter| is *undefined* or the TV of |TemplateCharacters| is *undefined*. Otherwise, it is the string-concatenation of the TV of |TemplateCharacter| and the TV of |TemplateCharacters|.
@@ -14281,6 +14281,25 @@
           </li>
           <li>
             The TV of <emu-grammar>LineContinuation :: `\` LineTerminatorSequence</emu-grammar> is the empty String.
+          </li>
+        </ul>
+      </emu-clause>
+
+      <emu-clause id="sec-static-semantics-trv" type="sdo" aoid="TRV">
+        <h1>Static Semantics: TRV</h1>
+        <p>The Template Raw Value (TRV) of a template literal component is similar to a Template Value (TV) with the difference that in TRVs escape sequences are interpreted literally.</p>
+        <ul>
+          <li>
+            The TRV of <emu-grammar>NoSubstitutionTemplate :: ``` ```</emu-grammar> is the empty String.
+          </li>
+          <li>
+            The TRV of <emu-grammar>TemplateHead :: ``` `${`</emu-grammar> is the empty String.
+          </li>
+          <li>
+            The TRV of <emu-grammar>TemplateMiddle :: `}` `${`</emu-grammar> is the empty String.
+          </li>
+          <li>
+            The TRV of <emu-grammar>TemplateTail :: `}` ```</emu-grammar> is the empty String.
           </li>
           <li>
             The TRV of <emu-grammar>TemplateCharacters :: TemplateCharacter TemplateCharacters</emu-grammar> is the string-concatenation of the TRV of |TemplateCharacter| and the TRV of |TemplateCharacters|.
