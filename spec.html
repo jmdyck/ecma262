@@ -24411,12 +24411,16 @@
           1. Let _onFulfilled_ be CreateBuiltinFunction(_stepsFulfilled_, 0, *""*, &laquo; &raquo;).
           1. Let _stepsRejected_ be the steps of a CallDynamicImportRejected function as specified below.
           1. Let _onRejected_ be CreateBuiltinFunction(_stepsRejected_, 0, *""*, &laquo; &raquo;).
+          1. Let _innerPromise_ be *undefined*.
           1. Perform ! PerformPromiseThen(_innerPromise_.[[Promise]], _onFulfilled_, _onRejected_).
         </emu-alg>
 
         <p>A CallDynamicImportFulfilled function is an anonymous built-in function with no internal slots and has one argument _result_. When a CallDynamicImportFulfilled function is called it performs the following steps:</p>
         <emu-alg>
           1. Assert: _result_ is *undefined*.
+          1. Let _referencingScriptOrModule_ be *undefined*.
+          1. Let _specifier_ be *undefined*.
+          1. Let _promiseCapability_ be *undefined*.
           1. Let _moduleRecord_ be ! HostResolveImportedModule(_referencingScriptOrModule_, _specifier_).
           1. Assert: Evaluate has already been invoked on _moduleRecord_ and successfully completed.
           1. Let _namespace_ be GetModuleNamespace(_moduleRecord_).
@@ -24426,6 +24430,7 @@
 
         <p>A CallDynamicImportRejected function is an anonymous built-in function with no internal slots and has one argument _error_. When a CallDynamicImportRejected function is called it performs the following steps:</p>
         <emu-alg>
+          1. Let _promiseCapability_ be *undefined*.
           1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, &laquo; _error_ &raquo;).
         </emu-alg>
       </emu-clause>
