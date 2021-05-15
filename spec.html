@@ -24403,14 +24403,14 @@
         <h1>FinishDynamicImport ( _referencingScriptOrModule_, _specifier_, _promiseCapability_, _completion_ )</h1>
         <p>The abstract operation FinishDynamicImport takes arguments _referencingScriptOrModule_, _specifier_, _promiseCapability_ (a PromiseCapability Record), and _completion_. FinishDynamicImport completes the process of a dynamic import originally started by an <emu-xref href="#sec-import-calls">`import()`</emu-xref> call, resolving or rejecting the promise returned by that call as appropriate according to _completion_. It is performed by host environments as part of HostImportModuleDynamically. It performs the following steps when called:</p>
         <emu-alg>
-          1. Let _stepsFulfilled_ be the steps of a CallDynamicImportResolved function as specified below.
+          1. Let _stepsFulfilled_ be the steps of a CallDynamicImportFulfilled function as specified below.
           1. Let _onFulfilled_ be CreateBuiltinFunction(_stepsFulfilled_, &laquo; &raquo;).
           1. Let _stepsRejected_ be the steps of a CallDynamicImportRejected function as specified below.
           1. Let _onRejected_ be CreateBuiltinFunction(_stepsRejected_, &laquo; &raquo;).
           1. Perform ! PerformPromiseThen(_innerPromise_.[[Promise]], _onFulfilled_, _onRejected_).
         </emu-alg>
 
-        <p>A CallDynamicImportResolved function is an anonymous built-in function with no internal slots and has one argument _result_. When a CallDynamicImportResolved function is called it performs the following steps:</p>
+        <p>A CallDynamicImportFulfilled function is an anonymous built-in function with no internal slots and has one argument _result_. When a CallDynamicImportFulfilled function is called it performs the following steps:</p>
         <emu-alg>
           1. Assert: _result_ is *undefined*.
           1. Let _moduleRecord_ be ! HostResolveImportedModule(_referencingScriptOrModule_, _specifier_).
