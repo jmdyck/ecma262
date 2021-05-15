@@ -23165,7 +23165,7 @@
             <h1>GatherAsyncParentCompletions ( _module_, _execList_ )</h1>
             <emu-alg>
               1. Assert: _module_.[[Status]] is ~evaluated~.
-              1. For each Module _m_ of _module_.[[AsyncParentModules]], do
+              1. For each Cyclic Module Record _m_ of _module_.[[AsyncParentModules]], do
                 1. If _execList_ does not contain _m_ and _m_.[[CycleRoot]].[[EvaluationError]] is ~empty~, then
                   1. Assert: _m_.[[EvaluationError]] is ~empty~.
                   1. Assert: _m_.[[AsyncEvaluating]] is *true*.
@@ -23194,7 +23194,7 @@
               1. Perform ! GatherAsyncParentCompletions(_module_, _execList_).
               1. Let _sortedExecList_ be a List whose elements are the elements of _execList_, in the order in which they had their [[AsyncEvaluating]] fields set to *true* in InnerModuleEvaluation.
               1. Assert: All elements of _sortedExecList_ have their [[AsyncEvaluating]] field set to *true*, [[PendingAsyncDependencies]] field set to 0, and [[EvaluationError]] field set to *undefined*.
-              1. For each Module _m_ of _sortedExecList_, do
+              1. For each Cyclic Module Record _m_ of _sortedExecList_, do
                 1. If _m_.[[AsyncEvaluating]] is *false*, then
                   1. Assert: _m_.[[EvaluationError]] is not ~empty~.
                 1. Else if _m_.[[Async]] is *true*, then
@@ -23222,7 +23222,7 @@
               1. Assert: _module_.[[EvaluationError]] is ~empty~.
               1. Set _module_.[[EvaluationError]] to ThrowCompletion(_error_).
               1. Set _module_.[[AsyncEvaluating]] to *false*.
-              1. For each Module _m_ of _module_.[[AsyncParentModules]], do
+              1. For each Cyclic Module Record _m_ of _module_.[[AsyncParentModules]], do
                 1. Perform ! AsyncModuleExecutionRejected(_m_, _error_).
               1. If _module_.[[TopLevelCapability]] is not ~empty~, then
                 1. Assert: _module_.[[CycleRoot]] is _module_.
