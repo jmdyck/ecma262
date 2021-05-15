@@ -9573,7 +9573,7 @@
             1. If the binding for _N_ is an indirect binding, then
               1. Let _M_ and _N2_ be the indirection values provided when this binding for _N_ was created.
               1. Let _targetEnv_ be _M_.[[Environment]].
-              1. If _targetEnv_ is *undefined*, throw a *ReferenceError* exception.
+              1. If _targetEnv_ is ~empty~, throw a *ReferenceError* exception.
               1. Return ? _targetEnv_.GetBindingValue(_N2_, *true*).
             1. If the binding for _N_ in _envRec_ is an uninitialized binding, throw a *ReferenceError* exception.
             1. Return the value currently bound to _N_ in _envRec_.
@@ -12501,7 +12501,7 @@
           1. If _binding_.[[BindingName]] is *"\*namespace\*"*, then
             1. Return ? GetModuleNamespace(_targetModule_).
           1. Let _targetEnv_ be _targetModule_.[[Environment]].
-          1. If _targetEnv_ is *undefined*, throw a *ReferenceError* exception.
+          1. If _targetEnv_ is ~empty~, throw a *ReferenceError* exception.
           1. Return ? _targetEnv_.GetBindingValue(_binding_.[[BindingName]], *true*).
         </emu-alg>
         <emu-note>
@@ -12546,7 +12546,7 @@
         <p>The abstract operation ModuleNamespaceCreate takes arguments _module_ and _exports_. It is used to specify the creation of new module namespace exotic objects. It performs the following steps when called:</p>
         <emu-alg>
           1. Assert: _module_ is a Module Record.
-          1. Assert: _module_.[[Namespace]] is *undefined*.
+          1. Assert: _module_.[[Namespace]] is ~empty~.
           1. Assert: _exports_ is a List of String values.
           1. Let _internalSlotsList_ be the internal slots listed in <emu-xref href="#table-internal-slots-of-module-namespace-exotic-objects"></emu-xref>.
           1. Let _M_ be ! MakeBasicObject(_internalSlotsList_).
@@ -24434,7 +24434,7 @@
           1. Assert: _module_ is an instance of a concrete subclass of Module Record.
           1. Assert: If _module_ is a Cyclic Module Record, then _module_.[[Status]] is not ~unlinked~.
           1. Let _namespace_ be _module_.[[Namespace]].
-          1. If _namespace_ is *undefined*, then
+          1. If _namespace_ is ~empty~, then
             1. Let _exportedNames_ be ? _module_.GetExportedNames().
             1. Let _unambiguousNames_ be a new empty List.
             1. For each element _name_ of _exportedNames_, do
