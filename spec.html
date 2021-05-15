@@ -23134,10 +23134,10 @@
               1. Assert: _module_.[[Async]] is *true*.
               1. Let _capability_ be ! NewPromiseCapability(%Promise%).
               1. Let _stepsFulfilled_ be the steps of a CallAsyncModuleFulfilled function as specified below.
-              1. Let _onFulfilled_ be CreateBuiltinFunction(_stepsFulfilled_, &laquo; [[Module]] &raquo;).
+              1. Let _onFulfilled_ be CreateBuiltinFunction(_stepsFulfilled_, 0, *""*, &laquo; [[Module]] &raquo;).
               1. Set _onFulfilled_.[[Module]] to _module_.
               1. Let _stepsRejected_ be the steps of a CallAsyncModuleRejected function as specified below.
-              1. Let _onRejected_ be CreateBuiltinFunction(_stepsRejected_, &laquo; [[Module]] &raquo;).
+              1. Let _onRejected_ be CreateBuiltinFunction(_stepsRejected_, 0, *""*, &laquo; [[Module]] &raquo;).
               1. Set _onRejected_.[[Module]] to _module_.
               1. Perform ! PerformPromiseThen(_capability_.[[Promise]], _onFulfilled_, _onRejected_).
               1. Perform ! _module_.ExecuteModule(_capability_).
@@ -24404,9 +24404,9 @@
         <p>The abstract operation FinishDynamicImport takes arguments _referencingScriptOrModule_, _specifier_, _promiseCapability_ (a PromiseCapability Record), and _completion_. FinishDynamicImport completes the process of a dynamic import originally started by an <emu-xref href="#sec-import-calls">`import()`</emu-xref> call, resolving or rejecting the promise returned by that call as appropriate according to _completion_. It is performed by host environments as part of HostImportModuleDynamically. It performs the following steps when called:</p>
         <emu-alg>
           1. Let _stepsFulfilled_ be the steps of a CallDynamicImportFulfilled function as specified below.
-          1. Let _onFulfilled_ be CreateBuiltinFunction(_stepsFulfilled_, &laquo; &raquo;).
+          1. Let _onFulfilled_ be CreateBuiltinFunction(_stepsFulfilled_, 0, *""*, &laquo; &raquo;).
           1. Let _stepsRejected_ be the steps of a CallDynamicImportRejected function as specified below.
-          1. Let _onRejected_ be CreateBuiltinFunction(_stepsRejected_, &laquo; &raquo;).
+          1. Let _onRejected_ be CreateBuiltinFunction(_stepsRejected_, 0, *""*, &laquo; &raquo;).
           1. Perform ! PerformPromiseThen(_innerPromise_.[[Promise]], _onFulfilled_, _onRejected_).
         </emu-alg>
 
