@@ -23129,6 +23129,7 @@
 
           <emu-clause id="sec-execute-async-module" aoid="ExecuteAsyncModule">
             <h1>ExecuteAsyncModule ( _module_ )</h1>
+            <p>The abstract operation ExecuteAsyncModule takes argument _module_ (a Cyclic Module Record). It performs the following steps when called:</p>
             <emu-alg>
               1. Assert: _module_.[[Status]] is ~evaluating~ or ~evaluated~.
               1. Assert: _module_.[[Async]] is *true*.
@@ -23163,6 +23164,7 @@
 
           <emu-clause id="sec-gather-async-parent-completions" aoid="GatherAsyncParentCompletions">
             <h1>GatherAsyncParentCompletions ( _module_, _execList_ )</h1>
+            <p>The abstract operation GatherAsyncParentCompletions takes arguments _module_ (a Cyclic Module Record) and _execList_ (a List of Cyclic Module Records). It performs the following steps when called:</p>
             <emu-alg>
               1. Assert: _module_.[[Status]] is ~evaluated~.
               1. For each Cyclic Module Record _m_ of _module_.[[AsyncParentModules]], do
@@ -23183,6 +23185,7 @@
 
           <emu-clause id="sec-async-module-execution-fulfilled" aoid="AsyncModuleExecutionFulfilled">
             <h1>AsyncModuleExecutionFulfilled ( _module_ )</h1>
+            <p>The abstract operation AsyncModuleExecutionFulfilled takes argument _module_ (a Cyclic Module Record). It performs the following steps when called:</p>
             <emu-alg>
               1. Assert: _module_.[[AsyncEvaluating]] is *true*.
               1. Assert: _module_.[[EvaluationError]] is ~empty~.
@@ -23214,6 +23217,7 @@
 
           <emu-clause id="sec-async-module-execution-rejected" aoid="AsyncModuleExecutionRejected">
             <h1>AsyncModuleExecutionRejected ( _module_, _error_ )</h1>
+            <p>The abstract operation AsyncModuleExecutionRejected takes arguments _module_ (a Cyclic Module Record) and _error_ (an ECMAScript language value). It performs the following steps when called:</p>
             <emu-alg>
               1. Assert: _module_.[[Status]] is ~evaluated~.
               1. If _module_.[[AsyncEvaluating]] is *false*, then
@@ -40955,6 +40959,7 @@ THH:mm:ss.sss
       </emu-clause>
       <emu-clause id="sec-asyncblockstart" aoid="AsyncBlockStart">
         <h1>AsyncBlockStart ( _promiseCapability_, _asyncBody_, _asyncContext_ )</h1>
+        <p>The abstract operation AsyncBlockStart takes arguments _promiseCapability_ (a PromiseCapability Record), _asyncBody_ (a Parse Node), and _asyncContext_ (an execution context). It performs the following steps when called:</p>
         <emu-alg>
           1. Assert: _promiseCapability_ is a PromiseCapability Record.
           1. Let _runningContext_ be the running execution context.
