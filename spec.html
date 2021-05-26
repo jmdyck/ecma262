@@ -14129,7 +14129,7 @@
             The MV of <emu-grammar>SignedInteger :: `-` DecimalDigits</emu-grammar> is the negative of the MV of |DecimalDigits|.
           </li>
           <li>
-            The MV of <emu-grammar>DecimalDigit :: `0`</emu-grammar> or of <emu-grammar>HexDigit :: `0`</emu-grammar> or of <emu-grammar>OctalDigit :: `0`</emu-grammar> or of <emu-grammar>BinaryDigit :: `0`</emu-grammar> is 0.
+            The MV of <emu-grammar>DecimalDigit :: `0`</emu-grammar> or of <emu-grammar>HexDigit :: `0`</emu-grammar> or of <emu-grammar>OctalDigit :: `0`</emu-grammar> or of <emu-grammar>LegacyOctalEscapeSequence :: `0`</emu-grammar> or of <emu-grammar>BinaryDigit :: `0`</emu-grammar> is 0.
           </li>
           <li>
             The MV of <emu-grammar>DecimalDigit :: `1`</emu-grammar> or of <emu-grammar>NonZeroDigit :: `1`</emu-grammar> or of <emu-grammar>HexDigit :: `1`</emu-grammar> or of <emu-grammar>OctalDigit :: `1`</emu-grammar> or of <emu-grammar>BinaryDigit :: `1`</emu-grammar> is 1.
@@ -14320,6 +14320,7 @@
 
         EscapeSequence ::
           CharacterEscapeSequence
+          `0` [lookahead &lt;! DecimalDigit]
           LegacyOctalEscapeSequence
           NonOctalDecimalEscapeSequence
           HexEscapeSequence
@@ -14342,10 +14343,14 @@
           `u`
 
         LegacyOctalEscapeSequence ::
-          OctalDigit [lookahead &lt;! OctalDigit]
+          `0` [lookahead &lt;- {`8`, `9`}]
+          NonZeroOctalDigit [lookahead &lt;! OctalDigit]
           ZeroToThree OctalDigit [lookahead &lt;! OctalDigit]
           FourToSeven OctalDigit
           ZeroToThree OctalDigit OctalDigit
+
+        NonZeroOctalDigit ::
+          OctalDigit but not `0`
 
         ZeroToThree :: one of
           `0` `1` `2` `3`
@@ -14371,22 +14376,11 @@
         <p>&lt;LF&gt; and &lt;CR&gt; cannot appear in a string literal, except as part of a |LineContinuation| to produce the empty code points sequence. The proper way to include either in the String value of a string literal is to use an escape sequence such as `\\n` or `\\u000A`.</p>
       </emu-note>
 
-      <h2>Supplemental Syntax</h2>
-      <p>When processing an instance of the production <emu-grammar>LegacyOctalEscapeSequence :: OctalDigit</emu-grammar> the following production is used to refine the interpretation of |LegacyOctalEscapeSequence|.</p>
-      <emu-grammar type="definition">
-        StrictZeroEscapeSequence ::
-          `0` [lookahead &lt;! DecimalDigit]
-      </emu-grammar>
-
       <emu-clause id="sec-string-literals-early-errors">
         <h1>Static Semantics: Early Errors</h1>
         <emu-grammar>
           EscapeSequence :: LegacyOctalEscapeSequence
-        </emu-grammar>
-        <ul>
-          <li>It is a Syntax Error if the source code matching this production is strict mode code and |EscapeSequence| is not covering a |StrictZeroEscapeSequence|.</li>
-        </ul>
-        <emu-grammar>
+
           EscapeSequence :: NonOctalDecimalEscapeSequence
         </emu-grammar>
         <ul>
@@ -14440,6 +14434,9 @@
           </li>
           <li>
             The SV of <emu-grammar>SingleStringCharacter :: LineContinuation</emu-grammar> is the empty String.
+          </li>
+          <li>
+            The SV of <emu-grammar>EscapeSequence :: `0`</emu-grammar> is the String value consisting of the code unit 0x0000 (NULL).
           </li>
           <li>
             The SV of <emu-grammar>CharacterEscapeSequence :: SingleEscapeCharacter</emu-grammar> is the String value consisting of the code unit whose value is determined by the |SingleEscapeCharacter| according to <emu-xref href="#table-string-single-character-escape-sequences"></emu-xref>.
@@ -41421,15 +41418,13 @@ THH:mm:ss.sss
     <emu-prodref name="NonEscapeCharacter"></emu-prodref>
     <emu-prodref name="EscapeCharacter"></emu-prodref>
     <emu-prodref name="LegacyOctalEscapeSequence"></emu-prodref>
+    <emu-prodref name="NonZeroOctalDigit"></emu-prodref>
     <emu-prodref name="ZeroToThree"></emu-prodref>
     <emu-prodref name="FourToSeven"></emu-prodref>
     <emu-prodref name="NonOctalDecimalEscapeSequence"></emu-prodref>
     <emu-prodref name="HexEscapeSequence"></emu-prodref>
     <emu-prodref name="UnicodeEscapeSequence"></emu-prodref>
     <emu-prodref name="Hex4Digits"></emu-prodref>
-    <p>When processing an instance of the production <emu-prodref name="LegacyOctalEscapeSequence"></emu-prodref> the following production is used to refine the interpretation of |LegacyOctalEscapeSequence|.</p>
-    <emu-prodref name="StrictZeroEscapeSequence"></emu-prodref>
-    <p>&nbsp;</p>
     <emu-prodref name="RegularExpressionLiteral"></emu-prodref>
     <emu-prodref name="RegularExpressionBody"></emu-prodref>
     <emu-prodref name="RegularExpressionChars"></emu-prodref>
@@ -42972,7 +42967,7 @@ THH:mm:ss.sss
       A conforming implementation, when processing strict mode code, must disallow instances of the productions <emu-grammar>NumericLiteral :: LegacyOctalIntegerLiteral</emu-grammar> and <emu-grammar>DecimalIntegerLiteral :: NonOctalDecimalIntegerLiteral</emu-grammar>.
     </li>
     <li>
-      A conforming implementation, when processing strict mode code, must disallow instances of the production <emu-grammar>EscapeSequence :: LegacyOctalEscapeSequence</emu-grammar> that do not cover a |StrictZeroEscapeSequence|, and instances of the production <emu-grammar>EscapeSequence :: NonOctalDecimalEscapeSequence</emu-grammar>.
+      A conforming implementation, when processing strict mode code, must disallow instances of the productions <emu-grammar>EscapeSequence :: LegacyOctalEscapeSequence</emu-grammar> and <emu-grammar>EscapeSequence :: NonOctalDecimalEscapeSequence</emu-grammar>.
     </li>
     <li>
       Assignment to an undeclared identifier or otherwise unresolvable reference does not create a property in the global object. When a simple assignment occurs within strict mode code, its |LeftHandSideExpression| must not evaluate to an unresolvable Reference. If it does a *ReferenceError* exception is thrown (<emu-xref href="#sec-putvalue"></emu-xref>). The |LeftHandSideExpression| also may not be a reference to a data property with the attribute value { [[Writable]]: *false* }, to an accessor property with the attribute value { [[Set]]: *undefined* }, nor to a non-existent property of an object whose [[Extensible]] internal slot has the value *false*. In these cases a `TypeError` exception is thrown (<emu-xref href="#sec-assignment-operators"></emu-xref>).
