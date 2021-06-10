@@ -13928,7 +13928,7 @@
       </emu-grammar>
     </emu-clause>
 
-    <emu-clause id="sec-literals-numeric-literals">
+    <emu-clause id="sec-literals-numeric-literals" oldids="sec-additional-syntax-numeric-literals">
       <h1>Numeric Literals</h1>
       <h2>Syntax</h2>
       <emu-grammar type="definition">
@@ -14055,7 +14055,7 @@
         <ul>
           <li>It is a Syntax Error if the source code matching this production is strict mode code.</li>
         </ul>
-        <emu-note>In non-strict code, this syntax is allowed, but deprecated.</emu-note>
+        <emu-note>In non-strict code, this syntax is legacy.</emu-note>
       </emu-clause>
 
       <emu-clause id="sec-static-semantics-mv" oldids="sec-additional-syntax-numeric-literals-status-semantics">
@@ -24453,7 +24453,7 @@
         The Syntactic Grammar must not be extended in any manner that allows the token `:` to immediately follow source text that matches the |BindingIdentifier| nonterminal symbol.
       </li>
       <li>
-        When processing strict mode code, the syntax of |NumericLiteral| must not be extended to include |LegacyOctalIntegerLiteral| and the syntax of |DecimalIntegerLiteral| must not be extended to include |NonOctalDecimalIntegerLiteral| as described in <emu-xref href="#sec-literals-numeric-literals"></emu-xref>.
+        When processing strict mode code, an implementation must not relax the early error rules of <emu-xref href="#sec-numeric-literals-early-errors"></emu-xref>.
       </li>
       <li>
         |TemplateCharacter| must not be extended to include <emu-xref href="#prod-annexB-LegacyOctalEscapeSequence"></emu-xref> or <emu-xref href="#prod-annexB-NonOctalDecimalEscapeSequence"></emu-xref> as defined in <emu-xref href="#sec-additional-syntax-string-literals"></emu-xref>.
@@ -41674,17 +41674,6 @@ THH:mm:ss.sss
 
   <emu-annex id="sec-additional-syntax">
     <h1>Additional Syntax</h1>
-
-    <emu-annex id="sec-additional-syntax-numeric-literals">
-      <h1>Numeric Literals</h1>
-      <p>The following syntax from <emu-xref href="#sec-literals-numeric-literals"></emu-xref>, and its associated semantics, used to be normative optional:</p>
-      <emu-grammar>
-        NumericLiteral :: LegacyOctalIntegerLiteral
-
-        DecimalIntegerLiteral :: NonOctalDecimalIntegerLiteral
-      </emu-grammar>
-      <p>and the productions for |LegacyOctalIntegerLiteral|, |NonOctalDecimalIntegerLiteral|, |LegacyOctalLikeDecimalIntegerLiteral|, and |NonOctalDigit|.</p>
-    </emu-annex>
 
     <emu-annex id="sec-additional-syntax-string-literals">
       <h1>String Literals</h1>
