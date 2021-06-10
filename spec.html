@@ -14284,7 +14284,7 @@
       </emu-clause>
     </emu-clause>
 
-    <emu-clause id="sec-literals-string-literals">
+    <emu-clause id="sec-literals-string-literals" oldids="sec-additional-syntax-string-literals">
       <h1>String Literals</h1>
       <emu-note>
         <p>A string literal is 0 or more Unicode code points enclosed in single or double quotes. Unicode code points may also be represented by an escape sequence. All code points may appear literally in a string literal except for the closing quote code points, U+005C (REVERSE SOLIDUS), U+000D (CARRIAGE RETURN), and U+000A (LINE FEED). Any code points may appear in the form of an escape sequence. String literals evaluate to ECMAScript String values. When generating these String values Unicode code points are UTF-16 encoded as defined in <emu-xref href="#sec-utf16encodecodepoint"></emu-xref>. Code points belonging to the Basic Multilingual Plane are encoded as a single code unit element of the string. All other code points are encoded as two code unit elements of the string.</p>
@@ -14386,7 +14386,7 @@
         <ul>
           <li>It is a Syntax Error if the source code matching this production is strict mode code.</li>
         </ul>
-        <emu-note>In non-strict code, this syntax is allowed, but deprecated.</emu-note>
+        <emu-note>In non-strict code, this syntax is legacy.</emu-note>
         <emu-note>
           <p>It is possible for string literals to precede a Use Strict Directive that places the enclosing code in <emu-xref href="#sec-strict-mode-code">strict mode</emu-xref>, and implementations must take care to enforce the above rules for such literals. For example, the following source text contains a Syntax Error:</p>
           <pre><code class="javascript">
@@ -24544,7 +24544,7 @@
         When processing strict mode code, an implementation must not relax the early error rules of <emu-xref href="#sec-numeric-literals-early-errors"></emu-xref>.
       </li>
       <li>
-        |TemplateCharacter| must not be extended to include |LegacyOctalEscapeSequence| or |NonOctalDecimalEscapeSequence| as defined in <emu-xref href="#sec-literals-string-literals"></emu-xref>.
+        |TemplateEscapeSequence| must not be extended to include |LegacyOctalEscapeSequence| or |NonOctalDecimalEscapeSequence| as defined in <emu-xref href="#sec-literals-string-literals"></emu-xref>.
       </li>
       <li>
         When processing strict mode code, the extensions defined in <emu-xref href="#sec-labelled-function-declarations"></emu-xref>, <emu-xref href="#sec-block-level-function-declarations-web-legacy-compatibility-semantics"></emu-xref>, <emu-xref href="#sec-functiondeclarations-in-ifstatement-statement-clauses"></emu-xref>, and <emu-xref href="#sec-initializers-in-forin-statement-heads"></emu-xref> must not be supported.
@@ -41768,17 +41768,6 @@ THH:mm:ss.sss
 
   <emu-annex id="sec-additional-syntax">
     <h1>Additional Syntax</h1>
-
-    <emu-annex id="sec-additional-syntax-string-literals">
-      <h1>String Literals</h1>
-      <p>The following syntax from <emu-xref href="#sec-literals-string-literals"></emu-xref>, and its associated semantics, used to be normative optional:</p>
-      <emu-grammar>
-        EscapeSequence :: LegacyOctalEscapeSequence
-
-        EscapeSequence :: NonOctalDecimalEscapeSequence
-      </emu-grammar>
-      <p>and the productions for |LegacyOctalEscapeSequence|, |ZeroToThree|, and |FourToSeven|.</p>
-    </emu-annex>
 
     <emu-annex id="sec-html-like-comments">
       <h1>HTML-like Comments</h1>
