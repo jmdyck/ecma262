@@ -11642,8 +11642,8 @@
         1. Let _internalSlotsList_ be a List containing the names of all the internal slots that <emu-xref href="#sec-built-in-function-objects"></emu-xref> requires for the built-in function object that is about to be created.
         1. Append to _internalSlotsList_ the elements of _additionalInternalSlotsList_.
         1. Let _func_ be a new built-in function object that when called performs the action described by _steps_. The new function object has internal slots whose names are the elements of _internalSlotsList_.
-        1. Set _func_.[[Extensible]] to *true*.
         1. Set _func_.[[Prototype]] to _prototype_.
+        1. Set _func_.[[Extensible]] to *true*.
         1. Set _func_.[[Realm]] to _realm_.
         1. Set _func_.[[InitialName]] to *null*.
         1. Perform ! SetFunctionLength(_func_, _length_).
