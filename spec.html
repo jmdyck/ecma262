@@ -11674,15 +11674,15 @@
     </emu-clause>
 
     <emu-clause id="sec-createbuiltinfunction" aoid="CreateBuiltinFunction">
-      <h1>CreateBuiltinFunction ( _steps_, _length_, _name_ [ , _additionalInternalSlotsList_ [ , _realm_ [ , _prototype_ [ , _prefix_ ] ] ] ] )</h1>
-      <p>The abstract operation CreateBuiltinFunction takes arguments _steps_, _length_, _name_, and optional arguments _additionalInternalSlotsList_ (a List of names of internal slots), _realm_, _prototype_, and _prefix_. _additionalInternalSlotsList_ contains the names of additional internal slots that must be defined as part of the object. This operation creates a built-in function object. It performs the following steps when called:</p>
+      <h1>CreateBuiltinFunction ( _steps_, _length_, _name_, _additionalInternalSlotsList_ [ , _realm_ [ , _prototype_ [ , _prefix_ ] ] ] )</h1>
+      <p>The abstract operation CreateBuiltinFunction takes arguments _steps_, _length_, _name_, and _additionalInternalSlotsList_ (a List of names of internal slots) and optional arguments _realm_, _prototype_, and _prefix_. _additionalInternalSlotsList_ contains the names of additional internal slots that must be defined as part of the object. This operation creates a built-in function object. It performs the following steps when called:</p>
       <emu-alg>
         1. Assert: _steps_ is either a set of algorithm steps or other definition of a function's behaviour provided in this specification.
         1. If _realm_ is not present or _realm_ is ~empty~, set _realm_ to the current Realm Record.
         1. Assert: _realm_ is a Realm Record.
         1. If _prototype_ is not present, set _prototype_ to _realm_.[[Intrinsics]].[[%Function.prototype%]].
         1. Let _internalSlotsList_ be a List containing [[Prototype]], [[Extensible]], and the internal slots specified in <emu-xref href="#table-internal-slots-of-ecmascript-function-objects"></emu-xref> and [[InitialName]], or the internal slots specified in <emu-xref href="#table-internal-slots-of-built-in-function-objects"></emu-xref>, as appropriate.
-        1. If _additionalInternalSlotsList_ is present, append each of its elements to _internalSlotsList_.
+        1. Append to _internalSlotsList_ the elements of _additionalInternalSlotsList_.
         1. Let _func_ be a new built-in function object that when called performs the action described by _steps_. The new function object has internal slots whose names are the elements of _internalSlotsList_.
         1. Set _func_.[[Extensible]] to *true*.
         1. Set _func_.[[Prototype]] to _prototype_.
