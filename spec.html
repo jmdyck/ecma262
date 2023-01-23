@@ -7546,7 +7546,7 @@
         DisposeResources (
           _disposable_: an object with a [[DisposableResourceStack]] internal slot or *undefined*,
           _completion_: a Completion Record,
-        ): a Completion Record
+        ): either a normal completion containing an ECMAScript language value or an abrupt completion
       </h1>
       <dl class="header"></dl>
       <emu-alg>
@@ -10686,7 +10686,7 @@
               _name_: a String,
               _value_: an ECMAScript language value,
               _hint_: either ~normal~ or ~sync-dispose~,
-            ): a normal completion containing ~unused~
+            ): either a normal completion containing ~unused~ or a throw completion
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11348,7 +11348,7 @@
           <emu-alg>
             1. Let _declarativeRecord_ be _envRec_.[[DeclarativeRecord]].
             1. If ! _declarativeRecord_.HasBinding(_name_) is *true*, then
-              1. Return ! _declarativeRecord_.InitializeBinding(_name_, _value_, _hint_).
+              1. Return ? _declarativeRecord_.InitializeBinding(_name_, _value_, _hint_).
             1. Assert: _hint_ is ~normal~.
             1. Assert: If the binding exists, it must be in the Object Environment Record.
             1. Let _objectRecord_ be _envRec_.[[ObjectRecord]].
@@ -21888,7 +21888,7 @@
           1. Assert: _hint_ is ~normal~.
           1. Let _lhs_ be ! ResolveBinding(StringValue of |BindingIdentifier|).
           1. Perform ! InitializeReferencedBinding(_lhs_, *undefined*, ~normal~).
-          1. Return ~empty~.
+          1. Return ~unused~.
         </emu-alg>
         <emu-note>
           <p>A static semantics rule ensures that this form of |LexicalBinding| never occurs in a `const` or `using` declaration.</p>
@@ -21903,7 +21903,7 @@
             1. Let _rhs_ be ? Evaluation of |Initializer|.
             1. Let _value_ be ? GetValue(_rhs_).
           1. Perform ! InitializeReferencedBinding(_lhs_, _value_, _hint_).
-          1. Return ~empty~.
+          1. Return ~unused~.
         </emu-alg>
         <emu-grammar>LexicalBinding : BindingPattern Initializer</emu-grammar>
         <emu-alg>
