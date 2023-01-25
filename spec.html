@@ -21775,7 +21775,8 @@
         1. Perform BlockDeclarationInstantiation(|StatementList|, _blockEnv_).
         1. Set the running execution context's LexicalEnvironment to _blockEnv_.
         1. Let _blockValue_ be Completion(Evaluation of |StatementList|).
-        1. Set _blockValue_ to Completion(DisposeResources(_blockEnv_.[[DisposeCapability]], UpdateEmpty(_blockValue_, *undefined*))).
+        1. Set _blockValue_ to Completion(UpdateEmpty(_blockValue_, *undefined*)).
+        1. Set _blockValue_ to Completion(DisposeResources(_blockEnv_.[[DisposeCapability]], _blockValue_)).
         1. Set the running execution context's LexicalEnvironment to _oldEnv_.
         1. Return ? _blockValue_.
       </emu-alg>
@@ -22875,14 +22876,16 @@
                 1. Else,
                   1. Let _status_ be Completion(InitializeReferencedBinding(_lhsRef_, _nextValue_, ~normal~)).
             1. If _status_ is an abrupt completion, then
-              1. Set _status_ to Completion(DisposeResources(_iterationEnv_.[[DisposeCapability]], UpdateEmpty(_status_, *undefined*))).
+              1. Set _status_ to Completion(UpdateEmpty(_status_, *undefined*)).
+              1. Set _status_ to Completion(DisposeResources(_iterationEnv_.[[DisposeCapability]], _status_)).
               1. Set the running execution context's LexicalEnvironment to _oldEnv_.
               1. If _iterationKind_ is ~enumerate~, return ? _status_.
               1. Assert: _iterationKind_ is ~iterate~.
               1. If _iteratorKind_ is ~async~, return ? AsyncIteratorClose(_iteratorRecord_, _status_).
               1. Return ? IteratorClose(_iteratorRecord_, _status_).
             1. Let _result_ be Completion(Evaluation of _stmt_).
-            1. Set _result_ to Completion(DisposeResources(_iterationEnv_.[[DisposeCapability]], UpdateEmpty(_result_, *undefined*))).
+            1. Set _result_ to Completion(UpdateEmpty(_result_, *undefined*)).
+            1. Set _result_ to Completion(DisposeResources(_iterationEnv_.[[DisposeCapability]], _result_)).
             1. Set the running execution context's LexicalEnvironment to _oldEnv_.
             1. If LoopContinues(_result_, _labelSet_) is *false*, then
               1. Set _status_ to Completion(UpdateEmpty(_result_, _iterationResult_)).
@@ -24067,6 +24070,7 @@
         1. Let _result_ be Completion(Evaluation of |FunctionStatementList|).
         1. NOTE: If _result_ a normal completion, then evaluation finished by proceeding past the end of the |FunctionStatementList|.
         1. Let _env_ be the running execution context's LexicalEnvironment.
+        1. Set _result_ to Completion(UpdateEmpty(_result_, *undefined*)).
         1. Perform ? DisposeResources(_env_.[[DisposeCapability]], _result_).
         1. Return ReturnCompletion(*undefined*).
       </emu-alg>
@@ -25459,6 +25463,7 @@
         1. Perform ! FunctionDeclarationInstantiation(_functionObject_, « »).
         1. Let _result_ be Completion(Evaluation of |ClassStaticBlockStatementList|).
         1. Let _env_ be the running execution context's LexicalEnvironment.
+        1. Set _result_ to Completion(UpdateEmpty(_result_, *undefined*)).
         1. Perform ? DisposeResources(_env_.[[DisposeCapability]], _result_).
         1. Return ReturnCompletion(*undefined*).
       </emu-alg>
