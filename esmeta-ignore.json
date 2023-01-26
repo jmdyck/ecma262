@@ -1,7 +1,9 @@
 [
   "AsyncFromSyncIteratorContinuation",
+  "ClassStaticBlockBody[0,0].EvaluateClassStaticBlockBody",
   "AsyncGeneratorYield",
   "CompareTypedArrayElements",
+  "FunctionBody[0,0].EvaluateFunctionBody",
   "DoWait",
   "EvaluateImportCall",
   "FunctionDeclarationInstantiation",
