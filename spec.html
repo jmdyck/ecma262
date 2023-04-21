@@ -36344,8 +36344,24 @@ THH:mm:ss.sss
         </emu-alg>
         <emu-grammar>AtomEscape :: CharacterClassEscape</emu-grammar>
         <emu-alg>
-          1. Let _A_ be CompileToCharSet of |CharacterClassEscape| with argument _rer_.
-          1. Return CharacterSetMatcher(_rer_, _A_, *false*, _direction_).
+          1. Let _cs_ be CompileToCharSet of |CharacterClassEscape| with argument _rer_.
+          1. If _rer_.[[UnicodeSets]] is *false* or if every element of _cs_ consists of a single character, return CharacterSetMatcher(_rer_, _cs_, *false, _direction_).
+          1. Let _lm_ be an empty List of Matchers.
+          1. For each string _s_ in _cs_ whose length is greater than 1, iterating in descending order of string length, do
+            1. Let _cs2_ be a one-element CharSet containing the last code point of _s_.
+            1. Let _m2_ be the result of CharacterSetMatcher(_rer_, _cs2_, *false*, _direction_).
+            1. For each code point _c1_ in _s_, iterating backwards from its second-to-last code point, do
+              1. Let _cs1_ be a one-element CharSet containing _c1_.
+              1. Let _m1_ be the result of CharacterSetMatcher(_rer_, _cs1_, *false*, _direction_).
+              1. Let _m2_ be MatchSequence(_m1_, _m2_, _direction_).
+            1. Append _m2_ to _lm_.
+          1. Let _singles_ be the CharSet that contains every element of _cs_ which consists of a single character.
+          1. Append CharacterSetMatcher(_rer_, _singles_, *false*, _direction_) to _lm_.
+          1. If _cs_ contains the empty String, append EmptyMatcher() to _lm_.
+          1. Let _m2_ be the last Matcher in _lm_.
+          1. For each Matcher _m1_ in _lm_, iterating backwards from its second-to-last element, do
+            1. Let _m2_ be MatchTwoAlternatives(_m1_, _m2_).
+          1. Return _m2_.
         </emu-alg>
         <emu-grammar>AtomEscape :: `k` GroupName</emu-grammar>
         <emu-alg>
