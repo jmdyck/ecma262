@@ -36837,7 +36837,7 @@ THH:mm:ss.sss
           </h1>
           <dl class="header">
             <dt>description</dt>
-            <dd>If _rer_.[[UnicodeSets]] is *false* or _rer_.[[IgnoreCase]] is *false*, it returns _A_. Otherwise, it uses the <a href="https://www.unicode.org/reports/tr44/#Simple_Case_Folding">Simple Case Folding</a> (<emu-eqn id="scf" aoid="scf">scf(_cp_)</emu-eqn>) definitions in the file <a href="https://unicode.org/Public/UCD/latest/ucd/CaseFolding.txt"><code>CaseFolding.txt</code></a> of the Unicode Character Database (each of which maps a single code point to another single code point) to map each CharSetElement of _A_ character-by-character into a canonical form and returns the resulting CharSet.</dd>
+            <dd>If _rer_.[[UnicodeSets]] is *false* or _rer_.[[IgnoreCase]] is *false*, it returns _A_. Otherwise, it uses the <a href="https://www.unicode.org/reports/tr44/#Simple_Case_Folding">Simple Case Folding</a> (<emu-eqn id="eqn-scf" aoid="scf">scf(_cp_)</emu-eqn>) definitions in the file <a href="https://unicode.org/Public/UCD/latest/ucd/CaseFolding.txt"><code>CaseFolding.txt</code></a> of the Unicode Character Database (each of which maps a single code point to another single code point) to map each CharSetElement of _A_ character-by-character into a canonical form and returns the resulting CharSet.</dd>
           </dl>
           <emu-alg>
             1. If _rer_.[[UnicodeSets]] is *false* or _rer_.[[IgnoreCase]] is *false*, return _A_.
