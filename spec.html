@@ -36606,11 +36606,11 @@ THH:mm:ss.sss
         </emu-alg>
         <emu-grammar>CharacterClassEscape :: `p{` UnicodePropertyValueExpression `}`</emu-grammar>
         <emu-alg>
-          1. Return the CharSet returned by CompileToCharSet of |UnicodePropertyValueExpression| with argument _rer_.
+          1. Return CompileToCharSet of |UnicodePropertyValueExpression| with argument _rer_.
         </emu-alg>
         <emu-grammar>CharacterClassEscape :: `P{` UnicodePropertyValueExpression `}`</emu-grammar>
         <emu-alg>
-          1. Let _S_ be the CharSet returned by CompileToCharSet of |UnicodePropertyValueExpression| with argument _rer_.
+          1. Let _S_ be CompileToCharSet of |UnicodePropertyValueExpression| with argument _rer_.
           1. Assert: _S_ contains only single code points.
           1. Return CharacterComplement(_rer_, _S_).
         </emu-alg>
