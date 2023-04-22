@@ -36341,7 +36341,7 @@ THH:mm:ss.sss
         <emu-grammar>AtomEscape :: CharacterClassEscape</emu-grammar>
         <emu-alg>
           1. Let _cs_ be CompileToCharSet of |CharacterClassEscape| with argument _rer_.
-          1. If _rer_.[[UnicodeSets]] is *false*, or if every element of _cs_ consists of a single character, return CharacterSetMatcher(_rer_, _cs_, *false, _direction_).
+          1. If _rer_.[[UnicodeSets]] is *false*, or if every element of _cs_ consists of a single character, return CharacterSetMatcher(_rer_, _cs_, *false*, _direction_).
           1. Let _lm_ be an empty List of Matchers.
           1. For each string _s_ in _cs_ whose length is greater than 1, iterating in descending order of string length, do
             1. Let _cs2_ be a one-element CharSet containing the last code point of _s_.
