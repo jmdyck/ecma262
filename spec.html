@@ -35484,7 +35484,7 @@ THH:mm:ss.sss
         <dl class="header">
         </dl>
         <emu-grammar>
-          CharacterClassEscape[UnicodeMode] ::
+          CharacterClassEscape ::
             `d`
             `D`
             `s`
@@ -35496,15 +35496,15 @@ THH:mm:ss.sss
           UnicodePropertyValueExpression ::
             UnicodePropertyName `=` UnicodePropertyValue
 
-          CharacterClass[UnicodeMode, UnicodeSetsMode] ::
-            `[^` ClassContents[?UnicodeMode, ?UnicodeSetsMode] `]`
+          CharacterClass ::
+            `[^` ClassContents `]`
 
           NestedClass ::
-            `[^` ClassContents[+UnicodeMode, +UnicodeSetsMode] `]`
+            `[^` ClassContents `]`
 
-          ClassContents[UnicodeMode, UnicodeSetsMode] ::
+          ClassContents ::
             [empty]
-            NonemptyClassRanges[?UnicodeMode]
+            NonemptyClassRanges
 
           ClassSetOperand ::
             ClassSetCharacter
