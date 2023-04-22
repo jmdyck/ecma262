@@ -37425,7 +37425,13 @@ THH:mm:ss.sss
           <dl class="header">
           </dl>
           <emu-alg>
-            1. Let _S_ be a String in the form of a |Pattern[~UnicodeMode, ~UnicodeSetsMode]| (|Pattern[+UnicodeMode, ~UnicodeSetsMode]| if _F_ contains *"u"* or |Pattern[+UnicodeMode, +UnicodeSetsMode]| if _F_ contains *"v"*) equivalent to _P_ interpreted as UTF-16 encoded Unicode code points (<emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>), in which certain code points are escaped as described below. _S_ may or may not differ from _P_; however, the Abstract Closure that would result from evaluating _S_ as a |Pattern[~UnicodeMode, ~UnicodeSetsMode]| (|Pattern[+UnicodeMode, ~UnicodeSetsMode]| if _F_ contains *"u"* or |Pattern[+UnicodeMode, +UnicodeSetsMode]| if _F_ contains *"v"*) must behave identically to the Abstract Closure given by the constructed object's [[RegExpMatcher]] internal slot. Multiple calls to this abstract operation using the same values for _P_ and _F_ must produce identical results.
+            1. If _F_ contains *"v"*, then
+              1. Let _patternSymbol_ be |Pattern[+UnicodeMode, +UnicodeSetsMode]|.
+            1. Else if _F_ contains *"u"*, then
+              1. Let _patternSymbol_ be |Pattern[+UnicodeMode, ~UnicodeSetsMode]|.
+            1. Else,
+              1. Let _patternSymbol_ be |Pattern[~UnicodeMode, ~UnicodeSetsMode]|.
+            1. Let _S_ be a String in the form of a _patternSymbol_ equivalent to _P_ interpreted as UTF-16 encoded Unicode code points (<emu-xref href="#sec-ecmascript-language-types-string-type"></emu-xref>), in which certain code points are escaped as described below. _S_ may or may not differ from _P_; however, the Abstract Closure that would result from evaluating _S_ as a _patternSymbol_ must behave identically to the Abstract Closure given by the constructed object's [[RegExpMatcher]] internal slot. Multiple calls to this abstract operation using the same values for _P_ and _F_ must produce identical results.
             1. The code points `/` or any |LineTerminator| occurring in the pattern shall be escaped in _S_ as necessary to ensure that the string-concatenation of *"/"*, _S_, *"/"*, and _F_ can be parsed (in an appropriate lexical context) as a |RegularExpressionLiteral| that behaves identically to the constructed regular expression. For example, if _P_ is *"/"*, then _S_ could be *"\\/"* or *"\\u002F"*, among other possibilities, but not *"/"*, because `///` followed by _F_ would be parsed as a |SingleLineComment| rather than a |RegularExpressionLiteral|. If _P_ is the empty String, this specification can be met by letting _S_ be *"(?:)"*.
             1. Return _S_.
           </emu-alg>
