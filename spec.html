@@ -12244,7 +12244,12 @@
             1. Set _ref_.[[WeakRefTarget]] to ~empty~.
           1. For each FinalizationRegistry _fg_ such that _fg_.[[Cells]] contains a Record _cell_ such that _cell_.[[WeakRefTarget]] is _value_, do
             1. Set _cell_.[[WeakRefTarget]] to ~empty~.
-            1. Optionally, perform HostEnqueueFinalizationRegistryCleanupJob(_fg_).
+            1. Optionally, perform the following steps:
+              1. Let _cleanupJob_ be a new Job Abstract Closure with no parameters that captures _fg_ and performs the following steps when called:
+                1. Let _cleanupResult_ be Completion(CleanupFinalizationRegistry(_fg_)).
+                1. If _cleanupResult_ is an abrupt completion, perform any host-defined steps for reporting the error.
+                1. Return ~unused~.
+              1. Perform HostEnqueueFinalizationRegistryCleanupJob(_cleanupJob_).
           1. For each WeakMap _map_ such that _map_.[[WeakMapData]] contains a Record _r_ such that _r_.[[Key]] is _value_, do
             1. Set _r_.[[Key]] to ~empty~.
             1. Set _r_.[[Value]] to ~empty~.
@@ -12273,17 +12278,11 @@
       <emu-clause id="sec-host-cleanup-finalization-registry" type="host-defined abstract operation">
         <h1>
           HostEnqueueFinalizationRegistryCleanupJob (
-            _finalizationRegistry_: a FinalizationRegistry,
+            _cleanupJob_: a Job Abstract Closure,
           ): ~unused~
         </h1>
         <dl class="header">
         </dl>
-        <p>Let _cleanupJob_ be a new Job Abstract Closure with no parameters that captures _finalizationRegistry_ and performs the following steps when called:</p>
-        <emu-alg>
-          1. Let _cleanupResult_ be Completion(CleanupFinalizationRegistry(_finalizationRegistry_)).
-          1. If _cleanupResult_ is an abrupt completion, perform any host-defined steps for reporting the error.
-          1. Return ~unused~.
-        </emu-alg>
         <p>An implementation of HostEnqueueFinalizationRegistryCleanupJob schedules _cleanupJob_ to be performed at some future time, if possible. It must also conform to the requirements in <emu-xref href="#sec-jobs"></emu-xref>.</p>
       </emu-clause>
     </emu-clause>
