@@ -35496,9 +35496,6 @@ THH:mm:ss.sss
           UnicodePropertyValueExpression ::
             UnicodePropertyName `=` UnicodePropertyValue
 
-          CharacterClass ::
-            `[^` ClassContents `]`
-
           NestedClass ::
             `[^` ClassContents `]`
 
@@ -35512,34 +35509,10 @@ THH:mm:ss.sss
         <emu-alg>
           1. Return *false*.
         </emu-alg>
-        <emu-grammar>CharacterClassEscape :: `p{` UnicodePropertyValueExpression `}`</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |UnicodePropertyValueExpression|.
-        </emu-alg>
         <emu-grammar>UnicodePropertyValueExpression :: LoneUnicodePropertyNameOrValue</emu-grammar>
         <emu-alg>
           1. If the source text matched by |LoneUnicodePropertyNameOrValue| is a binary property of strings listed in the “Property name” column of <emu-xref href="#table-binary-unicode-properties-of-strings"></emu-xref>, return *true*.
           1. Return *false*.
-        </emu-alg>
-        <emu-grammar>CharacterClass :: `[` ClassContents `]`</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |ClassContents|.
-        </emu-alg>
-        <emu-grammar>ClassContents :: ClassSetExpression</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |ClassSetExpression|.
-        </emu-alg>
-        <emu-grammar>ClassSetExpression :: ClassUnion</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |ClassUnion|.
-        </emu-alg>
-        <emu-grammar>ClassSetExpression :: ClassIntersection</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |ClassIntersection|.
-        </emu-alg>
-        <emu-grammar>ClassSetExpression :: ClassSubtraction</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |ClassSubtraction|.
         </emu-alg>
         <emu-grammar>ClassUnion :: ClassSetRange ClassUnion?</emu-grammar>
         <emu-alg>
@@ -35571,30 +35544,6 @@ THH:mm:ss.sss
         <emu-grammar>ClassSubtraction :: ClassSubtraction `--` ClassSetOperand</emu-grammar>
         <emu-alg>
           1. Return MayContainStrings of the |ClassSubtraction|.
-        </emu-alg>
-        <emu-grammar>ClassSetOperand :: ClassStringDisjunction</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |ClassStringDisjunction|.
-        </emu-alg>
-        <emu-grammar>ClassSetOperand :: NestedClass</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |NestedClass|.
-        </emu-alg>
-        <emu-grammar>NestedClass :: `[` ClassContents `]`</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |ClassContents|.
-        </emu-alg>
-        <emu-grammar>NestedClass :: `\` CharacterClassEscape</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |CharacterClassEscape|.
-        </emu-alg>
-        <emu-grammar>ClassStringDisjunction :: `\q{` ClassStringDisjunctionContents `}`</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |ClassStringDisjunctionContents|.
-        </emu-alg>
-        <emu-grammar>ClassStringDisjunctionContents :: ClassString</emu-grammar>
-        <emu-alg>
-          1. Return MayContainStrings of the |ClassString|.
         </emu-alg>
         <emu-grammar>ClassStringDisjunctionContents :: ClassString `|` ClassStringDisjunctionContents</emu-grammar>
         <emu-alg>
