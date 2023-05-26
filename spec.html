@@ -48373,8 +48373,8 @@ THH:mm:ss.sss
       <emu-grammar type="definition">
         Term[UnicodeMode, N] ::
           [+UnicodeMode] Assertion[+UnicodeMode, ?N]
-          [+UnicodeMode] Atom[+UnicodeMode, ?N] Quantifier
-          [+UnicodeMode] Atom[+UnicodeMode, ?N]
+          [+UnicodeMode] Atom[+UnicodeMode, ?UnicodeSetsMode, ?N] Quantifier
+          [+UnicodeMode] Atom[+UnicodeMode, ?UnicodeSetsMode, ?N]
           [~UnicodeMode] QuantifiableAssertion[?N] Quantifier
           [~UnicodeMode] Assertion[~UnicodeMode, ?N]
           [~UnicodeMode] ExtendedAtom[?N] Quantifier
@@ -48385,23 +48385,23 @@ THH:mm:ss.sss
           `$`
           `\b`
           `\B`
-          [+UnicodeMode] `(?=` Disjunction[+UnicodeMode, ?N] `)`
-          [+UnicodeMode] `(?!` Disjunction[+UnicodeMode, ?N] `)`
+          [+UnicodeMode] `(?=` Disjunction[+UnicodeMode, ?UnicodeSetsMode, ?N] `)`
+          [+UnicodeMode] `(?!` Disjunction[+UnicodeMode, ?UnicodeSetsMode, ?N] `)`
           [~UnicodeMode] QuantifiableAssertion[?N]
-          `(?&lt;=` Disjunction[?UnicodeMode, ?N] `)`
-          `(?&lt;!` Disjunction[?UnicodeMode, ?N] `)`
+          `(?&lt;=` Disjunction[?UnicodeMode, ?UnicodeSetsMode, ?N] `)`
+          `(?&lt;!` Disjunction[?UnicodeMode, ?UnicodeSetsMode, ?N] `)`
 
         QuantifiableAssertion[N] ::
-          `(?=` Disjunction[~UnicodeMode, ?N] `)`
-          `(?!` Disjunction[~UnicodeMode, ?N] `)`
+          `(?=` Disjunction[~UnicodeMode, ?UnicodeSetsMode, ?N] `)`
+          `(?!` Disjunction[~UnicodeMode, ?UnicodeSetsMode, ?N] `)`
 
         ExtendedAtom[N] ::
           `.`
           `\` AtomEscape[~UnicodeMode, ?N]
           `\` [lookahead == `c`]
-          CharacterClass[~UnicodeMode]
-          `(` GroupSpecifier[~UnicodeMode]? Disjunction[~UnicodeMode, ?N] `)`
-          `(?:` Disjunction[~UnicodeMode, ?N] `)`
+          CharacterClass[~UnicodeMode, ?UnicodeSetsMode]
+          `(` GroupSpecifier[~UnicodeMode]? Disjunction[~UnicodeMode, ?UnicodeSetsMode, ?N] `)`
+          `(?:` Disjunction[~UnicodeMode, ?UnicodeSetsMode, ?N] `)`
           InvalidBracedQuantifier
           ExtendedPatternCharacter
 
