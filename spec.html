@@ -48372,11 +48372,11 @@ THH:mm:ss.sss
       <h2>Syntax</h2>
       <emu-grammar type="definition">
         Term[UnicodeMode, UnicodeSetsMode, N] ::
-          [+UnicodeMode] Assertion[+UnicodeMode, ?N]
+          [+UnicodeMode] Assertion[+UnicodeMode, ?UnicodeSetsMode, ?N]
           [+UnicodeMode] Atom[+UnicodeMode, ?UnicodeSetsMode, ?N] Quantifier
           [+UnicodeMode] Atom[+UnicodeMode, ?UnicodeSetsMode, ?N]
           [~UnicodeMode] QuantifiableAssertion[?N] Quantifier
-          [~UnicodeMode] Assertion[~UnicodeMode, ?N]
+          [~UnicodeMode] Assertion[~UnicodeMode, ~UnicodeSetsMode, ?N]
           [~UnicodeMode] ExtendedAtom[?N] Quantifier
           [~UnicodeMode] ExtendedAtom[?N]
 
@@ -48391,17 +48391,17 @@ THH:mm:ss.sss
           `(?&lt;=` Disjunction[?UnicodeMode, ?UnicodeSetsMode, ?N] `)`
           `(?&lt;!` Disjunction[?UnicodeMode, ?UnicodeSetsMode, ?N] `)`
 
-        QuantifiableAssertion[UnicodeSetsMode, N] ::
-          `(?=` Disjunction[~UnicodeMode, ?UnicodeSetsMode, ?N] `)`
-          `(?!` Disjunction[~UnicodeMode, ?UnicodeSetsMode, ?N] `)`
+        QuantifiableAssertion[N] ::
+          `(?=` Disjunction[~UnicodeMode, ~UnicodeSetsMode, ?N] `)`
+          `(?!` Disjunction[~UnicodeMode, ~UnicodeSetsMode, ?N] `)`
 
-        ExtendedAtom[UnicodeSetsMode, N] ::
+        ExtendedAtom[N] ::
           `.`
           `\` AtomEscape[~UnicodeMode, ?N]
           `\` [lookahead == `c`]
-          CharacterClass[~UnicodeMode, ?UnicodeSetsMode]
-          `(` GroupSpecifier[~UnicodeMode]? Disjunction[~UnicodeMode, ?UnicodeSetsMode, ?N] `)`
-          `(?:` Disjunction[~UnicodeMode, ?UnicodeSetsMode, ?N] `)`
+          CharacterClass[~UnicodeMode, ~UnicodeSetsMode]
+          `(` GroupSpecifier[~UnicodeMode]? Disjunction[~UnicodeMode, ~UnicodeSetsMode, ?N] `)`
+          `(?:` Disjunction[~UnicodeMode, ~UnicodeSetsMode, ?N] `)`
           InvalidBracedQuantifier
           ExtendedPatternCharacter
 
