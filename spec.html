@@ -24191,10 +24191,7 @@
       <emu-grammar>FunctionBody : FunctionStatementList</emu-grammar>
       <emu-alg>
         1. Perform ? FunctionDeclarationInstantiation(_functionObject_, _argumentsList_).
-        1. Let _result_ be Completion(Evaluation of |FunctionStatementList|).
-        1. NOTE: If _result_ a normal completion, then evaluation finished by proceeding past the end of the |FunctionStatementList|.
-        1. Let _env_ be the running execution context's LexicalEnvironment.
-        1. Perform ? DisposeResources(_env_.[[DisposeCapability]], _result_).
+        1. Perform ? Evaluation of |FunctionStatementList|.
         1. Return ReturnCompletion(*undefined*).
       </emu-alg>
     </emu-clause>
@@ -24294,6 +24291,13 @@
       <emu-grammar>FunctionStatementList : [empty]</emu-grammar>
       <emu-alg>
         1. Return *undefined*.
+      </emu-alg>
+      <emu-grammar>FunctionStatementList : StatementList</emu-grammar>
+      <emu-alg>
+        1. Let _result_ be Completion(Evaluation of |StatementList|).
+        1. Let _env_ be the running execution context's LexicalEnvironment.
+        1. Assert: _env_ is a Declarative Environment Record.
+        1. Return ? DisposeResources(_env_.[[DisposeCapability]], _result_).
       </emu-alg>
     </emu-clause>
   </emu-clause>
@@ -51725,14 +51729,12 @@ THH:mm:ss.sss
           1. Set the Generator component of _genContext_ to _generator_.
           1. Let _closure_ be a new Abstract Closure with no parameters that captures _generatorBody_ and performs the following steps when called:
             1. Let _acGenContext_ be the running execution context.
-            1. Let _env_ be _acGenContext_'s LexicalEnvironment.
             1. Let _acGenerator_ be the Generator component of _acGenContext_.
             1. If _generatorBody_ is a Parse Node, then
               1. Let _result_ be Completion(Evaluation of _generatorBody_).
             1. Else,
               1. Assert: _generatorBody_ is an Abstract Closure with no parameters.
               1. Let _result_ be Completion(_generatorBody_()).
-            1. Set _result_ to Completion(DisposeResources(_env_.[[DisposeCapability]], _result_)).
             1. Assert: If we return here, the generator either threw an exception or performed either an implicit or explicit return.
             1. Remove _acGenContext_ from the execution context stack and restore the execution context that is at the top of the execution context stack as the running execution context.
             1. Set _acGenerator_.[[GeneratorState]] to ~completed~.
@@ -52091,14 +52093,12 @@ THH:mm:ss.sss
           1. Set the Generator component of _genContext_ to _generator_.
           1. Let _closure_ be a new Abstract Closure with no parameters that captures _generatorBody_ and performs the following steps when called:
             1. Let _acGenContext_ be the running execution context.
-            1. Let _env_ be _acGenContext_'s LexicalEnvironment.
             1. Let _acGenerator_ be the Generator component of _acGenContext_.
             1. If _generatorBody_ is a Parse Node, then
               1. Let _result_ be Completion(Evaluation of _generatorBody_).
             1. Else,
               1. Assert: _generatorBody_ is an Abstract Closure with no parameters.
               1. Let _result_ be Completion(_generatorBody_()).
-            1. Set _result_ to Completion(DisposeResources(_env_.[[DisposeCapability]], _result_)).
             1. Assert: If we return here, the async generator either threw an exception or performed either an implicit or explicit return.
             1. Remove _acGenContext_ from the execution context stack and restore the execution context that is at the top of the execution context stack as the running execution context.
             1. Set _acGenerator_.[[AsyncGeneratorState]] to ~draining-queue~.
@@ -52454,13 +52454,11 @@ THH:mm:ss.sss
           1. Let _runningContext_ be the running execution context.
           1. Let _closure_ be a new Abstract Closure with no parameters that captures _promiseCapability_ and _asyncBody_ and performs the following steps when called:
             1. Let _acAsyncContext_ be the running execution context.
-            1. Let _env_ be _acAsyncContext_'s LexicalEnvironment.
             1. If _asyncBody_ is a Parse Node, then
               1. Let _result_ be Completion(Evaluation of _asyncBody_).
             1. Else,
               1. Assert: _asyncBody_ is an Abstract Closure with no parameters.
               1. Let _result_ be Completion(_asyncBody_()).
-            1. Set _result_ to Completion(DisposeResources(_env_.[[DisposeCapability]], _result_)).
             1. Assert: If we return here, the async function either threw an exception or performed an implicit or explicit return; all awaiting is done.
             1. Remove _acAsyncContext_ from the execution context stack and restore the execution context that is at the top of the execution context stack as the running execution context.
             1. If _result_ is a normal completion, then
