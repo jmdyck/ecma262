@@ -1,5 +1,4 @@
 [
-  "AsyncFromSyncIteratorContinuation",
   "AsyncGeneratorYield",
   "ClassStaticBlockBody[0,0].EvaluateClassStaticBlockBody",
   "CompareTypedArrayElements",
@@ -8,7 +7,6 @@
   "GetViewByteLength",
   "INTRINSICS.Atomics.notify",
   "MakeMatchIndicesIndexPairArray",
-  "Record[SourceTextModuleRecord].ExecuteModule",
   "Record[SourceTextModuleRecord].ResolveExport",
   "SuperCall[0,0].Evaluation",
   "TypedArrayGetElement",
