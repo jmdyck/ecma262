@@ -1,17 +1,10 @@
 [
-  "AddDisposableResource",
   "AsyncFromSyncIteratorContinuation",
   "AsyncGeneratorYield",
-  "ClassStaticBlockBody[0,0].EvaluateClassStaticBlockBody",
   "CompareTypedArrayElements",
-  "DeclarativeEnvironmentRecord.InitializeBinding",
   "DoWait",
-  "GlobalEnvironmentRecord.InitializeBinding",
   "EvaluateImportCall",
-  "FunctionBody[0,0].EvaluateFunctionBody",
   "FunctionDeclarationInstantiation",
   "GetViewByteLength",
-  "ObjectEnvironmentRecord.InitializeBinding",
-  "Record[SourceTextModuleRecord].ExecuteModule",
   "TypedArrayLength"
 ]
