@@ -23052,12 +23052,6 @@
           1. If _iteratorKind_ is not present, set _iteratorKind_ to ~sync~.
           1. Let _oldEnv_ be the running execution context's LexicalEnvironment.
           1. Let _iterationResult_ be *undefined*.
-          1. If IsAwaitUsingDeclaration of _lhs_ is *true*, then
-            1. Let _declarationKind_ be ~async-dispose~.
-          1. Else if IsUsingDeclaration of _lhs_ is *true*, then
-            1. Let _declarationKind_ be ~sync-dispose~.
-          1. Else,
-            1. Let _declarationKind_ be ~normal~.
           1. Let _destructuring_ be IsDestructuring of _lhs_.
           1. If _destructuring_ is *true* and _lhsKind_ is ~assignment~, then
             1. Assert: _lhs_ is a |LeftHandSideExpression|.
@@ -23095,6 +23089,12 @@
                 1. Let _status_ be Completion(ForDeclarationBindingInitialization of _lhs_ with arguments _nextValue_ and _iterationEnv_).
               1. Else,
                 1. Assert: _lhs_ binds a single name.
+                1. If IsAwaitUsingDeclaration of _lhs_ is *true*, then
+                  1. Let _declarationKind_ be ~async-dispose~.
+                1. Else if IsUsingDeclaration of _lhs_ is *true*, then
+                  1. Let _declarationKind_ be ~sync-dispose~.
+                1. Else,
+                  1. Let _declarationKind_ be ~normal~.
                 1. Let _lhsName_ be the sole element of the BoundNames of _lhs_.
                 1. Let _lhsRef_ be ! ResolveBinding(_lhsName_).
                 1. If _declarationKind_ is not ~normal~, then
