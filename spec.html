@@ -7534,7 +7534,7 @@
           1. NOTE: When _V_ is either *null* or *undefined* and _kind_ is ~async-dispose~, we record that the resource was evaluated to ensure we will still perform an Await when resources are later disposed.
           1. Let _resource_ be ? CreateDisposableResource(_V_, _kind_).
         1. Else,
-          1. Assert: V is *undefined*.
+          1. Assert: _V_ is *undefined*.
           1. Let _resource_ be ? CreateDisposableResource(*undefined*, _kind_, _method_).
         1. Append _resource_ to _disposeCapability_.[[DisposableResourceStack]].
         1. Return ~unused~.
@@ -7557,7 +7557,6 @@
             1. Set _V_ to *undefined*.
             1. Set _method_ to *undefined*.
           1. Else,
-            1. If _V_ is not an Object, throw a *TypeError* exception.
             1. Set _method_ to ? GetDisposeMethod(_V_, _kind_).
             1. If _method_ is *undefined*, throw a *TypeError* exception.
         1. Else,
@@ -7569,30 +7568,29 @@
     <emu-clause id="sec-getdisposemethod" type="abstract operation">
       <h1>
         GetDisposeMethod (
-          _V_: an Object,
+          _V_: an ECMAScript language value,
           _kind_: either ~sync-dispose~ or ~async-dispose~,
         ): either a normal completion containing either a function object or *undefined*, or a throw completion
       </h1>
       <dl class="header">
       </dl>
       <emu-alg>
-        1. If _kind_ is ~async-dispose~, then
-          1. Let _method_ be ? GetMethod(_V_, %Symbol.asyncDispose%).
-          1. If _method_ is *undefined*, then
-            1. Set _method_ to ? GetMethod(_V_, %Symbol.dispose%).
-            1. If _method_ is not *undefined*, then
-              1. Let _closure_ be a new Abstract Closure with no parameters that captures _method_ and performs the following steps when called:
-                1. Let _O_ be the *this* value.
-                1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
-                1. Let _result_ be Completion(Call(_method_, _O_)).
-                1. IfAbruptRejectPromise(_result_, _promiseCapability_).
-                1. Perform ? Call(_promiseCapability_.[[Resolve]], *undefined*, « *undefined* »).
-                1. Return _promiseCapability_.[[Promise]].
-              1. NOTE: This function is not observable to user code. It is used to ensure that a Promise returned from a synchronous `%Symbol.dispose%` method will not be awaited and that a synchronous exception will be translated to a rejected Promise.
-              1. Return CreateBuiltinFunction(_closure_, 0, *""*, « »).
-        1. Else,
-          1. Let _method_ be ? GetMethod(_V_, %Symbol.dispose%).
-        1. Return _method_.
+        1. If _V_ is not an Object, throw a *TypeError* exception.
+        1. If _kind_ is ~sync-dispose~, return ? GetMethod(_V_, %Symbol.dispose%).
+        1. Assert: _kind_ is ~async-dispose~.
+        1. Let _asyncMethod_ be ? GetMethod(_V_, %Symbol.asyncDispose%).
+        1. If _asyncMethod_ is not *undefined*, return _asyncMethod_.
+        1. Let _syncMethod_ be ? GetMethod(_V_, %Symbol.dispose%).
+        1. If _syncMethod_ is *undefined*, return *undefined*.
+        1. Let _closure_ be a new Abstract Closure with no parameters that captures _syncMethod_ and performs the following steps when called:
+          1. Let _O_ be the *this* value.
+          1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
+          1. Let _result_ be Completion(Call(_syncMethod_, _O_)).
+          1. IfAbruptRejectPromise(_result_, _promiseCapability_).
+          1. Perform ? Call(_promiseCapability_.[[Resolve]], *undefined*, « *undefined* »).
+          1. Return _promiseCapability_.[[Promise]].
+        1. NOTE: This function is not observable to user code. It is used to ensure that a Promise returned from a synchronous `%Symbol.dispose%` method will not be awaited and that a synchronous exception will be translated to a rejected Promise.
+        1. Return CreateBuiltinFunction(_closure_, 0, *""*, « »).
       </emu-alg>
     </emu-clause>
 
@@ -10606,7 +10604,7 @@
       </dl>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. If ContainsUsing of |StatementList| is *true*, return *true*.
+        1. If ContainsUsing of the derived |StatementList| is *true*, return *true*.
         1. If ContainsUsing of |StatementListItem| is *true*, return *true*.
         1. Return *false*.
       </emu-alg>
@@ -22140,7 +22138,7 @@
         </dl>
         <emu-grammar>BindingList : BindingList `,` LexicalBinding</emu-grammar>
         <emu-alg>
-          1. Perform ? BindingEvaluation of |BindingList| with argument _kind_.
+          1. Perform ? BindingEvaluation of the derived |BindingList| with argument _kind_.
           1. Return ? BindingEvaluation of |LexicalBinding| with argument _kind_.
         </emu-alg>
         <emu-grammar>LexicalBinding : BindingIdentifier</emu-grammar>
@@ -23052,7 +23050,7 @@
           1. If _iteratorKind_ is not present, set _iteratorKind_ to ~sync~.
           1. Let _oldEnv_ be the running execution context's LexicalEnvironment.
           1. Let _iterationResult_ be *undefined*.
-          1. If _lhsKind_ ~lexical-binding~, then
+          1. If _lhsKind_ is ~lexical-binding~, then
             1. Assert: _lhs_ is a |ForDeclaration|.
             1. If IsAwaitUsingDeclaration of _lhs_ is *true*, then
               1. Let _declarationKind_ be ~async-dispose~.
@@ -26328,9 +26326,9 @@
 
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _has_ be HasCallInTailPosition of |StatementList| with argument _call_.
+        1. Let _has_ be HasCallInTailPosition of the derived |StatementList| with argument _call_.
         1. If _has_ is *true*, return *true*.
-        1. If HasUnterminatedUsingDeclaration of |StatementList| is *true*, return *false*.
+        1. If HasUnterminatedUsingDeclaration of the derived |StatementList| is *true*, return *false*.
         1. Return HasCallInTailPosition of |StatementListItem| with argument _call_.
       </emu-alg>
       <emu-grammar>
@@ -26656,7 +26654,7 @@
       </dl>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
       <emu-alg>
-        1. Let _has_ be HasUnterminatedUsingDeclaration of |StatementList|.
+        1. Let _has_ be HasUnterminatedUsingDeclaration of the derived |StatementList|.
         1. If _has_ is *true*, return *true*.
         1. Return HasUnterminatedUsingDeclaration of |StatementListItem|.
       </emu-alg>
@@ -50080,7 +50078,7 @@ THH:mm:ss.sss
                 `%Symbol.asyncDispose%`
               </td>
               <td>
-                A function that returns a promise.
+                A function object that returns a promise.
               </td>
               <td>
                 <p>Invoking this method notifies the <em>AsyncDisposable</em> object that the caller does not intend to continue to use this object. This method should perform any necessary logic to perform explicit clean-up of the resource including, but not limited to, file system handles, streams, host objects, etc. When the promise returned by this method is rejected, it typically means that the resource could not be explicitly freed. An <em>AsyncDisposable</em> object is not considered "disposed" until the resulting Promise has been fulfilled.</p>
@@ -50205,7 +50203,7 @@ THH:mm:ss.sss
           1. Let _disposableStack_ be the *this* value.
           1. Perform ? RequireInternalSlot(_disposableStack_, [[DisposableState]]).
           1. If _disposableStack_.[[DisposableState]] is ~disposed~, return *true*.
-          1. Otherwise, return *false*.
+          1. Return *false*.
         </emu-alg>
       </emu-clause>
 
@@ -50403,7 +50401,7 @@ THH:mm:ss.sss
           1. Let _asyncDisposableStack_ be the *this* value.
           1. Perform ? RequireInternalSlot(_asyncDisposableStack_, [[AsyncDisposableState]]).
           1. If _asyncDisposableStack_.[[AsyncDisposableState]] is ~disposed~, return *true*.
-          1. Otherwise, return *false*.
+          1. Return *false*.
         </emu-alg>
       </emu-clause>
 
