@@ -7475,7 +7475,7 @@
               [[ResourceValue]]
             </td>
             <td>
-              an Object or *undefined*.
+              an Object or *undefined*
             </td>
             <td>
               The value to be disposed.
@@ -7625,7 +7625,7 @@
       <emu-alg>
         1. Let _needsAwait_ be *false*.
         1. Let _hasAwaited_ be *false*.
-        1. For each element _resource_ of _disposeCapability_.[[DisposableResourceStack]], in reverse list order, do
+        1. For each element _resource_ of _disposeCapability_.[[DisposableResourceStack]], in reverse List order, do
           1. Let _value_ be _resource_.[[ResourceValue]].
           1. Let _kind_ be _resource_.[[Kind]].
           1. Let _method_ be _resource_.[[DisposeMethod]].
@@ -10825,7 +10825,7 @@
       <emu-clause id="sec-declarative-environment-records">
         <h1>Declarative Environment Records</h1>
         <p>Each <dfn variants="Declarative Environment Records">Declarative Environment Record</dfn> is associated with an ECMAScript program scope containing variable, constant, let, class, module, import, and/or function declarations. A Declarative Environment Record binds the set of identifiers defined by the declarations contained within its scope.</p>
-        <p>Every declarative Environment Record also has a [[DisposeCapability]] field, which contains a DisposeCapability Record. This field holds a stack of resources tracked by the `using` declarations and `await using` declarations that must be disposed when the Evaluation step that constructed the Environment Record has completed.</p>
+        <p>Every Declarative Environment Record also has a [[DisposeCapability]] field, which contains a DisposeCapability Record. This field holds a stack of resources tracked by the `using` declarations and `await using` declarations that must be disposed when the Evaluation step that constructed the Environment Record has completed.</p>
 
         <emu-clause id="sec-declarative-environment-records-hasbinding-n" type="concrete method">
           <h1>
@@ -49806,7 +49806,7 @@ THH:mm:ss.sss
         <emu-alg>
           1. Let _O_ be the *this* value.
           1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
-          1. Let _return_ be Completion(GetMethod(_O_, `"return"`)).
+          1. Let _return_ be Completion(GetMethod(_O_, *"return"*)).
           1. IfAbruptRejectPromise(_return_, _promiseCapability_).
           1. If _return_ is *undefined*, then
             1. Perform ! Call(_promiseCapability_.[[Resolve]], *undefined*, « *undefined* »).
@@ -50078,7 +50078,7 @@ THH:mm:ss.sss
                 `%Symbol.asyncDispose%`
               </td>
               <td>
-                A function object that returns a promise.
+                A function object that returns a promise
               </td>
               <td>
                 <p>Invoking this method notifies the <em>AsyncDisposable</em> object that the caller does not intend to continue to use this object. This method should perform any necessary logic to perform explicit clean-up of the resource including, but not limited to, file system handles, streams, host objects, etc. When the promise returned by this method is rejected, it typically means that the resource could not be explicitly freed. An <em>AsyncDisposable</em> object is not considered "disposed" until the resulting Promise has been fulfilled.</p>
