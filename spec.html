@@ -7629,7 +7629,7 @@
           1. Let _value_ be _resource_.[[ResourceValue]].
           1. Let _kind_ be _resource_.[[Kind]].
           1. Let _method_ be _resource_.[[DisposeMethod]].
-          1. If _kind_ is ~sync-dispose~ and _needsAwait_ is *true* and _hasAwaited_ is *false*, then
+          1. If _kind_ is ~sync-dispose~, _needsAwait_ is *true*, and _hasAwaited_ is *false*, then
             1. Perform ! Await(*undefined*).
             1. Set _needsAwait_ to *false*.
           1. If _method_ is not *undefined*, then
@@ -10599,7 +10599,7 @@
     </emu-clause>
 
     <emu-clause id="sec-static-semantics-containsusing" type="sdo">
-      <h1>Static Semantics: ContainsUsing ( ): Boolean</h1>
+      <h1>Static Semantics: ContainsUsing ( ): a Boolean</h1>
       <dl class="header">
       </dl>
       <emu-grammar>StatementList : StatementList StatementListItem</emu-grammar>
@@ -10893,7 +10893,7 @@
             InitializeBinding (
               _name_: a String,
               _value_: an ECMAScript language value,
-            ): either a normal completion containing ~unused~ or a throw completion
+            ): a normal completion containing ~unused~
           </h1>
           <dl class="header">
             <dt>for</dt>
@@ -11551,7 +11551,7 @@
           <emu-alg>
             1. Let _declarativeRecord_ be _envRec_.[[DeclarativeRecord]].
             1. If ! _declarativeRecord_.HasBinding(_name_) is *true*, then
-              1. Return ? _declarativeRecord_.InitializeBinding(_name_, _value_).
+              1. Return ! _declarativeRecord_.InitializeBinding(_name_, _value_).
             1. Assert: If the binding exists, it must be in the Object Environment Record.
             1. Let _objectRecord_ be _envRec_.[[ObjectRecord]].
             1. Return ? <emu-meta effects="user-code">_objectRecord_.InitializeBinding(_name_, _value_)</emu-meta>.
@@ -22128,7 +22128,7 @@
         </emu-alg>
       </emu-clause>
 
-      <emu-clause id="sec-let-const-using-and-await-using-declarations-runtime-semantics-bindingevaluation" type="sdo">
+      <emu-clause id="sec-bindingevaluation" type="sdo">
         <h1>
           Runtime Semantics: BindingEvaluation (
             _kind_: ~normal~, ~sync-dispose~, or ~async-dispose~,
@@ -29317,7 +29317,7 @@
                 1. If _in_.[[ImportName]] is ~namespace~, then
                   1. Let _namespace_ be GetModuleNamespace(_importedModule_).
                   1. Perform ! _env_.CreateImmutableBinding(_in_.[[LocalName]], *true*).
-                1. Perform ! _env_.InitializeBinding(_in_.[[LocalName]], _namespace_).
+                  1. Perform ! _env_.InitializeBinding(_in_.[[LocalName]], _namespace_).
                 1. Else,
                   1. Assert: _in_.[[ImportName]] is a String.
                   1. Let _resolution_ be _importedModule_.ResolveExport(_in_.[[ImportName]]).
@@ -29325,7 +29325,7 @@
                   1. If _resolution_.[[BindingName]] is ~namespace~, then
                     1. Let _namespace_ be GetModuleNamespace(_resolution_.[[Module]]).
                     1. Perform ! _env_.CreateImmutableBinding(_in_.[[LocalName]], *true*).
-                  1. Perform ! _env_.InitializeBinding(_in_.[[LocalName]], _namespace_).
+                    1. Perform ! _env_.InitializeBinding(_in_.[[LocalName]], _namespace_).
                   1. Else,
                     1. Perform CreateImportBinding(_env_, _in_.[[LocalName]], _resolution_.[[Module]], _resolution_.[[BindingName]]).
               1. Let _moduleContext_ be a new ECMAScript code execution context.
@@ -49739,8 +49739,8 @@ THH:mm:ss.sss
           </emu-alg>
         </emu-clause>
 
-        <emu-clause id="sec-%iteratorprototype%-%symbol.dispose%">
-          <h1>%IteratorPrototype% [ %Symbol.dispose% ] ( )</h1>
+        <emu-clause id="sec-Iterator.prototype-%symbol.dispose%">
+          <h1>Iterator.prototype [ %Symbol.dispose% ] ( )</h1>
           <p>This function performs the following steps when called:</p>
           <emu-alg>
             1. Let _O_ be the *this* value.
@@ -50025,9 +50025,9 @@ THH:mm:ss.sss
       <h1>Common Resource Management Interfaces</h1>
 
       <emu-clause id="sec-disposable-interface">
-        <h1>The <em>Disposable</em> Interface</h1>
-        <p>The <em>Disposable</em> interface includes the property described in <emu-xref href="#table-disposable-interface-required-properties"></emu-xref>:</p>
-        <emu-table id="table-disposable-interface-required-properties" caption="<em>Disposable</em> Interface Required Properties">
+        <h1>The Disposable Interface</h1>
+        <p>The <dfn variants="Disposable object">Disposable</dfn> interface includes the property described in <emu-xref href="#table-disposable-interface-required-properties"></emu-xref>:</p>
+        <emu-table id="table-disposable-interface-required-properties" caption="Disposable Interface Required Properties">
           <table>
             <tr>
               <th>
@@ -50048,9 +50048,9 @@ THH:mm:ss.sss
                 a function object
               </td>
               <td>
-                <p>Invoking this method notifies the <em>Disposable</em> object that the caller does not intend to continue to use this object. This method should perform any necessary logic to perform explicit clean-up of the resource including, but not limited to, file system handles, streams, host objects, etc. When an exception is thrown from this method, it typically means that the resource could not be explicitly freed.</p>
+                <p>Invoking this method notifies the Disposable object that the caller does not intend to continue to use this object. This method should perform any necessary logic to perform explicit clean-up of the resource including, but not limited to, file system handles, streams, host objects, etc. When an exception is thrown from this method, it typically means that the resource could not be explicitly freed.</p>
                 <p>If called more than once on the same object, the function should not throw an exception. However, this requirement is not enforced.</p>
-                <p>When using a <em>Disposable</em> object, in most circumstances it is good practice to create the instance with a `using` declaration, as the resource will be automatically disposed when the |Block| or |Module| immediately containing the declaration has been evaluated.</p>
+                <p>When using a Disposable object, in most circumstances it is good practice to create the instance with a `using` declaration, as the resource will be automatically disposed when the |Block| or |Module| immediately containing the declaration has been evaluated.</p>
               </td>
             </tr>
           </table>
@@ -50058,9 +50058,9 @@ THH:mm:ss.sss
       </emu-clause>
 
       <emu-clause id="sec-asyncdisposable-interface">
-        <h1>The <em>AsyncDisposable</em> Interface</h1>
-        <p>The <em>AsyncDisposable</em> interface includes the property described in <emu-xref href="#table-asyncdisposable-interface-required-properties"></emu-xref>:</p>
-        <emu-table id="table-asyncdisposable-interface-required-properties" caption="<em>AsyncDisposable</em> Interface Required Properties">
+        <h1>The AsyncDisposable Interface</h1>
+        <p>The <dfn variants="AsyncDisposable object">AsyncDisposable</dfn> interface includes the property described in <emu-xref href="#table-asyncdisposable-interface-required-properties"></emu-xref>:</p>
+        <emu-table id="table-asyncdisposable-interface-required-properties" caption="AsyncDisposable Interface Required Properties">
           <table>
             <tr>
               <th>
@@ -50078,12 +50078,12 @@ THH:mm:ss.sss
                 `%Symbol.asyncDispose%`
               </td>
               <td>
-                A function object that returns a promise
+                a function object that returns a promise
               </td>
               <td>
-                <p>Invoking this method notifies the <em>AsyncDisposable</em> object that the caller does not intend to continue to use this object. This method should perform any necessary logic to perform explicit clean-up of the resource including, but not limited to, file system handles, streams, host objects, etc. When the promise returned by this method is rejected, it typically means that the resource could not be explicitly freed. An <em>AsyncDisposable</em> object is not considered "disposed" until the resulting Promise has been fulfilled.</p>
+                <p>Invoking this method notifies the AsyncDisposable object that the caller does not intend to continue to use this object. This method should perform any necessary logic to perform explicit clean-up of the resource including, but not limited to, file system handles, streams, host objects, etc. When the promise returned by this method is rejected, it typically means that the resource could not be explicitly freed. An AsyncDisposable object is not considered "disposed" until the resulting Promise has been fulfilled.</p>
                 <p>If called more than once on the same object, the function should not throw an exception or return a rejected promise. However, this requirement is not enforced.</p>
-                <p>When using an <em>AsyncDisposable</em> object, in most circumstances it is good practice to create the instance with a `await using` declaration, as the resource will be automatically disposed when the |Block| or |Module| immediately containing the declaration has been evaluated.</p>
+                <p>When using an AsyncDisposable object, in most circumstances it is good practice to create the instance with a `await using` declaration, as the resource will be automatically disposed when the |Block| or |Module| immediately containing the declaration has been evaluated.</p>
               </td>
             </tr>
           </table>
@@ -53692,6 +53692,13 @@ THH:mm:ss.sss
     <emu-prodref name="LeftHandSideExpression"></emu-prodref>
     <emu-prodref name="UpdateExpression"></emu-prodref>
     <emu-prodref name="UnaryExpression"></emu-prodref>
+    <p>
+      When processing an instance of the production<br>
+      <emu-prodref name="UnaryExpression" a="awaitusingcover"></emu-prodref><br>
+      the interpretation of |CoverAwaitExpressionAndAwaitUsingDeclarationHead| is refined using the following grammar:
+    </p>
+    <emu-prodref name="AwaitExpression"></emu-prodref>
+    <p>&nbsp;</p>
     <emu-prodref name="ExponentiationExpression"></emu-prodref>
     <emu-prodref name="MultiplicativeExpression"></emu-prodref>
     <emu-prodref name="MultiplicativeOperator"></emu-prodref>
@@ -53745,7 +53752,7 @@ THH:mm:ss.sss
     <emu-prodref name="UsingDeclaration"></emu-prodref>
     <emu-prodref name="AwaitUsingDeclaration"></emu-prodref>
     <p>
-      In certain circumstances when processing an instance of the production<br>
+      When processing an instance of the production<br>
       <emu-prodref name="AwaitUsingDeclaration"></emu-prodref><br>
       the interpretation of |CoverAwaitExpressionAndAwaitUsingDeclarationHead| is refined using the following grammar:
     </p>
@@ -53844,14 +53851,6 @@ THH:mm:ss.sss
     <emu-prodref name="AsyncFunctionExpression"></emu-prodref>
     <emu-prodref name="AsyncMethod"></emu-prodref>
     <emu-prodref name="AsyncFunctionBody"></emu-prodref>
-    <emu-prodref name="CoverAwaitExpressionAndAwaitUsingDeclarationHead"></emu-prodref>
-    <p>
-      When processing an instance of the production<br>
-      <emu-prodref name="UnaryExpression" a="awaitusingcover"></emu-prodref><br>
-      the interpretation of |CoverAwaitExpressionAndAwaitUsingDeclarationHead| is refined using the following grammar:
-    </p>
-    <emu-prodref name="AwaitExpression"></emu-prodref>
-    <p>&nbsp;</p>
     <emu-prodref name="ClassDeclaration"></emu-prodref>
     <emu-prodref name="ClassExpression"></emu-prodref>
     <emu-prodref name="ClassTail"></emu-prodref>
