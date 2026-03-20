@@ -22904,6 +22904,14 @@
         <emu-alg>
           1. Return ? BindingInitialization of |ForBinding| with arguments _value_ and _environment_.
         </emu-alg>
+        <emu-grammar>
+          ForDeclaration :
+            `using` ForBinding
+            `await` `using` ForBinding
+        </emu-grammar>
+        <emu-alg>
+          1. Throw a *SyntaxError* exception.
+        </emu-alg>
       </emu-clause>
 
       <emu-clause id="sec-runtime-semantics-fordeclarationbindinginstantiation" oldids="sec-runtime-semantics-bindinginstantiation" type="sdo">
