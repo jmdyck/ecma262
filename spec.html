@@ -8073,15 +8073,6 @@
       <emu-alg>
         1. Return *false*.
       </emu-alg>
-      <emu-grammar>
-        ExportDeclaration :
-          `export` ExportFromClause FromClause `;`
-          `export` NamedExports `;`
-          `export` `default` AssignmentExpression `;`
-      </emu-grammar>
-      <emu-alg>
-        1. Return *false*.
-      </emu-alg>
     </emu-clause>
 
     <emu-clause id="sec-static-semantics-isawaitusingdeclaration" type="sdo">
@@ -8136,15 +8127,6 @@
         ClassDeclaration :
           `class` BindingIdentifier ClassTail
           `class` ClassTail
-      </emu-grammar>
-      <emu-alg>
-        1. Return *false*.
-      </emu-alg>
-      <emu-grammar>
-        ExportDeclaration :
-          `export` ExportFromClause FromClause `;`
-          `export` NamedExports `;`
-          `export` `default` AssignmentExpression `;`
       </emu-grammar>
       <emu-alg>
         1. Return *false*.
