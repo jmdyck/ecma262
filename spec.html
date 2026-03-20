@@ -7536,8 +7536,6 @@
           1. Else,
             1. Set _method_ to ? GetDisposeMethod(_V_, _kind_).
             1. If _method_ is *undefined*, throw a *TypeError* exception.
-        1. Else,
-          1. If IsCallable(_method_) is *false*, throw a *TypeError* exception.
         1. Return the DisposableResource Record { [[ResourceValue]]: _V_, [[Kind]]: _kind_, [[DisposeMethod]]: _method_ }.
       </emu-alg>
     </emu-clause>
