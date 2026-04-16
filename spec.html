@@ -23610,8 +23610,7 @@
         1. Perform BlockDeclarationInstantiation(|CaseBlock|, _blockEnv_).
         1. Set the running execution context's LexicalEnvironment to _blockEnv_.
         1. Let _blockResult_ be Completion(CaseBlockEvaluation of |CaseBlock| with argument _switchValue_).
-        1. Set _R_ to Completion(DisposeResources(_blockEnv_.[[DisposeCapability]], _R_)).
-        1. Assert: If _R_.[[Type]] is ~normal~, then _R_.[[Value]] is not ~empty~.
+        1. Assert: _blockEnv_.[[DisposeCapability]] is an empty List.
         1. Set the running execution context's LexicalEnvironment to _oldEnv_.
         1. Return _blockResult_.
       </emu-alg>
