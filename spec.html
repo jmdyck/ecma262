@@ -7521,7 +7521,7 @@
       <h1>
         AddDisposableResource (
           _disposeCapability_: a DisposeCapability Record,
-          _V_: an ECMAScript language value,
+          _value_: an ECMAScript language value,
           _kind_: ~sync-dispose~ or ~async-dispose~,
           optional _method_: a function object,
         ): either a normal completion containing ~unused~ or a throw completion
@@ -7530,11 +7530,11 @@
       </dl>
       <emu-alg>
         1. If _method_ is not present, then
-          1. If _V_ is either *null* or *undefined* and _kind_ is ~sync-dispose~, return ~unused~.
-          1. NOTE: When _V_ is either *null* or *undefined* and _kind_ is ~async-dispose~, we record that the resource was evaluated to ensure we will still perform an Await when resources are later disposed.
-          1. Let _resource_ be ? CreateDisposableResource(_V_, _kind_).
+          1. If _value_ is either *null* or *undefined* and _kind_ is ~sync-dispose~, return ~unused~.
+          1. NOTE: When _value_ is either *null* or *undefined* and _kind_ is ~async-dispose~, we record that the resource was evaluated to ensure we will still perform an Await when resources are later disposed.
+          1. Let _resource_ be ? CreateDisposableResource(_value_, _kind_).
         1. Else,
-          1. Assert: _V_ is *undefined*.
+          1. Assert: _value_ is *undefined*.
           1. Let _resource_ be ? CreateDisposableResource(*undefined*, _kind_, _method_).
         1. Append _resource_ to _disposeCapability_.[[DisposableResourceStack]].
         1. Return ~unused~.
@@ -7544,7 +7544,7 @@
     <emu-clause id="sec-createdisposableresource" type="abstract operation">
       <h1>
         CreateDisposableResource (
-          _V_: an ECMAScript language value,
+          _value_: an ECMAScript language value,
           _kind_: ~sync-dispose~ or ~async-dispose~,
           optional _method_: a function object,
         ): either a normal completion containing a DisposableResource Record or a throw completion
@@ -7553,39 +7553,39 @@
       </dl>
       <emu-alg>
         1. If _method_ is not present, then
-          1. If _V_ is either *null* or *undefined*, then
-            1. Set _V_ to *undefined*.
+          1. If _value_ is either *null* or *undefined*, then
+            1. Set _value_ to *undefined*.
             1. Set _method_ to *undefined*.
           1. Else,
-            1. Set _method_ to ? GetDisposeMethod(_V_, _kind_).
+            1. Set _method_ to ? GetDisposeMethod(_value_, _kind_).
             1. If _method_ is *undefined*, throw a *TypeError* exception.
-        1. Return the DisposableResource Record { [[ResourceValue]]: _V_, [[Kind]]: _kind_, [[DisposeMethod]]: _method_ }.
+        1. Return the DisposableResource Record { [[ResourceValue]]: _value_, [[Kind]]: _kind_, [[DisposeMethod]]: _method_ }.
       </emu-alg>
     </emu-clause>
 
     <emu-clause id="sec-getdisposemethod" type="abstract operation">
       <h1>
         GetDisposeMethod (
-          _V_: an ECMAScript language value,
+          _value_: an ECMAScript language value,
           _kind_: ~sync-dispose~ or ~async-dispose~,
         ): either a normal completion containing either a function object or *undefined*, or a throw completion
       </h1>
       <dl class="header">
       </dl>
       <emu-alg>
-        1. If _V_ is not an Object, throw a *TypeError* exception.
-        1. If _kind_ is ~sync-dispose~, return ? GetMethod(_V_, %Symbol.dispose%).
+        1. If _value_ is not an Object, throw a *TypeError* exception.
+        1. If _kind_ is ~sync-dispose~, return ? GetMethod(_value_, %Symbol.dispose%).
         1. Assert: _kind_ is ~async-dispose~.
-        1. Let _asyncMethod_ be ? GetMethod(_V_, %Symbol.asyncDispose%).
+        1. Let _asyncMethod_ be ? GetMethod(_value_, %Symbol.asyncDispose%).
         1. If _asyncMethod_ is not *undefined*, return _asyncMethod_.
-        1. Let _syncMethod_ be ? GetMethod(_V_, %Symbol.dispose%).
+        1. Let _syncMethod_ be ? GetMethod(_value_, %Symbol.dispose%).
         1. If _syncMethod_ is *undefined*, return *undefined*.
         1. Let _closure_ be a new Abstract Closure with no parameters that captures _syncMethod_ and performs the following steps when called:
-          1. Let _O_ be the *this* value.
+          1. Let _obj_ be the *this* value.
           1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
-          1. Let _result_ be Completion(Call(_syncMethod_, _O_)).
+          1. Let _result_ be Completion(Call(_syncMethod_, _obj_)).
           1. IfAbruptRejectPromise(_result_, _promiseCapability_).
-          1. Perform ? Call(_promiseCapability_.[[Resolve]], *undefined*, « *undefined* »).
+          1. Perform ! Call(_promiseCapability_.[[Resolve]], *undefined*, « *undefined* »).
           1. Return _promiseCapability_.[[Promise]].
         1. NOTE: This function is not observable to user code. It is used to ensure that a Promise returned from a synchronous `%Symbol.dispose%` method will not be awaited and that a synchronous exception will be translated to a rejected Promise.
         1. Return CreateBuiltinFunction(_closure_, 0, *""*, « »).
@@ -7595,7 +7595,7 @@
     <emu-clause id="sec-dispose" type="abstract operation">
       <h1>
         Dispose (
-          _V_: an Object or *undefined*,
+          _value_: an Object or *undefined*,
           _kind_: ~sync-dispose~ or ~async-dispose~,
           _method_: a function object or *undefined*,
         ): either a normal completion containing *undefined* or a throw completion
@@ -7604,7 +7604,7 @@
       </dl>
       <emu-alg>
         1. If _method_ is *undefined*, let _result_ be *undefined*.
-        1. Else, let _result_ be ? Call(_method_, _V_).
+        1. Else, let _result_ be ? Call(_method_, _value_).
         1. If _kind_ is ~async-dispose~, then
           1. Perform ? Await(_result_).
         1. Return *undefined*.
@@ -32804,13 +32804,13 @@
           <p>This function performs the following steps when called:</p>
           <emu-alg>
             1. If NewTarget is *undefined*, let _newTarget_ be the active function object; else let _newTarget_ be NewTarget.
-            1. Let _O_ be ? OrdinaryCreateFromConstructor(_newTarget_, *"%SuppressedError.prototype%"*, « [[ErrorData]] »).
+            1. Let _obj_ be ? OrdinaryCreateFromConstructor(_newTarget_, *"%SuppressedError.prototype%"*, « [[ErrorData]] »).
             1. If _message_ is not *undefined*, then
               1. Let _messageString_ be ? ToString(_message_).
-              1. Perform CreateNonEnumerableDataPropertyOrThrow(_O_, *"message"*, _messageString_).
-            1. Perform CreateNonEnumerableDataPropertyOrThrow(_O_, *"error"*, _error_).
-            1. Perform CreateNonEnumerableDataPropertyOrThrow(_O_, *"suppressed"*, _suppressed_).
-            1. Return _O_.
+              1. Perform CreateNonEnumerableDataPropertyOrThrow(_obj_, *"message"*, _messageString_).
+            1. Perform CreateNonEnumerableDataPropertyOrThrow(_obj_, *"error"*, _error_).
+            1. Perform CreateNonEnumerableDataPropertyOrThrow(_obj_, *"suppressed"*, _suppressed_).
+            1. Return _obj_.
           </emu-alg>
         </emu-clause>
       </emu-clause>
@@ -49702,10 +49702,10 @@ THH:mm:ss.sss
           <h1>Iterator.prototype [ %Symbol.dispose% ] ( )</h1>
           <p>This function performs the following steps when called:</p>
           <emu-alg>
-            1. Let _O_ be the *this* value.
-            1. Let _return_ be ? GetMethod(_O_, *"return"*).
+            1. Let _obj_ be the *this* value.
+            1. Let _return_ be ? GetMethod(_obj_, *"return"*).
             1. If _return_ is not *undefined*, then
-              1. Perform ? Call(_return_, _O_, « »).
+              1. Perform ? Call(_return_, _obj_).
             1. Return *undefined*.
           </emu-alg>
           <p>The value of the *"name"* property of this function is *"[Symbol.dispose]"*.</p>
@@ -49763,14 +49763,14 @@ THH:mm:ss.sss
         <h1>%AsyncIteratorPrototype% [ %Symbol.asyncDispose% ] ( )</h1>
         <p>This function performs the following steps when called:</p>
         <emu-alg>
-          1. Let _O_ be the *this* value.
+          1. Let _obj_ be the *this* value.
           1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
-          1. Let _return_ be Completion(GetMethod(_O_, *"return"*)).
+          1. Let _return_ be Completion(GetMethod(_obj_, *"return"*)).
           1. IfAbruptRejectPromise(_return_, _promiseCapability_).
           1. If _return_ is *undefined*, then
             1. Perform ! Call(_promiseCapability_.[[Resolve]], *undefined*, « *undefined* »).
           1. Else,
-            1. Let _result_ be Completion(Call(_return_, _O_, « *undefined* »)).
+            1. Let _result_ be Completion(Call(_return_, _obj_, « *undefined* »)).
             1. IfAbruptRejectPromise(_result_, _promiseCapability_).
             1. Let _resultWrapper_ be Completion(PromiseResolve(%Promise%, _result_)).
             1. IfAbruptRejectPromise(_resultWrapper_, _promiseCapability_).
