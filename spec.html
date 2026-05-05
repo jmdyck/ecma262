@@ -10526,7 +10526,7 @@
             1. If _binding_.[[BoundValue]] is ~uninitialized~, then
               1. Throw a *ReferenceError* exception.
             1. Else if _binding_.[[IsMutable]] is *true*, then
-              1. Change its bound value to _value_.
+              1. Set _binding_.[[BoundValue]] to _value_.
             1. Else,
               1. Assert: This is an attempt to change the value of an immutable binding.
               1. If _strict_ is *true*, throw a *TypeError* exception.
